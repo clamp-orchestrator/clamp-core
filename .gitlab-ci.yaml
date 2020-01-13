@@ -1,0 +1,23 @@
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  image: golang:1.13.5
+  script:
+    - go test ./...
+  only:
+    - merge_requests
+    - master
+
+build:
+  stage: build
+  image: golang:1.13.5
+  script:
+    - go build
+  artifacts:
+    paths:
+      - ./clam-core
+  only:
+    - master
