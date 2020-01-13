@@ -8,18 +8,17 @@ import (
 )
 
 func TestShouldCreateANewServiceRequestWithUUID(t *testing.T) {
-	expectedLen := 36
+	expectedLen := 16
 	servRequest := Create("CreateOrder")
-	strUUID := servRequest.ID.String()
 
-	assert.Equal(t, expectedLen, len(strUUID), fmt.Sprintf("The UUID %s should be %d chars long", strUUID, expectedLen))
+	assert.Equal(t, expectedLen, len(servRequest.ID), fmt.Sprintf("The UUID %s should be %d chars long", servRequest.ID.String(), expectedLen))
 }
 
 func TestShouldCreateANewServiceRequestWithWorkflowName(t *testing.T) {
 	expectedWorkflowName := "CreateOrder"
 	servRequest := Create(expectedWorkflowName)
 
-	assert.Equal(t, expectedWorkflowName, servRequest.workflowName, fmt.Sprintf("Expected worflow name to be %s but was %s", expectedWorkflowName, servRequest.workflowName))
+	assert.Equal(t, expectedWorkflowName, servRequest.WorkflowName, fmt.Sprintf("Expected worflow name to be %s but was %s", expectedWorkflowName, servRequest.WorkflowName))
 }
 
 func TestThatGeneratedUUIDForServiceRequestAreDifferent(t *testing.T) {

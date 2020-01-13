@@ -2,26 +2,29 @@ package handler
 
 import (
 	"clamp-core/servicerequest"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")
-		servicerequest.Create(workflowName)
+		serviceReq := servicerequest.Create(workflowName)
 
-		c.JSON(http.StatusOK, gin.H{
-			"message": "ok!",
-		})
+		//TODO - handle error scenario. Currently it is always 200 ok
+		c.JSON(http.StatusOK, serviceReq)
 	}
+}
+
+func setupRouter() *gin.Engine {
+	r := gin.Default()
+	r.POST("/serviceRequest/:workflow", createServiceRequestHandler())
+	return r
 }
 
 //LoadHTTPRoutes loads all HTTP api routes
 func LoadHTTPRoutes() {
-	r := gin.Default()
-
-	r.POST("/serviceRequest/:workflow", createServiceRequestHandler())
-
+	r := setupRouter()
 	r.Run()
 }
