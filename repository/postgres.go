@@ -1,0 +1,48 @@
+package repository
+
+import (
+	"clamp-core/servicerequest"
+	"fmt"
+
+	pg "github.com/go-pg/pg/v9/"
+	"github.com/google/uuid"
+)
+
+type pgServiceRequest struct {
+	tableName    struct{} `pg:"service_requests"`
+	ID           uuid.UUID
+	WorkflowName string
+}
+
+func from(serviceReq servicerequest.ServiceRequest) pgServiceRequest {
+	return pgServiceRequest{
+		ID:           serviceReq.ID,
+		WorkflowName: serviceReq.WorkflowName,
+	}
+}
+
+func (pgServReq pgServiceRequest) to() servicerequest.ServiceRequest {
+	return servicerequest.ServiceRequest{
+		ID:           pgServReq.ID,
+		WorkflowName: pgServReq.WorkflowName,
+	}
+}
+
+//FindByID is
+func FindByID(serviceReq servicerequest.ServiceRequest) {
+	db := pg.Connect(&pg.Options{
+		User:     "clamp",
+		Password: "clamppass",
+		Database: "clampdev",
+	})
+	defer db.Close()
+
+	pgServReq := from(serviceReq)
+	err := db.Select(&pgServReq)
+
+	fmt.Println(pgServReq)
+
+	if err != nil {
+		panic(err)
+	}
+}
