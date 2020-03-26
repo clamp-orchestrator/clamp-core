@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"clamp-core/servicerequest"
+	"clamp-core/domain"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -19,7 +19,7 @@ func TestCreateNewServiceRequestRoute(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
-	var jsonResp servicerequest.ServiceRequest
+	var jsonResp domain.ServiceRequest
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
