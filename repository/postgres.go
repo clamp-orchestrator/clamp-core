@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"clamp-core/servicerequest"
+	"clamp-core/domain"
 	"fmt"
 
 	pg "github.com/go-pg/pg/v9"
@@ -15,7 +15,7 @@ type pgServiceRequest struct {
 	Status       servicerequest.Status
 }
 
-func from(serviceReq servicerequest.ServiceRequest) pgServiceRequest {
+func from(serviceReq domain.ServiceRequest) pgServiceRequest {
 	return pgServiceRequest{
 		ID:           serviceReq.ID,
 		WorkflowName: serviceReq.WorkflowName,
@@ -23,8 +23,8 @@ func from(serviceReq servicerequest.ServiceRequest) pgServiceRequest {
 	}
 }
 
-func (pgServReq pgServiceRequest) to() servicerequest.ServiceRequest {
-	return servicerequest.ServiceRequest{
+func (pgServReq pgServiceRequest) to() domain.ServiceRequest {
+	return domain.ServiceRequest{
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,
 		Status:       pgServReq.Status,
@@ -32,7 +32,7 @@ func (pgServReq pgServiceRequest) to() servicerequest.ServiceRequest {
 }
 
 //FindByID is
-func FindByID(serviceReq servicerequest.ServiceRequest) {
+func FindByID(serviceReq domain.ServiceRequest) {
 	db := pg.Connect(&pg.Options{
 		User:     "clamp",
 		Password: "clamppass",
