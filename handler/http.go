@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"clamp-core/repository"
 	"clamp-core/servicerequest"
 	"net/http"
 
@@ -11,7 +12,7 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")
 		serviceReq := servicerequest.Create(workflowName)
-
+		repository.SaveServiceRequest(serviceReq)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceReq)
 	}

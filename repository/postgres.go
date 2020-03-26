@@ -4,7 +4,7 @@ import (
 	"clamp-core/servicerequest"
 	"fmt"
 
-	pg "github.com/go-pg/pg/v9/"
+	pg "github.com/go-pg/pg/v9"
 	"github.com/google/uuid"
 )
 
@@ -12,12 +12,14 @@ type pgServiceRequest struct {
 	tableName    struct{} `pg:"service_requests"`
 	ID           uuid.UUID
 	WorkflowName string
+	Status       servicerequest.Status
 }
 
 func from(serviceReq servicerequest.ServiceRequest) pgServiceRequest {
 	return pgServiceRequest{
 		ID:           serviceReq.ID,
 		WorkflowName: serviceReq.WorkflowName,
+		Status:       serviceReq.Status,
 	}
 }
 
@@ -25,6 +27,7 @@ func (pgServReq pgServiceRequest) to() servicerequest.ServiceRequest {
 	return servicerequest.ServiceRequest{
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,
+		Status:       pgServReq.Status,
 	}
 }
 
@@ -45,4 +48,23 @@ func FindByID(serviceReq servicerequest.ServiceRequest) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func SaveServiceRequest(serviceReq servicerequest.ServiceRequest) servicerequest.ServiceRequest {
+	db := pg.Connect(&pg.Options{
+		User:     "clamp",
+		Password: "clamppass",
+		Database: "clampdev",
+	})
+	defer db.Close()
+
+	pgServReq := from(serviceReq)
+	err := db.Insert(&pgServReq)
+
+	fmt.Println(pgServReq)
+
+	if err != nil {
+		panic(err)
+	}
+	return serviceReq
 }
