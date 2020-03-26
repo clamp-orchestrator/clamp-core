@@ -9,7 +9,7 @@ type ServiceFlow struct {
 	FlowMode string `json:"flowMode"`
 	Id string `json:"id"`
 	Name string `json:"name"`
-	Enabled string `json:"enabled"`
+	Enabled bool `json:"enabled"`
 	Steps Steps `json:"steps"`
 }
 
