@@ -2,6 +2,7 @@ package handler
 
 import (
 	"clamp-core/domain"
+	"clamp-core/repository"
 	"encoding/json"
 
 	//"encoding/json"
@@ -15,7 +16,7 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")
 		serviceReq := domain.Create(workflowName)
-
+		repository.SaveServiceRequest(serviceReq)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceReq)
 	}

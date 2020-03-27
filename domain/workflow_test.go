@@ -22,7 +22,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		Id:          "1",
 		Name:        "Test",
 		Enabled:     true,
-		Steps:       Steps{
+		Steps: Steps{
 			Step: steps,
 		},
 	}

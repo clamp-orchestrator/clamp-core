@@ -28,3 +28,9 @@ func TestThatGeneratedUUIDForServiceRequestAreDifferent(t *testing.T) {
 
 	assert.NotEqual(t, servRequestOne, servRequestTwo, fmt.Sprintf("Expected service request UUIDs to be different but were %s and %s", servRequestOne.ID, servRequestTwo.ID))
 }
+
+func TestShouldCreateANewServiceRequestWithDefaultStatus9(t *testing.T) {
+	servRequest := Create("CreateOrder")
+	expectedStatus := STATUS_NEW
+	assert.Equal(t, expectedStatus, servRequest.Status, fmt.Sprintf("Expected service request status to be equal but were %s and %s", expectedStatus, servRequest.Status))
+}
