@@ -12,7 +12,7 @@ type pgServiceRequest struct {
 	tableName    struct{} `pg:"service_requests"`
 	ID           uuid.UUID
 	WorkflowName string
-	Status       servicerequest.Status
+	Status       domain.Status
 }
 
 func from(serviceReq domain.ServiceRequest) pgServiceRequest {
@@ -50,7 +50,7 @@ func FindByID(serviceReq domain.ServiceRequest) {
 	}
 }
 
-func SaveServiceRequest(serviceReq servicerequest.ServiceRequest) servicerequest.ServiceRequest {
+func SaveServiceRequest(serviceReq domain.ServiceRequest) domain.ServiceRequest {
 	db := pg.Connect(&pg.Options{
 		User:     "clamp",
 		Password: "clamppass",
