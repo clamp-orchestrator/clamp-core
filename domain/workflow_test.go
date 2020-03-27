@@ -16,7 +16,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		Enabled: true,
 	}
 
-	serviceFlowRequest := ServiceFlow{
+	serviceFlow := ServiceFlow{
 		Description: "Test",
 		FlowMode:    "None",
 		Id:          "1",
@@ -27,9 +27,10 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		},
 	}
 
+	serviceFlowRequest := Request{ServiceFlow:serviceFlow}
 	workflowResponse := CreateWorkflow(serviceFlowRequest)
 
-	assert.Equal(t, serviceFlowRequest.Description, workflowResponse.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.Description, workflowResponse.Description))
-	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
-	assert.Equal(t, serviceFlowRequest.Steps.Step[0].Name, workflowResponse.Steps.Step[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps.Step[0].Name, workflowResponse.Steps.Step[0].Name))
+	assert.Equal(t, serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description))
+	assert.Equal(t, serviceFlowRequest.ServiceFlow.Name, workflowResponse.ServiceFlow.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.ServiceFlow.Name, workflowResponse.ServiceFlow.Name))
+	assert.Equal(t, serviceFlowRequest.ServiceFlow.Steps.Step[0].Name, workflowResponse.ServiceFlow.Steps.Step[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.ServiceFlow.Steps.Step[0].Name, workflowResponse.ServiceFlow.Steps.Step[0].Name))
 }

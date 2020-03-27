@@ -24,10 +24,10 @@ type Step struct {
 }
 
 //Create a new work flow for a given service flow and return service flow details
-func CreateWorkflow(serviceFlow ServiceFlow) ServiceFlow {
-	return newServiceFlow(serviceFlow)
+func CreateWorkflow(serviceFlowRequest Request) Request {
+	return newServiceFlow(serviceFlowRequest)
 }
 
-func newServiceFlow(serviceFlow ServiceFlow) ServiceFlow {
-	return ServiceFlow{Description: serviceFlow.Description, FlowMode: serviceFlow.FlowMode, Id:serviceFlow.Id , Name: serviceFlow.Name, Enabled: serviceFlow.Enabled, Steps: serviceFlow.Steps}
+func newServiceFlow(serviceFlow Request) Request {
+	return Request{ServiceFlow:serviceFlow.ServiceFlow}
 }

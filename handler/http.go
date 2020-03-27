@@ -29,7 +29,7 @@ func createWorkflowRequestHandler() gin.HandlerFunc {
 		json.Unmarshal([]byte(requestBody), &request)
 		fmt.Printf("Operation: %v \n", request.ServiceFlow)
 
-		serviceFlowRes := domain.CreateWorkflow(request.ServiceFlow)
+		serviceFlowRes := domain.CreateWorkflow(request)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}
