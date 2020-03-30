@@ -15,7 +15,7 @@ func createWorkflowHandler() gin.HandlerFunc {
 		// Create new Service Workflow
 		request := models.Workflow{}
 		json.Unmarshal([]byte(requestBody), &request)
-		fmt.Printf("Operation: %v \n", request.ServiceFlow)
+		fmt.Printf("Workflow request : %v \n", request.ServiceFlow)
 
 		serviceFlowRes := models.CreateWorkflow(request)
 		services.SaveServiceFlow(serviceFlowRes)
