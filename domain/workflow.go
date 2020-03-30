@@ -1,7 +1,12 @@
 package domain
 
+import (
+	"github.com/google/uuid"
+)
+
 //Workflow is a structure to store the service request details
-type Request struct {
+type Workflow struct {
+	ID           uuid.UUID
 	ServiceFlow ServiceFlow
 }
 type ServiceFlow struct {
@@ -24,11 +29,11 @@ type Step struct {
 }
 
 //Create a new work flow for a given service flow and return service flow details
-func CreateWorkflow(serviceFlowRequest Request) Request {
+func CreateWorkflow(serviceFlowRequest Workflow) Workflow {
 	return newServiceFlow(serviceFlowRequest)
 }
 
 
-func newServiceFlow(serviceFlow Request) Request {
-	return Request{ServiceFlow:serviceFlow.ServiceFlow}
+func newServiceFlow(workflow Workflow) Workflow {
+	return Workflow{ServiceFlow: workflow.ServiceFlow}
 }

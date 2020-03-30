@@ -25,12 +25,13 @@ func createServiceRequestHandler() gin.HandlerFunc {
 func createWorkflowRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestBody, _ := c.GetRawData()
-		// Create new Service Request
-		request := domain.Request{}
+		// Create new Service Workflow
+		request := domain.Workflow{}
 		json.Unmarshal([]byte(requestBody), &request)
 		fmt.Printf("Operation: %v \n", request.ServiceFlow)
 
 		serviceFlowRes := domain.CreateWorkflow(request)
+		repository.SaveServiceFlow(serviceFlowRes)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}

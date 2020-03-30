@@ -27,7 +27,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		},
 	}
 
-	serviceFlowRequest := Request{ServiceFlow:serviceFlow}
+	serviceFlowRequest := Workflow{ServiceFlow: serviceFlow}
 	workflowResponse := CreateWorkflow(serviceFlowRequest)
 
 	assert.Equal(t, serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description))
