@@ -1,4 +1,4 @@
-package domain
+package models
 
 import (
 	"github.com/google/uuid"
@@ -6,7 +6,7 @@ import (
 
 //Workflow is a structure to store the service request details
 type Workflow struct {
-	ID           uuid.UUID
+	ID          uuid.UUID
 	ServiceFlow ServiceFlow
 }
 type ServiceFlow struct {
@@ -32,7 +32,6 @@ type Step struct {
 func CreateWorkflow(serviceFlowRequest Workflow) Workflow {
 	return newServiceFlow(serviceFlowRequest)
 }
-
 
 func newServiceFlow(workflow Workflow) Workflow {
 	return Workflow{ServiceFlow: workflow.ServiceFlow}

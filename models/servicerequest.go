@@ -1,4 +1,4 @@
-package domain
+package models
 
 import (
 	"github.com/google/uuid"
@@ -20,11 +20,6 @@ const (
 	STATUS_FAILED    Status = "FAILED"
 )
 
-//Create a new service request for a given flow name and return service request details
-func Create(workflowName string) ServiceRequest {
-	return newServiceRequest(workflowName)
-}
-
-func newServiceRequest(workflowName string) ServiceRequest {
+func NewServiceRequest(workflowName string) ServiceRequest {
 	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW}
 }
