@@ -2,15 +2,13 @@ package services
 
 import (
 	"clamp-core/models"
-	"clamp-core/repository"
 	"fmt"
 )
 
 func SaveServiceFlow(serviceFlowReg models.Workflow) models.Workflow {
-	db := repository.GetDB()
 
 	pgServReq := serviceFlowReg.ToPGWorkflow()
-	err := db.Insert(&pgServReq)
+	err := repo.insertQuery(&pgServReq)
 
 	fmt.Println(pgServReq)
 
