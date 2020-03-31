@@ -27,9 +27,11 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		},
 	}
 
-	serviceFlowRequest := Workflow{ServiceFlow: serviceFlow}
+	//serviceFlowRequest := Workflow{ID: uuid.New(), ServiceFlow: serviceFlow}
+	serviceFlowRequest := Workflow{ ServiceFlow: serviceFlow}
 	workflowResponse := CreateWorkflow(serviceFlowRequest)
 
+	assert.NotEmpty(t, workflowResponse.ID)
 	assert.Equal(t, serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description))
 	assert.Equal(t, serviceFlowRequest.ServiceFlow.Name, workflowResponse.ServiceFlow.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.ServiceFlow.Name, workflowResponse.ServiceFlow.Name))
 	assert.Equal(t, serviceFlowRequest.ServiceFlow.Steps.Step[0].Name, workflowResponse.ServiceFlow.Steps.Step[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.ServiceFlow.Steps.Step[0].Name, workflowResponse.ServiceFlow.Steps.Step[0].Name))
