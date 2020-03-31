@@ -9,7 +9,7 @@ import (
 
 //Workflow is a structure to store the service request details
 type Workflow struct {
-	ID          uuid.UUID
+	ID          uuid.UUID `json:"id"`
 	ServiceFlow ServiceFlow
 }
 type ServiceFlow struct {
@@ -37,17 +37,18 @@ func CreateWorkflow(serviceFlowRequest Workflow) Workflow {
 }
 
 func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{ServiceFlow: workflow.ServiceFlow}
+	return Workflow{ID: uuid.New(), ServiceFlow: workflow.ServiceFlow}
 }
 
 type PGWorkflow struct {
 	tableName   struct{} `pg:"workflows"`
 	ServiceFlow ServiceFlow
+	ID           uuid.UUID
 }
 
 func (serviceFlow Workflow) ToPGWorkflow() PGWorkflow {
 	return PGWorkflow{
-		//ID:           serviceFlow.ID,
+		ID:           serviceFlow.ID,
 		ServiceFlow: serviceFlow.ServiceFlow,
 	}
 }
