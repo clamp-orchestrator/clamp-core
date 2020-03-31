@@ -5,8 +5,7 @@ import (
 	"fmt"
 )
 
-func SaveServiceFlow(serviceFlowReg models.Workflow) models.Workflow {
-
+func SaveServiceFlow(serviceFlowReg models.Workflow) (models.Workflow, error) {
 	pgServReq := serviceFlowReg.ToPGWorkflow()
 	err := repo.insertQuery(&pgServReq)
 
@@ -15,5 +14,5 @@ func SaveServiceFlow(serviceFlowReg models.Workflow) models.Workflow {
 	if err != nil {
 		panic(err)
 	}
-	return serviceFlowReg
+	return serviceFlowReg, err
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,8 +28,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		},
 	}
 
-	//serviceFlowRequest := Workflow{ID: uuid.New(), ServiceFlow: serviceFlow}
-	serviceFlowRequest := Workflow{ ServiceFlow: serviceFlow}
+	serviceFlowRequest := Workflow{ID: uuid.New(), ServiceFlow: serviceFlow}
 	workflowResponse := CreateWorkflow(serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)

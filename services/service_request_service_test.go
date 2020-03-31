@@ -11,14 +11,14 @@ import (
 var insertQueryMock func(model interface{}) error
 var selectQueryMock func(model interface{}) error
 
-type mockServiceRequestRepoImpl struct {
+type mockGenericRepoImpl struct {
 }
 
-func (s mockServiceRequestRepoImpl) insertQuery(model interface{}) error {
+func (s mockGenericRepoImpl) insertQuery(model interface{}) error {
 	return insertQueryMock(model)
 }
 
-func (s mockServiceRequestRepoImpl) selectQuery(model interface{}) error {
+func (s mockGenericRepoImpl) selectQuery(model interface{}) error {
 	return selectQueryMock(model)
 }
 
@@ -28,7 +28,7 @@ func TestSaveServiceRequest(t *testing.T) {
 		WorkflowName: "TESTING",
 		Status:       models.STATUS_NEW,
 	}
-	repo = mockServiceRequestRepoImpl{}
+	repo = mockGenericRepoImpl{}
 
 	insertQueryMock = func(model interface{}) error {
 		return nil
@@ -52,7 +52,7 @@ func TestFindByID(t *testing.T) {
 	serviceReq := models.ServiceRequest{
 		ID: uuid.UUID{},
 	}
-	repo = mockServiceRequestRepoImpl{}
+	repo = mockGenericRepoImpl{}
 
 	selectQueryMock = func(model interface{}) error {
 		serviceReq.WorkflowName = "TEST_WF"
