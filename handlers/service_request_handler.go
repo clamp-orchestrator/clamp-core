@@ -11,7 +11,8 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")
 		serviceReq := NewServiceRequest(workflowName)
-		services.SaveServiceRequest(serviceReq)
+		serviceReq, _ = services.SaveServiceRequest(serviceReq)
+		services.AddServiceRequestToChannel(serviceReq)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceReq)
 	}
