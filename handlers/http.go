@@ -8,6 +8,7 @@ func setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.POST("/serviceRequest/:workflow", createServiceRequestHandler())
 	r.POST("/workflow", createWorkflowHandler())
+	r.GET("/workflow/:workflow", fetchWorkflowBasedOnWorkflowName())
 	return r
 }
 

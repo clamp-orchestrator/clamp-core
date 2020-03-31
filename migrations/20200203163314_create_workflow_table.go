@@ -7,7 +7,7 @@ import (
 
 func init() {
 	up := func(db orm.DB) error {
-		_, err := db.Exec("CREATE TABLE WORKFLOWS ( ID uuid, SERVICE_FLOW JSONB, PRIMARY KEY(ID));")
+		_, err := db.Exec("CREATE TABLE WORKFLOWS ( ID uuid, SERVICE_FLOW JSONB, NAME VARCHAR NOT NULL, PRIMARY KEY(NAME));")
 		return err
 	}
 

@@ -11,6 +11,7 @@ import (
 type Workflow struct {
 	ID          uuid.UUID `json:"id"`
 	ServiceFlow ServiceFlow
+	Name string `json:"name"`
 }
 type ServiceFlow struct {
 	Description string `json:"description"`
@@ -37,19 +38,21 @@ func CreateWorkflow(serviceFlowRequest Workflow) Workflow {
 }
 
 func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{ID: uuid.New(), ServiceFlow: workflow.ServiceFlow}
+	return Workflow{ID: uuid.New(), ServiceFlow: workflow.ServiceFlow, Name:workflow.ServiceFlow.Name}
 }
 
 type PGWorkflow struct {
 	tableName   struct{} `pg:"workflows"`
 	ServiceFlow ServiceFlow
-	ID           uuid.UUID
+	ID          uuid.UUID
+	Name 		string
 }
 
 func (serviceFlow Workflow) ToPGWorkflow() PGWorkflow {
 	return PGWorkflow{
 		ID:           serviceFlow.ID,
 		ServiceFlow: serviceFlow.ServiceFlow,
+		Name: serviceFlow.ServiceFlow.Name,
 	}
 }
 

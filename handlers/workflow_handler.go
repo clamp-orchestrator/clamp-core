@@ -23,3 +23,12 @@ func createWorkflowHandler() gin.HandlerFunc {
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}
 }
+
+func fetchWorkflowBasedOnWorkflowName() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		workflowName := c.Param("workflow")
+		services.FindWorkflowByName(workflowName)
+		//TODO - handle error scenario. Currently it is always 200 ok
+		c.JSON(http.StatusOK, "")
+	}
+}

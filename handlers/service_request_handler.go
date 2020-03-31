@@ -10,6 +10,8 @@ import (
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")
+		//services.FindWorkflowByName(workflowName)
+		// Create new service request
 		serviceReq := NewServiceRequest(workflowName)
 		serviceReq, _ = services.SaveServiceRequest(serviceReq)
 		services.AddServiceRequestToChannel(serviceReq)
