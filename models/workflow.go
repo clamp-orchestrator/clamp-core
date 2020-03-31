@@ -1,6 +1,9 @@
 package models
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 	"github.com/google/uuid"
 )
 
@@ -35,4 +38,33 @@ func CreateWorkflow(serviceFlowRequest Workflow) Workflow {
 
 func newServiceFlow(workflow Workflow) Workflow {
 	return Workflow{ServiceFlow: workflow.ServiceFlow}
+}
+
+type PGWorkflow struct {
+	tableName   struct{} `pg:"workflows"`
+	ServiceFlow ServiceFlow
+}
+
+func (serviceFlow Workflow) ToPGWorkflow() PGWorkflow {
+	return PGWorkflow{
+		//ID:           serviceFlow.ID,
+		ServiceFlow: serviceFlow.ServiceFlow,
+	}
+}
+
+// Make the Attrs struct implement the driver.Valuer interface. This method
+// simply returns the JSON-encoded representation of the struct.
+func (workflow PGWorkflow) Value() (driver.Value, error) {
+	return json.Marshal(workflow)
+}
+
+// Make the Attrs struct implement the sql.Scanner interface. This method
+// simply decodes a JSON-encoded value into the struct fields.
+func (workflow *PGWorkflow) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
+
+	return json.Unmarshal(b, &workflow)
 }
