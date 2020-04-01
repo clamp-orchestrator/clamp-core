@@ -23,10 +23,6 @@ func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
 func FindWorkflowByName(workflowName string) (*models.Workflow, error) {
 	workflowReq := models.Workflow{Name: workflowName}
 	fmt.Println("Workflow request is -- ", workflowReq)
-	pgWorkflowReq := workflowReq.ToPGWorkflow()
-	fmt.Println("Request is -- ", pgWorkflowReq)
-	//query := "select id, name from workflows where name = ?"
-	//res, err := repo.query(query, workflowName)
 	workflow := new(models.Workflow)
 	err := repo.whereQuery(workflow, "workflow.name = ?", workflowName)
 	if err != nil {

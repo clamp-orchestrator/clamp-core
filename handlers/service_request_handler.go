@@ -4,6 +4,7 @@ import (
 	. "clamp-core/models"
 	"clamp-core/services"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
 )
@@ -23,5 +24,16 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		services.AddServiceRequestToChannel(serviceReq)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceReq)
+	}
+}
+
+func getServiceRequestStatusHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		serviceRequestId := c.Param("serviceRequestId")
+
+		var serviceRequestRes *ServiceRequest
+		serviceRequestRes, _ = services.FindServiceRequestByID(uuid.MustParse(serviceRequestId))
+		//TODO - handle error scenario. Currently it is always 200 ok
+		c.JSON(http.StatusOK, serviceRequestRes)
 	}
 }
