@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,23 +15,21 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		Name:    "firstStep",
 		Enabled: true,
 	}
-
-	serviceFlow := ServiceFlow{
-		Description: "Test",
-		FlowMode:    "None",
+	workflow := Workflow{
 		Id:          "1",
 		Name:        "Test",
-		Enabled:     true,
-		Steps: Steps{
-			Step: steps,
+		Description: "Test",
+		Enabled:     false,
+		Steps:       Steps{
+			Step:steps,
 		},
 	}
 
-	serviceFlowRequest := Workflow{ID: uuid.New(), ServiceFlow: serviceFlow}
+	serviceFlowRequest := workflow
 	workflowResponse := CreateWorkflow(serviceFlowRequest)
 
-	assert.NotEmpty(t, workflowResponse.ID)
-	assert.Equal(t, serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.ServiceFlow.Description, workflowResponse.ServiceFlow.Description))
-	assert.Equal(t, serviceFlowRequest.ServiceFlow.Name, workflowResponse.ServiceFlow.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.ServiceFlow.Name, workflowResponse.ServiceFlow.Name))
-	assert.Equal(t, serviceFlowRequest.ServiceFlow.Steps.Step[0].Name, workflowResponse.ServiceFlow.Steps.Step[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.ServiceFlow.Steps.Step[0].Name, workflowResponse.ServiceFlow.Steps.Step[0].Name))
+	assert.NotEmpty(t, workflowResponse.Id)
+	assert.Equal(t, serviceFlowRequest.Description, workflowResponse.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.Description, workflowResponse.Description))
+	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
+	assert.Equal(t, serviceFlowRequest.Steps.Step[0].Name, workflowResponse.Steps.Step[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps.Step[0].Name, workflowResponse.Steps.Step[0].Name))
 }

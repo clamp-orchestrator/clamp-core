@@ -4,20 +4,13 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-	"github.com/google/uuid"
 )
 
 //Workflow is a structure to store the service request details
 type Workflow struct {
-	ID          uuid.UUID `json:"id"`
-	ServiceFlow ServiceFlow
-	Name string `json:"name"`
-}
-type ServiceFlow struct {
-	Description string `json:"description"`
-	FlowMode    string `json:"flowMode"`
 	Id          string `json:"id"`
 	Name        string `json:"name"`
+	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
 	Steps       Steps  `json:"steps"`
 }
@@ -29,30 +22,37 @@ type Steps struct {
 type Step struct {
 	Id      string `json:"id"`
 	Name    string `json:"name"`
+	Mode    string `json:"mode"`
+	URL    string `json:"url"`
+	Transform    bool `json:"transform"`
 	Enabled bool   `json:"enabled"`
 }
 
 //Create a new work flow for a given service flow and return service flow details
-func CreateWorkflow(serviceFlowRequest Workflow) Workflow {
-	return newServiceFlow(serviceFlowRequest)
+func CreateWorkflow(workflowRequest Workflow) Workflow {
+	return newServiceFlow(workflowRequest)
 }
 
 func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{ID: uuid.New(), ServiceFlow: workflow.ServiceFlow, Name:workflow.ServiceFlow.Name}
+	return Workflow{Id: workflow.Id, Name:workflow.Name, Description: workflow.Description, Enabled:true,Steps:workflow.Steps}
 }
 
 type PGWorkflow struct {
 	tableName   struct{} `pg:"workflows"`
-	ServiceFlow ServiceFlow
-	ID          uuid.UUID
+	Id          string
 	Name 		string
+	Description string
+	Enabled     bool
+	Steps       Steps
 }
 
-func (serviceFlow Workflow) ToPGWorkflow() PGWorkflow {
+func (workflow Workflow) ToPGWorkflow() PGWorkflow {
 	return PGWorkflow{
-		ID:           serviceFlow.ID,
-		ServiceFlow: serviceFlow.ServiceFlow,
-		Name: serviceFlow.ServiceFlow.Name,
+		Id:          workflow.Id,
+		Name:        workflow.Name,
+		Description: workflow.Description,
+		Enabled:     workflow.Enabled,
+		Steps:     	 workflow.Steps,
 	}
 }
 

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 )
 
@@ -16,10 +15,9 @@ func createWorkflowHandler() gin.HandlerFunc {
 		// Create new Service Workflow
 		request := models.Workflow{}
 		json.Unmarshal([]byte(requestBody), &request)
-		fmt.Printf("Workflow request : %v \n", request.ServiceFlow)
-
+		fmt.Printf("Workflow request : %v \n", request)
 		serviceFlowRes := models.CreateWorkflow(request)
-		services.SaveServiceFlow(serviceFlowRes)
+		services.SaveWorkflow(serviceFlowRes)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}
@@ -29,7 +27,7 @@ func fetchWorkflowBasedOnWorkflowName() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")
 		var result models.Workflow
-		result, _ = services.FindWorkflowByName(uuid.MustParse(workflowName))
+		result, _ = services.FindWorkflowByName(workflowName)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, result)
 	}

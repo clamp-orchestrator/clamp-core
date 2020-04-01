@@ -3,28 +3,32 @@ package services
 import (
 	"clamp-core/models"
 	"fmt"
-	"github.com/google/uuid"
 )
 
-func SaveServiceFlow(serviceFlowReg models.Workflow) (models.Workflow, error) {
-	pgServReq := serviceFlowReg.ToPGWorkflow()
-	err := repo.insertQuery(&pgServReq)
+func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
+	fmt.Println("Inside save service flow ", workflowReq)
+	pgWorkflow := workflowReq.ToPGWorkflow()
+	fmt.Println("After converting to pgworkflow request ", workflowReq)
+	err := repo.insertQuery(&pgWorkflow)
 
-	fmt.Println("",pgServReq)
+	fmt.Println("Response", pgWorkflow)
 
 	if err != nil {
 		panic(err)
 	}
-	return serviceFlowReg, err
+	return workflowReq, err
 }
 
 //FindServiceRequestByID is
-func FindWorkflowByName(workflowName uuid.UUID) (models.Workflow, error) {
-	workflowReq := models.Workflow{ID: workflowName}
+func FindWorkflowByName(workflowName string) (models.Workflow, error) {
+	workflowReq := models.Workflow{Name: workflowName}
 	fmt.Println("Workflow request is -- ",workflowReq)
 	pgWorkflowReq := workflowReq.ToPGWorkflow()
 	fmt.Println("Request is -- ",pgWorkflowReq)
-	err := repo.selectQuery(&pgWorkflowReq)
+	//query := "select id, name from workflows where name = ?"
+	//res, err := repo.query(query, workflowName)
+
+	err := repo.selectQuery(&workflowReq)
 	if err != nil {
 		panic(err)
 	}
