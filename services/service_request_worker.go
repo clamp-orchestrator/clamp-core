@@ -38,6 +38,12 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 	fmt.Printf("ServiceRequestWorker id %d started \n", workerId)
 	for serviceReq := range serviceReqChan {
 		fmt.Printf("ServiceRequestWorker id %d started processing service request id %s\n", workerId, serviceReq.ID)
+		workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
+		if err == nil {
+			for _, step := range workflow.Steps {
+				fmt.Printf("Started executing step id %s", step.Id)
+			}
+		}
 		time.Sleep(time.Second)
 		fmt.Printf("ServiceRequestWorker id %d completed processing service request id %s\n", workerId, serviceReq.ID)
 	}

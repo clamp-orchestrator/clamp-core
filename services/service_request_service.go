@@ -7,7 +7,7 @@ import (
 )
 
 //FindServiceRequestByID is
-func FindServiceRequestByID(serviceRequestId uuid.UUID)(*models.ServiceRequest, error) {
+func FindServiceRequestByID(serviceRequestId uuid.UUID) (*models.ServiceRequest, error) {
 	serviceRequestReq := models.ServiceRequest{ID: serviceRequestId}
 	fmt.Println("Service Request request is -- ", serviceRequestReq)
 	serviceReq := new(models.ServiceRequest)

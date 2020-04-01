@@ -10,13 +10,18 @@ import (
 
 var insertQueryMock func(model interface{}) error
 var selectQueryMock func(model interface{}) error
-var QueryMock func(query interface{},param interface{}) (Result,error)
+var queryMock func(query interface{}, param interface{}) (Result, error)
+var whereQueryMock func(model interface{}, cond string, params ...interface{}) error
 
 type mockGenericRepoImpl struct {
 }
 
+func (s mockGenericRepoImpl) whereQuery(models interface{}, cond string, params ...interface{}) error {
+	return whereQueryMock(models, cond, params)
+}
+
 func (s mockGenericRepoImpl) query(query interface{}, params interface{}) (Result, error) {
-	return QueryMock( query, params)
+	return queryMock(query, params)
 }
 
 func (s mockGenericRepoImpl) insertQuery(model interface{}) error {
@@ -59,22 +64,20 @@ func TestFindByID(t *testing.T) {
 	}
 	repo = mockGenericRepoImpl{}
 
-	selectQueryMock = func(model interface{}) error {
+	whereQueryMock = func(model interface{}, cond string, params ...interface{}) error {
+		serviceReq := model.(*models.ServiceRequest)
 		serviceReq.WorkflowName = "TEST_WF"
 		serviceReq.Status = models.STATUS_COMPLETED
 		return nil
 	}
-	FindServiceRequestByID(&serviceReq)
-	assert.Equal(t, "TEST_WF", serviceReq.WorkflowName)
-	assert.Equal(t, models.STATUS_COMPLETED, serviceReq.Status)
+	resp, err := FindServiceRequestByID(serviceReq.ID)
+	assert.Nil(t, err)
+	assert.Equal(t, "TEST_WF", resp.WorkflowName)
+	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
 
-	selectQueryMock = func(model interface{}) error {
+	whereQueryMock = func(model interface{}, cond string, params ...interface{}) error {
 		return errors.New("select query failed")
 	}
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("FindServiceRequestByID should have panicked!")
-		}
-	}()
-	FindServiceRequestByID(&serviceReq)
+	_, err = FindServiceRequestByID(serviceReq.ID)
+	assert.NotNil(t, err)
 }

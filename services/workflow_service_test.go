@@ -22,9 +22,7 @@ func TestSaveWorkflow(t *testing.T) {
 		Name:        "Test",
 		Description: "Test",
 		Enabled:     false,
-		Steps:       models.Steps{
-			Step:steps,
-		},
+		Steps:       steps,
 	}
 	repo = mockGenericRepoImpl{}
 
@@ -37,7 +35,7 @@ func TestSaveWorkflow(t *testing.T) {
 	assert.NotNil(t, response.Id)
 	assert.Equal(t, workflow.Description, response.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", workflow.Description, response.Description))
 	assert.Equal(t, workflow.Name, response.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", workflow.Name, response.Name))
-	assert.Equal(t, workflow.Steps.Step[0].Name, response.Steps.Step[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", workflow.Steps.Step[0].Name, response.Steps.Step[0].Name))
+	assert.Equal(t, workflow.Steps[0].Name, response.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", workflow.Steps[0].Name, response.Steps[0].Name))
 
 	insertQueryMock = func(model interface{}) error {
 		return errors.New("insertion failed")

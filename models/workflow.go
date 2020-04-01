@@ -12,20 +12,16 @@ type Workflow struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
-	Steps       Steps  `json:"steps"`
-}
-
-type Steps struct {
-	Step []Step `json:"step"`
+	Steps       []Step `json:"steps"`
 }
 
 type Step struct {
-	Id      string `json:"id"`
-	Name    string `json:"name"`
-	Mode    string `json:"mode"`
-	URL    string `json:"url"`
-	Transform    bool `json:"transform"`
-	Enabled bool   `json:"enabled"`
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	Mode      string `json:"mode"`
+	URL       string `json:"url"`
+	Transform bool   `json:"transform"`
+	Enabled   bool   `json:"enabled"`
 }
 
 //Create a new work flow for a given service flow and return service flow details
@@ -34,16 +30,16 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 }
 
 func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{Id: workflow.Id, Name:workflow.Name, Description: workflow.Description, Enabled:true,Steps:workflow.Steps}
+	return Workflow{Id: workflow.Id, Name: workflow.Name, Description: workflow.Description, Enabled: true, Steps: workflow.Steps}
 }
 
 type PGWorkflow struct {
 	tableName   struct{} `pg:"workflows"`
 	Id          string
-	Name 		string
+	Name        string
 	Description string
 	Enabled     bool
-	Steps       Steps
+	Steps       []Step
 }
 
 func (workflow Workflow) ToPGWorkflow() PGWorkflow {
@@ -52,7 +48,7 @@ func (workflow Workflow) ToPGWorkflow() PGWorkflow {
 		Name:        workflow.Name,
 		Description: workflow.Description,
 		Enabled:     workflow.Enabled,
-		Steps:     	 workflow.Steps,
+		Steps:       workflow.Steps,
 	}
 }
 
