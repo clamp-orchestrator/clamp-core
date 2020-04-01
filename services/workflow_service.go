@@ -3,6 +3,7 @@ package services
 import (
 	"clamp-core/models"
 	"fmt"
+	"github.com/google/uuid"
 )
 
 func SaveServiceFlow(serviceFlowReg models.Workflow) (models.Workflow, error) {
@@ -18,12 +19,15 @@ func SaveServiceFlow(serviceFlowReg models.Workflow) (models.Workflow, error) {
 }
 
 //FindServiceRequestByID is
-func FindWorkflowByName(workflowName string) {
-	fmt.Print("Inside Find work flow function ",workflowName)
-	query := "select id from workflows where name = ?"
-	res, err := repo.query(query, workflowName)
+func FindWorkflowByName(workflowName uuid.UUID) (models.Workflow, error) {
+	workflowReq := models.Workflow{ID: workflowName}
+	fmt.Println("Workflow request is -- ",workflowReq)
+	pgWorkflowReq := workflowReq.ToPGWorkflow()
+	fmt.Println("Request is -- ",pgWorkflowReq)
+	err := repo.selectQuery(&pgWorkflowReq)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print("result is ", res)
+	fmt.Print( "Finally ---", pgWorkflowReq)
+	return workflowReq,err
 }

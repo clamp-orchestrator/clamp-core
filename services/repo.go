@@ -30,7 +30,7 @@ func (s serviceRequestRepoImpl) selectQuery(model interface{}) error {
 func (s serviceRequestRepoImpl) query(query interface{}, param interface{}) (Result, error) {
 	db := repository.GetDB()
 	result, err := db.Exec(query, param)
-
+	log.Print("Result ", result.Model())
 	log.Print("Affected ", result.RowsAffected())
 	log.Print("Returned ", result.RowsReturned())
 	if err != nil {
