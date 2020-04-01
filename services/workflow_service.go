@@ -30,8 +30,7 @@ func FindWorkflowByName(workflowName string) (*models.Workflow, error) {
 	workflow := new(models.Workflow)
 	err := repo.whereQuery(workflow, "workflow.name = ?", workflowName)
 	if err != nil {
-		panic(err)
+		fmt.Errorf("No record found with given workflow name %s", workflowName)
 	}
-	fmt.Print("Finally ---", pgWorkflowReq)
 	return workflow, err
 }
