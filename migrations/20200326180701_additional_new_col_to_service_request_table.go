@@ -7,7 +7,7 @@ import (
 
 func init() {
 	up := func(db orm.DB) error {
-		_, err := db.Exec("ALTER TABLE SERVICE_REQUESTS ADD COLUMN start_time timestamptz NOT NULL DEFAULT now(), ADD COLUMN end_time timestamp, ADD COLUMN total_time_elapsed_ms int, ADD COLUMN steps jsonb;")
+		_, err := db.Exec("ALTER TABLE SERVICE_REQUESTS ADD COLUMN start_time timestamp, ADD COLUMN end_time timestamp, ADD COLUMN total_time_elapsed_ms int, ADD COLUMN steps jsonb;")
 		return err
 	}
 

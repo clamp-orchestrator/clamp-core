@@ -26,7 +26,8 @@ const (
 )
 
 func NewServiceRequest(workflowName string) ServiceRequest {
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, EndTime:time.Now(), TotalTimeElapsedMs:0, Steps: Step{}}
+	currentTime := time.Now()
+	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, StartTime:currentTime, EndTime:currentTime, TotalTimeElapsedMs:0, Steps: Step{}}
 }
 
 type PGServiceRequest struct {
