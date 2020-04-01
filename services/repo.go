@@ -11,10 +11,16 @@ type Result = orm.Result
 type serviceRequestRepo interface {
 	selectQuery(interface{}) error
 	insertQuery(interface{}) error
+	whereQuery(interface{}, string, ...interface{}) error
 	query(interface{}, interface{}) (Result, error)
 }
 
 type serviceRequestRepoImpl struct {
+}
+
+func (s serviceRequestRepoImpl) whereQuery(model interface{}, condition string, params ...interface{}) error {
+	db := repository.GetDB()
+	return db.Model(model).Where(condition, params...).Select()
 }
 
 func (s serviceRequestRepoImpl) insertQuery(model interface{}) error {
@@ -39,7 +45,7 @@ func (s serviceRequestRepoImpl) query(query interface{}, param interface{}) (Res
 	if err != nil {
 		log.Fatal(err)
 	}
-	return result,err
+	return result, err
 }
 
 var repo serviceRequestRepo

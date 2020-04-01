@@ -1,15 +1,29 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-pg/pg/v9"
 	"sync"
 )
 
+const LogSQLQueries bool = true
+
 var (
 	singletonDB   *pg.DB
 	singletonOnce sync.Once
 )
+
+type dbLogger struct{}
+
+func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Context, error) {
+	return c, nil
+}
+
+func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
+	fmt.Println(q.FormattedQuery())
+	return nil
+}
 
 func connectDB() (db *pg.DB) {
 	db = pg.Connect(&pg.Options{
@@ -17,6 +31,9 @@ func connectDB() (db *pg.DB) {
 		Password: "clamppass",
 		Database: "clampdev",
 	})
+	if LogSQLQueries {
+		db.AddQueryHook(dbLogger{})
+	}
 	return db
 }
 
