@@ -7,16 +7,16 @@ import (
 
 func init() {
 	up := func(db orm.DB) error {
-		_, err := db.Exec("CREATE TABLE WORKFLOWS ( ID uuid, STEPS JSONB, NAME VARCHAR NOT NULL, ENABLED BOOLEAN, DESCRIPTION VARCHAR, PRIMARY KEY(NAME));")
+		_, err := db.Exec("CREATE UNIQUE INDEX WORKFLOW_NAME_INDEX ON WORKFLOWS (NAME);")
 		return err
 	}
 
 	down := func(db orm.DB) error {
-		_, err := db.Exec("DROP TABLE WORKFLOWS;")
+		_, err := db.Exec("DROP INDEX WORKFLOW_NAME_INDEX;")
 		return err
 	}
 
 	opts := migrations.MigrationOptions{}
 
-	migrations.Register("20200203163314_create_workflow_table", up, down, opts)
+	migrations.Register("20200402131700_create_workflow_name_unique_index", up, down, opts)
 }
