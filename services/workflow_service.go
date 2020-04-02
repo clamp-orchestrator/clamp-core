@@ -21,12 +21,10 @@ func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
 
 //FindServiceRequestByID is
 func FindWorkflowByName(workflowName string) (*models.Workflow, error) {
-	workflowReq := models.Workflow{Name: workflowName}
-	fmt.Println("Workflow request is -- ", workflowReq)
 	workflow := new(models.Workflow)
 	err := repo.whereQuery(workflow, "workflow.name = ?", workflowName)
 	if err != nil {
-		fmt.Errorf("No record found with given workflow name %s", workflowName)
+		panic(err)
 	}
 	return workflow, err
 }

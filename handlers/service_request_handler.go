@@ -3,9 +3,9 @@ package handlers
 import (
 	. "clamp-core/models"
 	"clamp-core/services"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"log"
 	"net/http"
 )
 
@@ -14,10 +14,10 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		workflowName := c.Param("workflow")
 		workflow, err := services.FindWorkflowByName(workflowName)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, "No record found with given workflow name : " + workflowName)
+			c.JSON(http.StatusBadRequest, "No record found with given workflow name : "+workflowName)
 			return
 		}
-		log.Println("Loaded workflow -", workflow)
+		fmt.Println("Loaded workflow -", workflow)
 		// Create new service request
 		serviceReq := NewServiceRequest(workflowName)
 		serviceReq, _ = services.SaveServiceRequest(serviceReq)
