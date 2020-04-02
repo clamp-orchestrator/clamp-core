@@ -4,6 +4,8 @@ import (
 	"clamp-core/models"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -45,6 +47,24 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 		if err == nil {
 			for _, step := range workflow.Steps {
 				fmt.Printf("%s Started executing step id %s\n", prefix, step.Id)
+				var httpClient = &http.Client{
+					Timeout: time.Second * 10,
+				}
+				request, err := http.NewRequest(step.Mode, step.URL, nil)
+				if err != nil {
+					panic(err)
+				}
+				resp, err := httpClient.Do(request)
+				if err != nil {
+					panic(err)
+				}
+				if resp != nil {
+					data, _ := ioutil.ReadAll(resp.Body)
+					fmt.Printf("%s resp %s", prefix, string(data))
+					fmt.Printf("%s resp %s\n", prefix, resp.Status)
+					fmt.Printf("%s resp %d\n", prefix, resp.StatusCode)
+					fmt.Printf("%s err %s\n", prefix, err)
+				}
 			}
 		}
 		elapsed := time.Since(start)
