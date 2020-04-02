@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"time"
 )
 
 //Workflow is a structure to store the service request details
@@ -12,6 +13,8 @@ type Workflow struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Enabled     bool   `json:"enabled"`
+	CreatedAt    time.Time    `json:"createdAt"`
+	UpdatedAt    time.Time    `json:"updatedAt"`
 	Steps       []Step `json:"steps"`
 }
 
@@ -30,7 +33,7 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 }
 
 func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{Id: workflow.Id, Name: workflow.Name, Description: workflow.Description, Enabled: true, Steps: workflow.Steps}
+	return Workflow{Id: workflow.Id, Name: workflow.Name, Description: workflow.Description, Enabled: true, CreatedAt:time.Time{}, UpdatedAt:time.Time{}, Steps: workflow.Steps}
 }
 
 type PGWorkflow struct {
@@ -39,6 +42,8 @@ type PGWorkflow struct {
 	Name        string
 	Description string
 	Enabled     bool
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 	Steps       []Step
 }
 
@@ -48,6 +53,8 @@ func (workflow Workflow) ToPGWorkflow() PGWorkflow {
 		Name:        workflow.Name,
 		Description: workflow.Description,
 		Enabled:     workflow.Enabled,
+		CreatedAt: workflow.CreatedAt,
+		UpdatedAt: workflow.UpdatedAt,
 		Steps:       workflow.Steps,
 	}
 }

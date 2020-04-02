@@ -10,10 +10,7 @@ type ServiceRequest struct {
 	ID           uuid.UUID `json:"id"`
 	WorkflowName string    `json:"workflowName"`
 	Status       Status    `json:"status"`
-	StartTime    time.Time    `json:"startTime"`
-	EndTime      time.Time   `json:"endTime"`
-	TotalTimeElapsedMs      int    `json:"totalTimeElapsedMs"`
-	Steps      Step    `json:"steps"`
+	CreatedAt    time.Time    `json:"createdAt"`
 }
 
 type Status string
@@ -27,7 +24,7 @@ const (
 
 func NewServiceRequest(workflowName string) ServiceRequest {
 	currentTime := time.Now()
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, StartTime:currentTime, EndTime:currentTime, TotalTimeElapsedMs:0, Steps: Step{}}
+	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt:currentTime}
 }
 
 type PGServiceRequest struct {
@@ -35,10 +32,7 @@ type PGServiceRequest struct {
 	ID           uuid.UUID
 	WorkflowName string
 	Status       Status
-	StartTime    time.Time
-	EndTime      time.Time
-	TotalTimeElapsedMs      int
-	Steps      	 Step
+	CreatedAt    time.Time
 }
 
 func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
@@ -46,10 +40,7 @@ func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
 		ID:           serviceReq.ID,
 		WorkflowName: serviceReq.WorkflowName,
 		Status:       serviceReq.Status,
-		StartTime:       serviceReq.StartTime,
-		EndTime:       serviceReq.EndTime,
-		TotalTimeElapsedMs:       serviceReq.TotalTimeElapsedMs,
-		Steps:       serviceReq.Steps,
+		CreatedAt:       serviceReq.CreatedAt,
 	}
 }
 
@@ -58,9 +49,6 @@ func (pgServReq PGServiceRequest) toServiceRequest() ServiceRequest {
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,
 		Status:       pgServReq.Status,
-		StartTime:       pgServReq.StartTime,
-		EndTime:       pgServReq.EndTime,
-		TotalTimeElapsedMs:       pgServReq.TotalTimeElapsedMs,
-		Steps:       pgServReq.Steps,
+		CreatedAt:       pgServReq.CreatedAt,
 	}
 }
