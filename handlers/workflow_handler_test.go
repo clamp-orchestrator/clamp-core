@@ -36,7 +36,7 @@ func setUpWorkflowRequest() models.Workflow {
 		Name:    "firstStep",
 		Enabled: true,
 		Mode:"http",
-		URL:"www.google.com",
+		URL:"http://35.166.176.234:3333/api/v1/user",
 		Transform:false,
 	}
 	workflow := models.Workflow{
