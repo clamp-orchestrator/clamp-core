@@ -10,7 +10,7 @@ import (
 
 var insertQueryMock func(model interface{}) error
 var selectQueryMock func(model interface{}) error
-var queryMock func(query interface{}, param interface{}) (Result, error)
+var queryMock func(model interface{}, query interface{}, param interface{}) (Result, error)
 var whereQueryMock func(model interface{}, cond string, params ...interface{}) error
 
 type mockGenericRepoImpl struct {
@@ -20,8 +20,8 @@ func (s mockGenericRepoImpl) whereQuery(models interface{}, cond string, params 
 	return whereQueryMock(models, cond, params)
 }
 
-func (s mockGenericRepoImpl) query(query interface{}, params interface{}) (Result, error) {
-	return queryMock(query, params)
+func (s mockGenericRepoImpl) query(model interface{}, query interface{}, params interface{}) (Result, error) {
+	return queryMock(model, query, params)
 }
 
 func (s mockGenericRepoImpl) insertQuery(model interface{}) error {

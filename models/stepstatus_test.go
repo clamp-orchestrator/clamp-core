@@ -16,11 +16,12 @@ func TestShouldCreateANewStepStatus(t *testing.T) {
 		WorkflowName:     "testWF",
 		Status:           STATUS_STARTED,
 		CreatedAt:        time.Now(),
+		TotalTimeInMs:        0,
 		StepName:         "firstStep",
 		Reason:           "Success",
 	}
 
-	stepStatusResponse := CreateStepStatus(stepStatusRequest)
+	stepStatusResponse := CreateStepsStatus(stepStatusRequest)
 
 	assert.NotEmpty(t, stepStatusResponse.ID)
 	assert.NotEmpty(t, stepStatusResponse.ServiceRequestId)

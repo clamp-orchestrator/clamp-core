@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -50,10 +51,13 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 		workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 		if err == nil {
 			for _, step := range workflow.Steps {
+				stepStartTime := time.Now()
 				stepStatus.Status =  models.STATUS_STARTED
 				stepStatus.StepName = step.Name
+				stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
 				SaveStepStatus(stepStatus)
-				fmt.Printf("%s Started executing step id %s\n", prefix, step.Id)
+				stepStartTime = time.Now()
+				log.Printf("%s Started executing step id %s\n", prefix, step.Id)
 				var httpClient = &http.Client{
 					Timeout: time.Second * 10,
 				}
@@ -61,6 +65,7 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 				if err != nil {
 					stepStatus.Status =  models.STATUS_FAILED
 					stepStatus.Reason = err.Error()
+					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
 					SaveStepStatus(stepStatus)
 					panic(err)
 				}
@@ -68,18 +73,21 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 				if err != nil {
 					stepStatus.Status =  models.STATUS_FAILED
 					stepStatus.Reason = err.Error()
+					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
 					SaveStepStatus(stepStatus)
 					panic(err)
 				}
 				if resp != nil {
 					data, _ := ioutil.ReadAll(resp.Body)
-					fmt.Printf("%s resp %s", prefix, string(data))
-					fmt.Printf("%s resp %s\n", prefix, resp.Status)
-					fmt.Printf("%s resp %d\n", prefix, resp.StatusCode)
-					fmt.Printf("%s err %s\n", prefix, err)
+					log.Printf("%s resp %s", prefix, string(data))
+					log.Printf("%s resp %s\n", prefix, resp.Status)
+					log.Printf("%s resp %d\n", prefix, resp.StatusCode)
+					log.Printf("%s err %s\n", prefix, err)
 					stepStatus.Status =  models.STATUS_COMPLETED
+					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
 					SaveStepStatus(stepStatus)
 				}
+				//stepElapsedTime := time.Since(start)
 			}
 		}
 		elapsed := time.Since(start)

@@ -2,10 +2,10 @@ package services
 
 import (
 	"clamp-core/models"
-	"clamp-core/repository"
 	"fmt"
 	"github.com/google/uuid"
 	"log"
+	"time"
 )
 
 func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error) {
@@ -22,45 +22,58 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) (models.StepsStatusResponse, error) {
 	serviceRequestReq := models.StepsStatus{ServiceRequestId: serviceRequestId}
 	fmt.Println("Service Request request is -- ", serviceRequestReq)
-	serviceReq := new(models.StepsStatus)
-	var stepStatusArr []models.StepsStatus
-	_, err := repository.GetDB().Query(&stepStatusArr, "select * from steps_status where service_request_id = ?", serviceRequestId)
-	//err := repo.whereQuery(&stepStatusArr, "steps_status.service_request_id = ?", serviceRequestId)
+	var stepsStatus []models.StepsStatus
 
+	_, err := repo.query(&stepsStatus, "select * from steps_status where service_request_id = ?", serviceRequestId)
+	//err := repo.whereQuery(stepsStatus, "steps_status.service_request_id = ?", serviceRequestId)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("Steps Status Where Query Response is ", stepsStatus)
 	if err != nil {
 		fmt.Errorf("No record found with given service request id %s", serviceRequestId)
 	}
 
-	stepStatusRes := PrepareStepStatusResponse(stepStatusArr)
+	stepStatusRes := PrepareStepStatusResponse(stepsStatus)
+	//stepStatusRes := models.StepsStatusResponse{}
+
 	log.Println("Steps Status Response is ", stepStatusRes)
-	log.Println("Service request id is ", serviceReq.ServiceRequestId)
+	log.Println("Service request id is ", serviceRequestReq.ServiceRequestId)
 	return stepStatusRes, err
 }
 
 func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.StepsStatusResponse {
 	var stepsStatusRes models.StepsStatusResponse
 	steps := make([]models.StepResponse, len(stepsStatusArr))
-	var statusFlag bool = true
+	var statusFlag = true
+
 	for i := range stepsStatusArr{
 		stepsStatus := models.StepsStatus{}
 		stepsStatus = stepsStatusArr[i]
-		stepsStatusRes.ServiceRequestId = stepsStatus.ServiceRequestId
-		stepsStatusRes.WorkflowName = stepsStatus.WorkflowName
 		stepsStatusRes.Reason = stepsStatus.Reason
-		if(stepsStatus.Status == models.STATUS_FAILED){
+		if stepsStatus.Status == models.STATUS_FAILED {
 			statusFlag = false
 			stepsStatusRes.Status = stepsStatus.Status
 		}
 		steps[i] = models.StepResponse{
 			Name:      stepsStatus.StepName,
 			Status:    stepsStatus.Status,
-			TimeTaken: 0,
+			TimeTaken: stepsStatus.TotalTimeInMs,
 		}
 	}
-	if(statusFlag){
+
+	if statusFlag {
 		stepsStatusRes.Status = models.STATUS_COMPLETED
 	}
-	stepsStatusRes.TotalTime = 10
+	stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
+	stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
+	timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
+	stepsStatusRes.TotalTimeInMs = timeTaken.Milliseconds()
 	stepsStatusRes.Steps = steps
 	return stepsStatusRes
+}
+
+func calculateTimeTaken(startTime time.Time, endTime time.Time) time.Duration {
+	log.Println("Time Difference is == ",endTime.Sub(startTime))
+	return endTime.Sub(startTime)
 }

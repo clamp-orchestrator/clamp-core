@@ -12,18 +12,19 @@ type StepsStatus struct {
 	WorkflowName 			   string    `json:"workflowName"`
 	Status       			   Status    `json:"status"`
 	CreatedAt    			   time.Time    `json:"createdAt"`
+	TotalTimeInMs    		   int64   `json:"totalTimeInMs"`
 	StepName   				   string   `json:"stepName"`
 	Reason   				   string    `json:"reason"`
 }
 
-func NewStepStatus(stepStatus StepsStatus) StepsStatus {
+func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
 	return StepsStatus{ID: stepStatus.ID, ServiceRequestId:stepStatus.ServiceRequestId,WorkflowName: stepStatus.WorkflowName,
-		Status: STATUS_STARTED, CreatedAt:time.Now(), StepName:stepStatus.StepName, Reason:stepStatus.Reason}
+		Status: STATUS_STARTED, CreatedAt:time.Now(), TotalTimeInMs:stepStatus.TotalTimeInMs, StepName:stepStatus.StepName, Reason:stepStatus.Reason}
 }
 
 //Create a Step Status Entry for a given service request id and return step status details
-func CreateStepStatus(stepStatus StepsStatus) StepsStatus {
-	return NewStepStatus(stepStatus)
+func CreateStepsStatus(stepStatus StepsStatus) StepsStatus {
+	return NewStepsStatus(stepStatus)
 }
 
 type PGStepStatus struct {
@@ -33,6 +34,7 @@ type PGStepStatus struct {
 	WorkflowName 			   string
 	Status       			   Status
 	CreatedAt    			   time.Time
+	TotalTimeInMs    		   int64
 	StepName   				   string
 	Reason   				   string
 }
@@ -44,6 +46,7 @@ func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 		WorkflowName:     stepStatus.WorkflowName,
 		Status:       	  stepStatus.Status,
 		CreatedAt:    	  stepStatus.CreatedAt,
+		TotalTimeInMs:    stepStatus.TotalTimeInMs,
 		StepName:		  stepStatus.StepName,
 		Reason:		      stepStatus.Reason,
 	}
@@ -56,6 +59,7 @@ func (pgStepStatus PGStepStatus) toStepStatus() StepsStatus {
 		WorkflowName:     pgStepStatus.WorkflowName,
 		Status:           pgStepStatus.Status,
 		CreatedAt:        pgStepStatus.CreatedAt,
+		TotalTimeInMs:    pgStepStatus.TotalTimeInMs,
 		StepName:         pgStepStatus.StepName,
 		Reason:           pgStepStatus.Reason,
 	}
