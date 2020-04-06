@@ -4,6 +4,7 @@ import (
 	"clamp-core/models"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -41,60 +42,89 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
-	var stepStatus models.StepsStatus
 	for serviceReq := range serviceReqChan {
-		stepStatus.ServiceRequestId = serviceReq.ID
-		stepStatus.WorkflowName = serviceReq.WorkflowName
-
-		start := time.Now()
-		prefix = prefix[:len(prefix)-2] + fmt.Sprintf("[REQUEST ID] : %s ", serviceReq.ID)
-		log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
-		workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
-		if err == nil {
-			for _, step := range workflow.Steps {
-				stepStartTime := time.Now()
-				stepStatus.Status = models.STATUS_STARTED
-				stepStatus.StepName = step.Name
-				stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
-				SaveStepStatus(stepStatus)
-				log.Printf("%s Started executing step id %s\n", prefix, step.Id)
-				var httpClient = &http.Client{
-					Timeout: time.Second * 10,
-				}
-				request, err := http.NewRequest(step.Mode, step.URL, nil)
-				if err != nil {
-					recordErrorStatus(stepStatus, err, stepStartTime, prefix)
-					break
-				}
-				resp, err := httpClient.Do(request)
-				if err != nil {
-					recordErrorStatus(stepStatus, err, stepStartTime, prefix)
-					break
-				}
-				if resp != nil {
-					data, _ := ioutil.ReadAll(resp.Body)
-					log.Printf("%s resp %s", prefix, string(data))
-					log.Printf("%s resp %s\n", prefix, resp.Status)
-					log.Printf("%s resp %d\n", prefix, resp.StatusCode)
-					log.Printf("%s err %s\n", prefix, err)
-					stepStatus.Status = models.STATUS_COMPLETED
-					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
-					SaveStepStatus(stepStatus)
-				}
-				//stepElapsedTime := time.Since(start)
-			}
-		}
-		elapsed := time.Since(start)
-		log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
+		executeWorkflow(serviceReq, prefix)
 	}
 }
 
-func recordErrorStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
+func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
+	prefix = prefix[:len(prefix)-2] + fmt.Sprintf("[REQUEST_ID: %s]", serviceReq.ID)
+	log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
+	var stepStatus models.StepsStatus
+	defer catchErrors(prefix, serviceReq.ID)
+	stepStatus.ServiceRequestId = serviceReq.ID
+	stepStatus.WorkflowName = serviceReq.WorkflowName
+
+	start := time.Now()
+	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
+	if err == nil {
+		executeWorkflowStepsInSync(workflow, prefix, stepStatus)
+	}
+	elapsed := time.Since(start)
+	log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
+}
+
+func catchErrors(prefix string, requestId uuid.UUID) {
+	if r := recover(); r != nil {
+		log.Println("[ERROR]", r)
+		log.Printf("%s Failed processing service request id %s\n", prefix, requestId)
+	}
+}
+
+func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepStatus models.StepsStatus) {
+	for _, step := range workflow.Steps {
+		stepStartTime := time.Now()
+		log.Printf("%s Started executing step id %s\n", prefix, step.Id)
+		stepStatus.StepName = step.Name
+		recordStepStartedStatus(stepStatus, stepStartTime)
+		var httpClient = &http.Client{
+			Timeout: time.Second * 10,
+		}
+		request, err := http.NewRequest(step.Mode, step.URL, nil)
+		if err != nil {
+			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
+			errFmt := fmt.Sprintf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+			panic(errFmt)
+		}
+		resp, err := httpClient.Do(request)
+		if err != nil {
+			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
+			errFmt := fmt.Sprintf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+			panic(errFmt)
+		}
+		if resp.StatusCode != 200 {
+			data, _ := ioutil.ReadAll(resp.Body)
+			err := errors.New(string(data))
+			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
+			errFmt := fmt.Sprintf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+			panic(errFmt)
+		}
+		if resp != nil {
+			data, _ := ioutil.ReadAll(resp.Body)
+			log.Printf("%s Received %s", prefix, string(data))
+			recordStepCompletionStatus(stepStatus, stepStartTime)
+		}
+		//stepElapsedTime := time.Since(start)
+	}
+}
+
+func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+	stepStatus.Status = models.STATUS_COMPLETED
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
+	SaveStepStatus(stepStatus)
+}
+
+func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+	stepStatus.Status = models.STATUS_STARTED
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
+	SaveStepStatus(stepStatus)
+}
+
+func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
 	stepStatus.Status = models.STATUS_FAILED
 	stepStatus.Reason = err.Error()
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
 	SaveStepStatus(stepStatus)
-	log.Printf("%s Failed executing step %s \n", prefix, stepStatus.StepName)
 }
 
 func getServiceRequestChannel() chan models.ServiceRequest {

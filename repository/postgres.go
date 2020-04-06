@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-pg/pg/v9"
+	"log"
 	"sync"
 )
 
@@ -21,7 +22,8 @@ func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Cont
 }
 
 func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
-	fmt.Println(q.FormattedQuery())
+	query, err := q.FormattedQuery()
+	log.Printf("[PSQL] Query: %v, Error: %v", query, err)
 	return nil
 }
 
@@ -39,7 +41,7 @@ func connectDB() (db *pg.DB) {
 
 func CloseDB() {
 	if singletonDB != nil {
-		fmt.Println("Disconnecting from DB")
+		log.Println("Disconnecting from DB")
 		singletonDB.Close()
 	}
 }
