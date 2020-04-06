@@ -5,7 +5,7 @@ import (
 )
 
 //Step Status is a structure to store the service request steps details
-type StepStatusResponse struct {
+type StepsStatusResponse struct {
 	ServiceRequestId           uuid.UUID `json:"serviceRequestId"`
 	WorkflowName 			   string    `json:"workflowName"`
 	Status       			   Status    `json:"status"`
