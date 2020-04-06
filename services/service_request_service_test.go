@@ -20,7 +20,7 @@ func (s mockGenericRepoImpl) whereQuery(models interface{}, cond string, params 
 	return whereQueryMock(models, cond, params)
 }
 
-func (s mockGenericRepoImpl) query(query interface{}, params interface{}) (Result, error) {
+func (s mockGenericRepoImpl) query(model interface{}, query interface{}, params interface{}) (Result, error) {
 	return queryMock(query, params)
 }
 
