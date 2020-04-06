@@ -14,7 +14,6 @@ import (
 const workflowName string = "testWF"
 
 func setUp() {
-	const workflowName = "testWorkflow"
 	workflow := models.Workflow{
 		Name: workflowName,
 	}
