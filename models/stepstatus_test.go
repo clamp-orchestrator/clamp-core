@@ -10,7 +10,7 @@ import (
 )
 
 func TestShouldCreateANewStepStatus(t *testing.T) {
-	stepStatusRequest := StepStatus{
+	stepStatusRequest := StepsStatus{
 		ID:               "1",
 		ServiceRequestId: uuid.New(),
 		WorkflowName:     "testWF",

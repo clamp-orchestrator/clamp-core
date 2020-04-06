@@ -40,22 +40,35 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	fmt.Printf("%s Started listening to service request channel\n", prefix)
+	var stepStatus models.StepsStatus
 	for serviceReq := range serviceReqChan {
+		stepStatus.ServiceRequestId = serviceReq.ID
+		stepStatus.WorkflowName = serviceReq.WorkflowName
+
 		start := time.Now()
 		fmt.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
 		workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 		if err == nil {
 			for _, step := range workflow.Steps {
+				stepStatus.Status =  models.STATUS_STARTED
+				stepStatus.StepName = step.Name
+				SaveStepStatus(stepStatus)
 				fmt.Printf("%s Started executing step id %s\n", prefix, step.Id)
 				var httpClient = &http.Client{
 					Timeout: time.Second * 10,
 				}
 				request, err := http.NewRequest(step.Mode, step.URL, nil)
 				if err != nil {
+					stepStatus.Status =  models.STATUS_FAILED
+					stepStatus.Reason = err.Error()
+					SaveStepStatus(stepStatus)
 					panic(err)
 				}
 				resp, err := httpClient.Do(request)
 				if err != nil {
+					stepStatus.Status =  models.STATUS_FAILED
+					stepStatus.Reason = err.Error()
+					SaveStepStatus(stepStatus)
 					panic(err)
 				}
 				if resp != nil {
@@ -64,6 +77,8 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 					fmt.Printf("%s resp %s\n", prefix, resp.Status)
 					fmt.Printf("%s resp %d\n", prefix, resp.StatusCode)
 					fmt.Printf("%s err %s\n", prefix, err)
+					stepStatus.Status =  models.STATUS_COMPLETED
+					SaveStepStatus(stepStatus)
 				}
 			}
 		}

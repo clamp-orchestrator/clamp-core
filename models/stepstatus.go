@@ -6,7 +6,7 @@ import (
 )
 
 //Step Status is a structure to store the service request steps details
-type StepStatus struct {
+type StepsStatus struct {
 	ID           			   string `json:"id"`
 	ServiceRequestId           uuid.UUID `json:"serviceRequestId"`
 	WorkflowName 			   string    `json:"workflowName"`
@@ -16,13 +16,13 @@ type StepStatus struct {
 	Reason   				   string    `json:"reason"`
 }
 
-func NewStepStatus(stepStatus StepStatus) StepStatus {
-	return StepStatus{ID: stepStatus.ID, ServiceRequestId:stepStatus.ServiceRequestId,WorkflowName: stepStatus.WorkflowName,
+func NewStepStatus(stepStatus StepsStatus) StepsStatus {
+	return StepsStatus{ID: stepStatus.ID, ServiceRequestId:stepStatus.ServiceRequestId,WorkflowName: stepStatus.WorkflowName,
 		Status: STATUS_STARTED, CreatedAt:time.Now(), StepName:stepStatus.StepName, Reason:stepStatus.Reason}
 }
 
 //Create a Step Status Entry for a given service request id and return step status details
-func CreateStepStatus(stepStatus StepStatus) StepStatus {
+func CreateStepStatus(stepStatus StepsStatus) StepsStatus {
 	return NewStepStatus(stepStatus)
 }
 
@@ -37,7 +37,7 @@ type PGStepStatus struct {
 	Reason   				   string
 }
 
-func (stepStatus StepStatus) ToPgStepStatus() PGStepStatus {
+func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 	return PGStepStatus{
 		ID:           	  stepStatus.ID,
 		ServiceRequestId: stepStatus.ServiceRequestId,
@@ -49,8 +49,8 @@ func (stepStatus StepStatus) ToPgStepStatus() PGStepStatus {
 	}
 }
 
-func (pgStepStatus PGStepStatus) toStepStatus() StepStatus {
-	return StepStatus{
+func (pgStepStatus PGStepStatus) toStepStatus() StepsStatus {
+	return StepsStatus{
 		ID:               pgStepStatus.ID,
 		ServiceRequestId: pgStepStatus.ServiceRequestId,
 		WorkflowName:     pgStepStatus.WorkflowName,

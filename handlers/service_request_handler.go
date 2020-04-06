@@ -31,8 +31,8 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		serviceRequestId := c.Param("serviceRequestId")
 
-		var serviceRequestRes *ServiceRequest
-		serviceRequestRes, _ = services.FindServiceRequestByID(uuid.MustParse(serviceRequestId))
+		var serviceRequestRes []StepsStatus
+		serviceRequestRes, _ = services.FindStepStatusByServiceRequestId(uuid.MustParse(serviceRequestId))
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceRequestRes)
 	}
