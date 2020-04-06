@@ -40,42 +40,36 @@ func createServiceRequestWorkers() {
 func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
-	fmt.Printf("%s Started listening to service request channel\n", prefix)
+	log.Printf("%s Started listening to service request channel\n", prefix)
 	var stepStatus models.StepsStatus
 	for serviceReq := range serviceReqChan {
 		stepStatus.ServiceRequestId = serviceReq.ID
 		stepStatus.WorkflowName = serviceReq.WorkflowName
 
 		start := time.Now()
-		fmt.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
+		prefix = prefix[:len(prefix)-2] + fmt.Sprintf("[REQUEST ID] : %s ", serviceReq.ID)
+		log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
 		workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 		if err == nil {
 			for _, step := range workflow.Steps {
 				stepStartTime := time.Now()
-				stepStatus.Status =  models.STATUS_STARTED
+				stepStatus.Status = models.STATUS_STARTED
 				stepStatus.StepName = step.Name
-				stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
+				stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
 				SaveStepStatus(stepStatus)
-				stepStartTime = time.Now()
 				log.Printf("%s Started executing step id %s\n", prefix, step.Id)
 				var httpClient = &http.Client{
 					Timeout: time.Second * 10,
 				}
 				request, err := http.NewRequest(step.Mode, step.URL, nil)
 				if err != nil {
-					stepStatus.Status =  models.STATUS_FAILED
-					stepStatus.Reason = err.Error()
-					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
-					SaveStepStatus(stepStatus)
-					panic(err)
+					recordErrorStatus(stepStatus, err, stepStartTime, prefix)
+					break
 				}
 				resp, err := httpClient.Do(request)
 				if err != nil {
-					stepStatus.Status =  models.STATUS_FAILED
-					stepStatus.Reason = err.Error()
-					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
-					SaveStepStatus(stepStatus)
-					panic(err)
+					recordErrorStatus(stepStatus, err, stepStartTime, prefix)
+					break
 				}
 				if resp != nil {
 					data, _ := ioutil.ReadAll(resp.Body)
@@ -83,16 +77,24 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 					log.Printf("%s resp %s\n", prefix, resp.Status)
 					log.Printf("%s resp %d\n", prefix, resp.StatusCode)
 					log.Printf("%s err %s\n", prefix, err)
-					stepStatus.Status =  models.STATUS_COMPLETED
-					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Milliseconds()
+					stepStatus.Status = models.STATUS_COMPLETED
+					stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
 					SaveStepStatus(stepStatus)
 				}
 				//stepElapsedTime := time.Since(start)
 			}
 		}
 		elapsed := time.Since(start)
-		fmt.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
+		log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
 	}
+}
+
+func recordErrorStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
+	stepStatus.Status = models.STATUS_FAILED
+	stepStatus.Reason = err.Error()
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
+	SaveStepStatus(stepStatus)
+	log.Printf("%s Failed executing step %s \n", prefix, stepStatus.StepName)
 }
 
 func getServiceRequestChannel() chan models.ServiceRequest {

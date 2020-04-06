@@ -18,7 +18,6 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 	return stepStatusReq, err
 }
 
-
 func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) (models.StepsStatusResponse, error) {
 	serviceRequestReq := models.StepsStatus{ServiceRequestId: serviceRequestId}
 	fmt.Println("Service Request request is -- ", serviceRequestReq)
@@ -47,7 +46,7 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 	steps := make([]models.StepResponse, len(stepsStatusArr))
 	var statusFlag = true
 
-	for i := range stepsStatusArr{
+	for i := range stepsStatusArr {
 		stepsStatus := models.StepsStatus{}
 		stepsStatus = stepsStatusArr[i]
 		stepsStatusRes.Reason = stepsStatus.Reason
@@ -68,12 +67,12 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 	stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
 	stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
 	timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
-	stepsStatusRes.TotalTimeInMs = timeTaken.Milliseconds()
+	stepsStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / 1000
 	stepsStatusRes.Steps = steps
 	return stepsStatusRes
 }
 
 func calculateTimeTaken(startTime time.Time, endTime time.Time) time.Duration {
-	log.Println("Time Difference is == ",endTime.Sub(startTime))
+	log.Println("Time Difference is == ", endTime.Sub(startTime))
 	return endTime.Sub(startTime)
 }
