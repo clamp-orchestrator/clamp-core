@@ -12,12 +12,12 @@ import (
 
 func prepareStepsStatus() models.StepsStatus {
 	stepsStatus := models.StepsStatus{
-		ID:          "1",
-		ServiceRequestId:        uuid.New(),
-		Status: models.STATUS_STARTED,
-		CreatedAt:     time.Now(),
-		StepName:       "Testing",
-		TotalTimeInMs:       10,
+		ID:               "1",
+		ServiceRequestId: uuid.New(),
+		Status:           models.STATUS_STARTED,
+		CreatedAt:        time.Now(),
+		StepName:         "Testing",
+		TotalTimeInMs:    10,
 	}
 	return stepsStatus
 }
@@ -81,4 +81,3 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	_, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
 	assert.NotNil(t, err)
 }
-
