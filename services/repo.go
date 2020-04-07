@@ -12,7 +12,7 @@ type serviceRequestRepo interface {
 	selectQuery(interface{}) error
 	insertQuery(interface{}) error
 	whereQuery(interface{}, string, ...interface{}) error
-	query(interface{},interface{}, interface{}) (Result, error)
+	query(interface{}, interface{}, interface{}) (Result, error)
 }
 
 type serviceRequestRepoImpl struct {
@@ -33,9 +33,9 @@ func (s serviceRequestRepoImpl) selectQuery(model interface{}) error {
 	return db.Select(model)
 }
 
-func (s serviceRequestRepoImpl) query(model interface{},query interface{}, param interface{}) (Result, error) {
+func (s serviceRequestRepoImpl) query(model interface{}, query interface{}, param interface{}) (Result, error) {
 	db := repository.GetDB()
-	result, err := db.Query(model,query, param)
+	result, err := db.Query(model, query, param)
 	if err != nil {
 		log.Fatal(err)
 	}

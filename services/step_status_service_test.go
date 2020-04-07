@@ -49,12 +49,13 @@ func TestSaveStepsStatus(t *testing.T) {
 }
 
 func TestFindStepStatusByServiceRequestId(t *testing.T) {
+	workflowName := "TEST_WF"
 	stepsStatusReq := prepareStepsStatus()
 
 	repo = mockGenericRepoImpl{}
 
 	//values :=  []models.StepsStatus{
-	//	models.StepsStatus{
+	//	{
 	//		ID:               "1",
 	//		ServiceRequestId: uuid.New(),
 	//		Status:           models.STATUS_STARTED,
@@ -64,20 +65,20 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	//	},
 	//}
 
-	//queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
-	//	test := model.([]*models.StepsStatus)
-	//	test[0].WorkflowName = "Test"
-	//	log.Println("Model value is ",test)
-	//	return result,err
-	//}
-	//resp, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
-	//assert.Nil(t, err)
-	//assert.Equal(t, stepsStatusReq.StepName, resp.Steps[0].Name)
-	//assert.NotNil(t, resp.Steps)
-
 	queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
-		return result, errors.New("select query failed")
+		test := model.(*[]models.StepsStatus)
+		*test = make([]models.StepsStatus, 1)
+		(*test)[0].WorkflowName = workflowName
+		return result, err
 	}
-	_, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
-	assert.NotNil(t, err)
+	resp, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	assert.Nil(t, err)
+	assert.Equal(t, workflowName, resp.WorkflowName)
+	assert.NotNil(t, resp.Steps)
+
+	//queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
+	//	return result, errors.New("select query failed")
+	//}
+	//_, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	//assert.NotNil(t, err)
 }
