@@ -3,22 +3,29 @@ package handlers
 import (
 	"clamp-core/models"
 	"clamp-core/services"
-	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
 func createWorkflowHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		requestBody, _ := c.GetRawData()
 		// Create new Service Workflow
-		request := models.Workflow{}
-		json.Unmarshal([]byte(requestBody), &request)
-		fmt.Printf("Workflow request : %v \n", request)
-		serviceFlowRes := models.CreateWorkflow(request)
-		services.SaveWorkflow(serviceFlowRes)
-		//TODO - handle error scenario. Currently it is always 200 ok
+		var workflowReq models.Workflow
+		err := c.ShouldBindJSON(&workflowReq)
+		if err != nil {
+			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse)
+			return
+		}
+		log.Printf("Create workflowReq workflowReq : %v \n", workflowReq)
+		serviceFlowRes := models.CreateWorkflow(workflowReq)
+		serviceFlowRes, err = services.SaveWorkflow(serviceFlowRes)
+		if err != nil {
+			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse)
+			return
+		}
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}
 }

@@ -12,12 +12,12 @@ import (
 
 func prepareStepsStatus() models.StepsStatus {
 	stepsStatus := models.StepsStatus{
-		ID:          "1",
-		ServiceRequestId:        uuid.New(),
-		Status: models.STATUS_STARTED,
-		CreatedAt:     time.Now(),
-		StepName:       "Testing",
-		TotalTimeInMs:       10,
+		ID:               "1",
+		ServiceRequestId: uuid.New(),
+		Status:           models.STATUS_STARTED,
+		CreatedAt:        time.Now(),
+		StepName:         "Testing",
+		TotalTimeInMs:    10,
 	}
 	return stepsStatus
 }
@@ -34,7 +34,7 @@ func TestSaveStepsStatus(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, response.ID)
 	assert.Equal(t, stepsStatusReq.StepName, response.StepName, fmt.Sprintf("Expected Step name to be %s but was %s", stepsStatusReq.StepName, response.StepName))
-	assert.Equal(t, stepsStatusReq.TotalTimeInMs, response.TotalTimeInMs, fmt.Sprintf("Expected Total time in ms to be %s but was %s", stepsStatusReq.TotalTimeInMs, response.TotalTimeInMs))
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, response.TotalTimeInMs, fmt.Sprintf("Expected Total time in ms to be %d but was %d", stepsStatusReq.TotalTimeInMs, response.TotalTimeInMs))
 	assert.Equal(t, stepsStatusReq.Status, response.Status, fmt.Sprintf("Expected Step status to be %s but was %s", stepsStatusReq.Status, response.Status))
 
 	insertQueryMock = func(model interface{}) error {
@@ -67,4 +67,3 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	_, err = FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
 	assert.NotNil(t, err)
 }
-

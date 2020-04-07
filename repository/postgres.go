@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-pg/pg/v9"
 	"log"
 	"sync"
@@ -49,7 +48,7 @@ func CloseDB() {
 // GetDB gets the db singleton
 func GetDB() *pg.DB {
 	singletonOnce.Do(func() {
-		fmt.Println("Connecting to DB")
+		log.Println("Connecting to DB")
 		singletonDB = connectDB()
 	})
 	return singletonDB

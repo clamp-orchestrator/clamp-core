@@ -3,20 +3,18 @@ package services
 import (
 	"clamp-core/models"
 	"fmt"
+	"log"
 )
 
 func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
-	fmt.Println("Inside save service flow ", workflowReq)
 	pgWorkflow := workflowReq.ToPGWorkflow()
-	fmt.Println("After converting to pgworkflow request ", workflowReq)
 	err := repo.insertQuery(&pgWorkflow)
 
-	fmt.Println("Response", pgWorkflow)
-
 	if err != nil {
-		panic(err)
+		log.Printf("Failed to save workflow: %v\n", pgWorkflow)
 	}
-	return workflowReq, err
+	log.Printf("Saved worflow %v", pgWorkflow)
+	return pgWorkflow.ToWorkflow(), err
 }
 
 func FindWorkflowByName(workflowName string) (*models.Workflow, error) {

@@ -23,7 +23,6 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		serviceReq := NewServiceRequest(workflowName)
 		serviceReq, _ = services.SaveServiceRequest(serviceReq)
 		services.AddServiceRequestToChannel(serviceReq)
-		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, serviceReq)
 	}
 }

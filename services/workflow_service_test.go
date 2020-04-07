@@ -45,12 +45,8 @@ func TestSaveWorkflow(t *testing.T) {
 	insertQueryMock = func(model interface{}) error {
 		return errors.New("insertion failed")
 	}
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("SaveWorkflow should have panicked!")
-		}
-	}()
 	response, err = SaveWorkflow(workflow)
+	assert.NotNil(t, err)
 }
 
 func TestFindWorkflowByWorkflowName(t *testing.T) {
@@ -75,4 +71,3 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 	_, err = FindWorkflowByName(workflow.Name)
 	assert.NotNil(t, err)
 }
-
