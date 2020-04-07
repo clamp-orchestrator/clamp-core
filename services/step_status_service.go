@@ -25,12 +25,11 @@ func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) (models.StepsS
 
 	_, err := repo.query(&stepsStatus, "select * from steps_status where service_request_id = ?", serviceRequestId)
 	//err := repo.whereQuery(stepsStatus, "steps_status.service_request_id = ?", serviceRequestId)
-	if err != nil {
-		panic(err)
-	}
+
 	log.Println("Steps Status Where Query Response is ", stepsStatus)
 	if err != nil {
 		fmt.Errorf("No record found with given service request id %s", serviceRequestId)
+		return models.StepsStatusResponse{}, err
 	}
 
 	stepStatusRes := PrepareStepStatusResponse(stepsStatus)
