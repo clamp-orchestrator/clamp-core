@@ -14,7 +14,7 @@ func prepareStepsStatus() models.StepsStatus {
 	stepsStatus := models.StepsStatus{
 		ID:               "1",
 		ServiceRequestId: uuid.New(),
-		Status:           models.STATUS_STARTED,
+		Status:           models.STATUS_COMPLETED,
 		CreatedAt:        time.Now(),
 		StepName:         "Testing",
 		TotalTimeInMs:    10,
@@ -49,36 +49,47 @@ func TestSaveStepsStatus(t *testing.T) {
 }
 
 func TestFindStepStatusByServiceRequestId(t *testing.T) {
-	workflowName := "TEST_WF"
 	stepsStatusReq := prepareStepsStatus()
-
 	repo = mockGenericRepoImpl{}
 
-	//values :=  []models.StepsStatus{
-	//	{
-	//		ID:               "1",
-	//		ServiceRequestId: uuid.New(),
-	//		Status:           models.STATUS_STARTED,
-	//		CreatedAt:        time.Now(),
-	//		StepName:         "Testing",
-	//		TotalTimeInMs:    10,
-	//	},
-	//}
-
 	queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+		step2Time := time.Date(2020, time.April, 07, 16, 32, 00, 20000000, time.UTC)
+
 		test := model.(*[]models.StepsStatus)
-		*test = make([]models.StepsStatus, 1)
-		(*test)[0].WorkflowName = workflowName
+		*test = make([]models.StepsStatus, 2)
+		(*test)[0].WorkflowName = stepsStatusReq.WorkflowName
+		(*test)[0].ID = stepsStatusReq.ID
+		(*test)[0].Status = stepsStatusReq.Status
+		(*test)[0].StepName = stepsStatusReq.StepName
+		(*test)[0].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
+		(*test)[0].CreatedAt = step1Time
+		(*test)[1].WorkflowName = stepsStatusReq.WorkflowName
+		(*test)[1].ID = "2"
+		(*test)[1].Status = stepsStatusReq.Status
+		(*test)[1].StepName = "step2"
+		(*test)[1].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
+		(*test)[1].CreatedAt = step2Time
 		return result, err
 	}
 	resp, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
 	assert.Nil(t, err)
-	assert.Equal(t, workflowName, resp.WorkflowName)
+	assert.Equal(t, stepsStatusReq.WorkflowName, resp.WorkflowName)
+	assert.Equal(t, stepsStatusReq.Status, resp.Status)
+	//assert.Equal(t, stepsStatusReq.ServiceRequestId, resp.ServiceRequestId)
+	assert.Equal(t, int64(20000), resp.TotalTimeInMs)
+	assert.NotNil(t, resp.ServiceRequestId)
 	assert.NotNil(t, resp.Steps)
+	assert.Equal(t, stepsStatusReq.Status, resp.Steps[0].Status)
+	assert.Equal(t, stepsStatusReq.StepName,resp.Steps[0].Name)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs,resp.Steps[0].TimeTaken)
+	assert.Equal(t, stepsStatusReq.Status, resp.Steps[1].Status)
+	assert.Equal(t, "step2",resp.Steps[1].Name)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs,resp.Steps[1].TimeTaken)
 
-	//queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
-	//	return result, errors.New("select query failed")
-	//}
-	//_, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
-	//assert.NotNil(t, err)
+	queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
+		return result, errors.New("select query failed")
+	}
+	_, err = FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	assert.NotNil(t, err)
 }
