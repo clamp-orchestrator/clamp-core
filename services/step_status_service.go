@@ -20,11 +20,10 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 
 func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) (models.StepsStatusResponse, error) {
 	serviceRequestReq := models.StepsStatus{ServiceRequestId: serviceRequestId}
-	fmt.Println("Service Request request is -- ", serviceRequestReq)
+	log.Println("Service Request request is -- ", serviceRequestReq)
 	var stepsStatus []models.StepsStatus
 
 	_, err := repo.query(&stepsStatus, "select * from steps_status where service_request_id = ?", serviceRequestId)
-	//err := repo.whereQuery(stepsStatus, "steps_status.service_request_id = ?", serviceRequestId)
 
 	log.Println("Steps Status Where Query Response is ", stepsStatus)
 	if err != nil {

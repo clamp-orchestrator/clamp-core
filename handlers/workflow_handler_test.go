@@ -37,7 +37,7 @@ func setUpWorkflowRequest() models.Workflow {
 		Id:        "firstStep",
 		Name:      "firstStep",
 		Enabled:   true,
-		Mode:      "http",
+		Mode:      "POST",
 		URL:       "http://35.166.176.234:3333/api/v1/user",
 		Transform: false,
 	}

@@ -5,6 +5,7 @@ import (
 	"clamp-core/services"
 	"encoding/json"
 	"fmt"
+	"log"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -18,7 +19,7 @@ func setUp() {
 		Name: workflowName,
 	}
 	resp, err := services.FindWorkflowByName(workflowName)
-	fmt.Println(resp)
+	log.Println(resp)
 	if err != nil {
 		services.SaveWorkflow(workflow)
 	}

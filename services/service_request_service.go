@@ -4,12 +4,13 @@ import (
 	"clamp-core/models"
 	"fmt"
 	"github.com/google/uuid"
+	"log"
 )
 
 //FindServiceRequestByID is
 func FindServiceRequestByID(serviceRequestId uuid.UUID) (*models.ServiceRequest, error) {
 	serviceRequestReq := models.ServiceRequest{ID: serviceRequestId}
-	fmt.Println("Service Request request is -- ", serviceRequestReq)
+	log.Println("Service Request request is -- ", serviceRequestReq)
 	serviceReq := new(models.ServiceRequest)
 	err := repo.whereQuery(serviceReq, "service_request.id = ?", serviceRequestId)
 	if err != nil {
