@@ -21,7 +21,12 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		log.Println("Loaded workflow -", workflow)
 		// Create new service request
 		serviceReq := NewServiceRequest(workflowName)
-		serviceReq, _ = services.SaveServiceRequest(serviceReq)
+		serviceReq, err = services.SaveServiceRequest(serviceReq)
+		if err != nil {
+			errorResponse := CreateErrorResponse(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse)
+			return
+		}
 		services.AddServiceRequestToChannel(serviceReq)
 		c.JSON(http.StatusOK, serviceReq)
 	}

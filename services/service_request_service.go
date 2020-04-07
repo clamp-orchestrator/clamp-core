@@ -2,7 +2,6 @@ package services
 
 import (
 	"clamp-core/models"
-	"fmt"
 	"github.com/google/uuid"
 	"log"
 )
@@ -14,7 +13,7 @@ func FindServiceRequestByID(serviceRequestId uuid.UUID) (*models.ServiceRequest,
 	serviceReq := new(models.ServiceRequest)
 	err := repo.whereQuery(serviceReq, "service_request.id = ?", serviceRequestId)
 	if err != nil {
-		fmt.Errorf("No record found with given service request id %s", serviceRequestId)
+		log.Printf("No record found with given service request id %s", serviceRequestId)
 	}
 	return serviceReq, err
 }
@@ -22,9 +21,10 @@ func FindServiceRequestByID(serviceRequestId uuid.UUID) (*models.ServiceRequest,
 func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest, error) {
 	pgServReq := serviceReq.ToPgServiceRequest()
 	err := repo.insertQuery(&pgServReq)
-
 	if err != nil {
-		panic(err)
+		log.Printf("Failed saving service request %v, error: %s", pgServReq, err.Error())
+	} else {
+		log.Printf("Created new service request %v", pgServReq)
 	}
-	return serviceReq, err
+	return pgServReq.ToServiceRequest(), err
 }

@@ -10,7 +10,7 @@ type ServiceRequest struct {
 	ID           uuid.UUID `json:"id"`
 	WorkflowName string    `json:"workflowName"`
 	Status       Status    `json:"status"`
-	CreatedAt    time.Time    `json:"createdAt"`
+	CreatedAt    time.Time `json:"createdAt"`
 }
 
 type Status string
@@ -24,7 +24,7 @@ const (
 
 func NewServiceRequest(workflowName string) ServiceRequest {
 	currentTime := time.Now()
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt:currentTime}
+	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt: currentTime}
 }
 
 type PGServiceRequest struct {
@@ -40,15 +40,15 @@ func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
 		ID:           serviceReq.ID,
 		WorkflowName: serviceReq.WorkflowName,
 		Status:       serviceReq.Status,
-		CreatedAt:       serviceReq.CreatedAt,
+		CreatedAt:    serviceReq.CreatedAt,
 	}
 }
 
-func (pgServReq PGServiceRequest) toServiceRequest() ServiceRequest {
+func (pgServReq PGServiceRequest) ToServiceRequest() ServiceRequest {
 	return ServiceRequest{
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,
 		Status:       pgServReq.Status,
-		CreatedAt:       pgServReq.CreatedAt,
+		CreatedAt:    pgServReq.CreatedAt,
 	}
 }
