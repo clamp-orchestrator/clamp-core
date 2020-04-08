@@ -1,6 +1,7 @@
 package services
 
 import (
+	"clamp-core/executors"
 	"clamp-core/models"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -10,13 +11,43 @@ import (
 
 const workflowName string = "testWF"
 
-func setUp() {
-	whereQueryMock = func(model interface{}, cond string, params ...interface{}) error {
-		serviceReq := model.(*models.Workflow)
-		serviceReq.Id = "TEST_WF"
-		serviceReq.Steps = []models.Step{}
-		return nil
+type mockRepoImpl struct {
+}
+
+func (s mockRepoImpl) whereQuery(model interface{}, condition string, params ...interface{}) error {
+	serviceReq := model.(*models.Workflow)
+	serviceReq.Id = "TEST_WF"
+	step := models.Step{
+		Id:        "1",
+		Name:      "1",
+		Mode:      "HTTP",
+		Transform: false,
+		Enabled:   false,
+		Val: executors.HttpVal{
+			Method:  "POST",
+			Url:     "http://35.166.176.234:3333/api/v1/login",
+			Headers: "",
+		},
 	}
+	serviceReq.Steps = []models.Step{step}
+
+	return nil
+}
+
+func (s mockRepoImpl) insertQuery(model interface{}) error {
+	return nil
+}
+
+func (s mockRepoImpl) selectQuery(model interface{}) error {
+	return nil
+}
+
+func (s mockRepoImpl) query(model interface{}, query interface{}, param interface{}) (Result, error) {
+	panic("Query func not implemented")
+}
+
+func setUp() {
+	repo = mockRepoImpl{}
 }
 
 func TestAddServiceRequestToChannel(t *testing.T) {

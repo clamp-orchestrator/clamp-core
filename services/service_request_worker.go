@@ -5,9 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"sync"
 	"time"
 )
@@ -58,7 +56,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
-	if err == nil {
+	if err == nil && workflow != nil {
 		executeWorkflowStepsInSync(workflow, prefix, stepStatus)
 	}
 	elapsed := time.Since(start)
@@ -78,34 +76,19 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 		log.Printf("%s Started executing step id %s\n", prefix, step.Id)
 		stepStatus.StepName = step.Name
 		recordStepStartedStatus(stepStatus, stepStartTime)
-		var httpClient = &http.Client{
-			Timeout: time.Second * 10,
-		}
-		request, err := http.NewRequest(step.Mode, step.URL, nil)
+		oldPrefix := log.Prefix()
+		log.SetPrefix(oldPrefix + prefix)
+		resp, err := step.DoExecute()
+		log.SetPrefix(oldPrefix)
 		if err != nil {
 			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
-			errFmt := fmt.Sprintf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-			panic(errFmt)
-		}
-		resp, err := httpClient.Do(request)
-		if err != nil {
-			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
-			errFmt := fmt.Sprintf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-			panic(errFmt)
-		}
-		if resp.StatusCode != 200 {
-			data, _ := ioutil.ReadAll(resp.Body)
-			err := errors.New(string(data))
-			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
-			errFmt := fmt.Sprintf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+			errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
 			panic(errFmt)
 		}
 		if resp != nil {
-			data, _ := ioutil.ReadAll(resp.Body)
-			log.Printf("%s Received %s", prefix, string(data))
+			log.Printf("%s Received %s", prefix, resp.(string))
 			recordStepCompletionStatus(stepStatus, stepStartTime)
 		}
-		//stepElapsedTime := time.Since(start)
 	}
 }
 

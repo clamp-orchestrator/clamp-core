@@ -15,15 +15,6 @@ type Workflow struct {
 	Steps       []Step    `json:"steps" binding:"required,gt=0,dive"`
 }
 
-type Step struct {
-	Id        string `json:"id"`
-	Name      string `json:"name" binding:"required"`
-	Mode      string `json:"mode" binding:"required,oneof=GET POST PUT PATCH DELETE"`
-	URL       string `json:"url" binding:"required,url"`
-	Transform bool   `json:"transform"`
-	Enabled   bool   `json:"enabled"`
-}
-
 //Create a new work flow for a given service flow and return service flow details
 func CreateWorkflow(workflowRequest Workflow) Workflow {
 	return newServiceFlow(workflowRequest)

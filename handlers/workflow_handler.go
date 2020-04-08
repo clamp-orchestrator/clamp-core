@@ -15,6 +15,7 @@ func createWorkflowHandler() gin.HandlerFunc {
 		err := c.ShouldBindJSON(&workflowReq)
 		if err != nil {
 			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+			log.Println(err)
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}

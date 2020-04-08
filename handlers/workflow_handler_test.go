@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"clamp-core/executors"
 	"clamp-core/models"
 	"encoding/json"
 	"fmt"
@@ -32,14 +33,18 @@ func RandStringRunes(n int) string {
 
 func setUpWorkflowRequest() models.Workflow {
 	steps := make([]models.Step, 1)
-
+	httpVal := executors.HttpVal{
+		Method:  "GET",
+		Url:     "http: //35.166.176.234:3333/api/v1/user",
+		Headers: "",
+	}
 	steps[0] = models.Step{
 		Id:        "firstStep",
 		Name:      "firstStep",
-		Enabled:   true,
-		Mode:      "POST",
-		URL:       "http://35.166.176.234:3333/api/v1/user",
+		Mode:      "HTTP",
+		Val:       httpVal,
 		Transform: false,
+		Enabled:   true,
 	}
 	workflow := models.Workflow{
 		Name:        RandStringRunes(10),
@@ -125,8 +130,7 @@ func TestShouldThrowErrorIfStepsAreNotPresent(t *testing.T) {
 func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Steps[0].Name = ""
-	workflowReg.Steps[0].Mode = ""
-	workflowReg.Steps[0].URL = ""
+	workflowReg.Steps[0].Mode = "HTTP"
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	workflowJsonReg, _ := json.Marshal(workflowReg)
@@ -141,6 +145,4 @@ func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
 	errorMessages := strings.Split(jsonResp.Message, "\n")
 	assert.Equal(t, "Key: 'Workflow.Steps[0].Name' Error:Field validation for 'Name' failed on the 'required' tag", errorMessages[0])
-	assert.Equal(t, "Key: 'Workflow.Steps[0].Mode' Error:Field validation for 'Mode' failed on the 'required' tag", errorMessages[1])
-	assert.Equal(t, "Key: 'Workflow.Steps[0].URL' Error:Field validation for 'URL' failed on the 'required' tag", errorMessages[2])
 }
