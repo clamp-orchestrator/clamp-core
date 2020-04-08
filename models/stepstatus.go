@@ -15,7 +15,7 @@ type StepsStatus struct {
 	TotalTimeInMs    		   int64   `json:"totalTimeInMs"`
 	StepName   				   string   `json:"stepName"`
 	Reason   				   string    `json:"reason"`
-	Payload      			   string   `json:"payload"`
+	Payload      			   map[string]interface{}   `json:"payload"`
 }
 
 func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
@@ -38,7 +38,7 @@ type PGStepStatus struct {
 	TotalTimeInMs    		   int64
 	StepName   				   string
 	Reason   				   string
-	Payload      			   string
+	Payload      			   map[string]interface{}
 }
 
 func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
@@ -51,7 +51,7 @@ func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 		TotalTimeInMs:    stepStatus.TotalTimeInMs,
 		StepName:		  stepStatus.StepName,
 		Reason:		      stepStatus.Reason,
-		Payload:		      stepStatus.Payload,
+		Payload:		  stepStatus.Payload,
 	}
 }
 

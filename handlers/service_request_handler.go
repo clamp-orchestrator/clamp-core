@@ -3,8 +3,10 @@ package handlers
 import (
 	. "clamp-core/models"
 	"clamp-core/services"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -35,12 +37,12 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	}
 }
 
-func readRequestPayload(c *gin.Context) string {
-	buf := make([]byte, 1024)
-	num, _ := c.Request.Body.Read(buf)
-	reqBody := string(buf[0:num])
-	log.Println("Request Body ", reqBody)
-	return reqBody
+func readRequestPayload(c *gin.Context) map[string]interface{} {
+	var payload map[string]interface{}
+	data, _ := ioutil.ReadAll(c.Request.Body)
+	json.Unmarshal(data,&payload)
+	log.Println("Request Body", payload)
+	return payload
 }
 
 func getServiceRequestStatusHandler() gin.HandlerFunc {
