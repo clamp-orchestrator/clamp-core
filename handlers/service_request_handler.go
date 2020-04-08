@@ -13,6 +13,9 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflowName")
 		workflow, err := services.FindWorkflowByName(workflowName)
+
+		payload := readRequestPayload(c)
+
 		if err != nil {
 			errorResponse := CreateErrorResponse(http.StatusBadRequest, "No record found with given workflow name : "+workflowName)
 			c.JSON(http.StatusBadRequest, errorResponse)
@@ -20,11 +23,19 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		}
 		log.Println("Loaded workflow -", workflow)
 		// Create new service request
-		serviceReq := NewServiceRequest(workflowName)
+		serviceReq := NewServiceRequest(workflowName, payload)
 		serviceReq, _ = services.SaveServiceRequest(serviceReq)
 		services.AddServiceRequestToChannel(serviceReq)
 		c.JSON(http.StatusOK, serviceReq)
 	}
+}
+
+func readRequestPayload(c *gin.Context) string {
+	buf := make([]byte, 1024)
+	num, _ := c.Request.Body.Read(buf)
+	reqBody := string(buf[0:num])
+	log.Println("Request Body ", reqBody)
+	return reqBody
 }
 
 func getServiceRequestStatusHandler() gin.HandlerFunc {

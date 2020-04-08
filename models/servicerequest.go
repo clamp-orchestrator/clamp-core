@@ -11,6 +11,7 @@ type ServiceRequest struct {
 	WorkflowName string    `json:"workflowName"`
 	Status       Status    `json:"status"`
 	CreatedAt    time.Time    `json:"createdAt"`
+	Payload      string   `json:"payload"`
 }
 
 type Status string
@@ -22,9 +23,9 @@ const (
 	STATUS_FAILED    Status = "FAILED"
 )
 
-func NewServiceRequest(workflowName string) ServiceRequest {
+func NewServiceRequest(workflowName string, payload string) ServiceRequest {
 	currentTime := time.Now()
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt:currentTime}
+	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt:currentTime, Payload:payload}
 }
 
 type PGServiceRequest struct {
@@ -33,6 +34,7 @@ type PGServiceRequest struct {
 	WorkflowName string
 	Status       Status
 	CreatedAt    time.Time
+	Payload      string   `json:"payload"`
 }
 
 func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
@@ -41,6 +43,7 @@ func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
 		WorkflowName: serviceReq.WorkflowName,
 		Status:       serviceReq.Status,
 		CreatedAt:       serviceReq.CreatedAt,
+		Payload:       serviceReq.Payload,
 	}
 }
 
@@ -50,5 +53,6 @@ func (pgServReq PGServiceRequest) toServiceRequest() ServiceRequest {
 		WorkflowName: pgServReq.WorkflowName,
 		Status:       pgServReq.Status,
 		CreatedAt:       pgServReq.CreatedAt,
+		Payload:       pgServReq.Payload,
 	}
 }

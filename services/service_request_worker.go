@@ -54,6 +54,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	defer catchErrors(prefix, serviceReq.ID)
 	stepStatus.ServiceRequestId = serviceReq.ID
 	stepStatus.WorkflowName = serviceReq.WorkflowName
+	stepStatus.Payload = serviceReq.Payload
 
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
