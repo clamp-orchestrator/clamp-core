@@ -47,7 +47,7 @@ func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
 	}
 }
 
-func (pgServReq PGServiceRequest) toServiceRequest() ServiceRequest {
+func (pgServReq PGServiceRequest) ToServiceRequest() ServiceRequest {
 	return ServiceRequest{
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,

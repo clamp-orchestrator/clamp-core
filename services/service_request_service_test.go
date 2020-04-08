@@ -50,12 +50,14 @@ func TestSaveServiceRequest(t *testing.T) {
 	insertQueryMock = func(model interface{}) error {
 		return errors.New("insertion failed")
 	}
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("SaveServiceRequest should have panicked!")
-		}
-	}()
+	//defer func() {
+	//	if r := recover(); r == nil {
+	//		t.Errorf("SaveServiceRequest should have panicked!")
+	//	}
+	//}()
 	request, err = SaveServiceRequest(serviceReq)
+	assert.NotNil(t, err)
+	assert.Equal(t, "insertion failed", err.Error())
 }
 
 func TestFindByID(t *testing.T) {
