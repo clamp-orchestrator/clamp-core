@@ -9,11 +9,6 @@ import (
 type Val interface {
 }
 
-type Val1 interface {
-	Val
-	DoExecute() (interface{}, error)
-}
-
 type Step struct {
 	Id        string `json:"id"`
 	Name      string `json:"name" binding:"required"`
