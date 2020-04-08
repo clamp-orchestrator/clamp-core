@@ -133,5 +133,32 @@ func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
 			t.Errorf("GetHttpVal should have panicked!")
 		}
 	}()
-	assert.Equal(t, "Key: 'Workflow.Steps[0].Mode' Error:Field validation for 'Mode' failed on the 'oneof' tag", workflow.Steps[0].getHttpVal())
+	workflow.Steps[0].getHttpVal()
+}
+
+func TestShouldThrowErrorIfGetHTTPValUrlIsEmpty(t *testing.T) {
+	http := executors.HttpVal{
+		Method:  "GET",
+		Url:     "",
+		Headers: "",
+	}
+	steps := []Step{{}}
+	steps[0] = Step{
+		Id:      "firstStep",
+		Name:    "firstStep",
+		Mode:    "QUEUE",
+		Val:     http,
+		Enabled: true,
+	}
+	workflow := Workflow{
+		Id:          "1",
+		Name:        "Test",
+		Description: "Test",
+		Enabled:     false,
+		Steps:       steps,
+	}
+
+	err := binding.Validator.ValidateStruct(workflow)
+	assert.NotNil(t, err)
+	assert.Equal(t, "Key: 'Workflow.Steps[0].Val.Url' Error:Field validation for 'Url' failed on the 'required' tag", err.Error())
 }
