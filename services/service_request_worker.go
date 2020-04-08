@@ -81,6 +81,7 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 		resp, err := step.DoExecute()
 		log.SetPrefix(oldPrefix)
 		if err != nil {
+			log.Println("Inside error block", err)
 			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
 			errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
 			panic(errFmt)

@@ -15,6 +15,7 @@ type HttpVal struct {
 }
 
 func (httpVal HttpVal) DoExecute() (interface{}, error) {
+	log.Println("Inside HTTP Do Execute function")
 	prefix := log.Prefix()
 	log.SetPrefix("")
 	log.Printf("%s HTTP Executor: Calling http %s:%s", prefix, httpVal.Method, httpVal.Url)
@@ -32,6 +33,7 @@ func (httpVal HttpVal) DoExecute() (interface{}, error) {
 	if resp.StatusCode != 200 {
 		data, _ := ioutil.ReadAll(resp.Body)
 		err := errors.New(string(data))
+		log.Println("Unable to execute \t", httpVal.Url," with error message",err)
 		return nil, err
 	}
 	data, _ := ioutil.ReadAll(resp.Body)

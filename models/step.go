@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"encoding/json"
 	"fmt"
+	"log"
 )
 
 type Val interface {
@@ -21,8 +22,10 @@ type Step struct {
 func (step Step) DoExecute() (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
-		return step.Val.(executors.HttpVal).DoExecute()
+		log.Println("Inside HTTP Execute")
+		return step.Val.(*executors.HttpVal).DoExecute()
 	case "QUEUE":
+		log.Println("Inside QUEUE Execute")
 		return step.Val.(executors.QueueVal).DoExecute()
 	}
 	panic("Invalid mode specified")
