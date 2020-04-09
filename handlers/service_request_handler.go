@@ -39,10 +39,14 @@ func createServiceRequestHandler() gin.HandlerFunc {
 
 func readRequestPayload(c *gin.Context) map[string]interface{} {
 	var payload map[string]interface{}
-	data, _ := ioutil.ReadAll(c.Request.Body)
-	json.Unmarshal(data,&payload)
-	log.Println("Request Body", payload)
-	return payload
+	if c.Request.Body != nil {
+		data, _ := ioutil.ReadAll(c.Request.Body)
+		json.Unmarshal(data, &payload)
+		log.Println("Request Body", payload)
+		return payload
+	} else {
+		return nil
+	}
 }
 
 func getServiceRequestStatusHandler() gin.HandlerFunc {

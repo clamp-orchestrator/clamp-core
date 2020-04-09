@@ -74,14 +74,17 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 }
 
 func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepStatus models.StepsStatus) {
+	previousStepResponse := stepStatus.Payload.Request
 	for _, step := range workflow.Steps {
+		stepStatus.Payload.Request = previousStepResponse
+		stepStatus.Payload.Response = nil
 		stepStartTime := time.Now()
 		log.Printf("%s Started executing step id %s\n", prefix, step.Id)
 		stepStatus.StepName = step.Name
 		recordStepStartedStatus(stepStatus, stepStartTime)
 		oldPrefix := log.Prefix()
 		log.SetPrefix(oldPrefix + prefix)
-		resp, err := step.DoExecute()
+		resp, err := step.DoExecute(stepStatus.Payload.Request)
 		log.SetPrefix(oldPrefix)
 		if err != nil {
 			log.Println("Inside error block", err)
@@ -91,16 +94,17 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 		}
 		if resp != nil {
 			log.Printf("%s Received %s", prefix, resp.(string))
-			recordStepCompletionStatus(stepStatus, resp.(string), stepStartTime)
+			var responsePayload map[string]interface{}
+			json.Unmarshal([]byte(resp.(string)), &responsePayload)
+			stepStatus.Payload.Response = responsePayload
+			recordStepCompletionStatus(stepStatus, stepStartTime)
+			previousStepResponse = responsePayload
 		}
 	}
 }
 
-func recordStepCompletionStatus(stepStatus models.StepsStatus, successResponse string, stepStartTime time.Time) {
+func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
-	var responsePayload map[string]interface{}
-	json.Unmarshal([]byte(successResponse), &responsePayload)
-	stepStatus.Payload.Response = responsePayload
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }

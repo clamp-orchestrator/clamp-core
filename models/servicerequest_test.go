@@ -17,6 +17,7 @@ func prepareRequestPayload() map[string]interface{} {
 func TestShouldCreateANewServiceRequestWithUUID(t *testing.T) {
 	expectedLen := 16
 	payload := prepareRequestPayload()
+
 	servRequest := NewServiceRequest("CreateOrder", payload)
 
 	assert.Equal(t, expectedLen, len(servRequest.ID), fmt.Sprintf("The UUID %s should be %d chars long", servRequest.ID.String(), expectedLen))
@@ -24,6 +25,7 @@ func TestShouldCreateANewServiceRequestWithUUID(t *testing.T) {
 
 func TestShouldCreateANewServiceRequestWithWorkflowName(t *testing.T) {
 	expectedWorkflowName := "CreateOrder"
+
 	payload := prepareRequestPayload()
 	servRequest := NewServiceRequest(expectedWorkflowName, payload)
 
@@ -32,6 +34,7 @@ func TestShouldCreateANewServiceRequestWithWorkflowName(t *testing.T) {
 
 func TestThatGeneratedUUIDForServiceRequestAreDifferent(t *testing.T) {
 	expectedWorkflowName := "CreateOrder"
+
 	payload := prepareRequestPayload()
 	servRequestOne := NewServiceRequest(expectedWorkflowName, payload)
 	servRequestTwo := NewServiceRequest(expectedWorkflowName, payload)
@@ -40,8 +43,10 @@ func TestThatGeneratedUUIDForServiceRequestAreDifferent(t *testing.T) {
 }
 
 func TestShouldCreateANewServiceRequestWithDefaultStatus9(t *testing.T) {
+
 	payload := prepareRequestPayload()
 	servRequest := NewServiceRequest("CreateOrder", payload)
+
 	expectedStatus := STATUS_NEW
 	assert.Equal(t, expectedStatus, servRequest.Status, fmt.Sprintf("Expected service request status to be equal but were %s and %s", expectedStatus, servRequest.Status))
 }

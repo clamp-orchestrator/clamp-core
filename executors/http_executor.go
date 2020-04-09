@@ -1,6 +1,8 @@
 package executors
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -14,15 +16,17 @@ type HttpVal struct {
 	Headers string `json:"headers"`
 }
 
-func (httpVal HttpVal) DoExecute() (interface{}, error) {
+func (httpVal HttpVal) DoExecute(requestBody interface{}) (interface{}, error) {
 	log.Println("Inside HTTP Do Execute function")
 	prefix := log.Prefix()
 	log.SetPrefix("")
-	log.Printf("%s HTTP Executor: Calling http %s:%s", prefix, httpVal.Method, httpVal.Url)
+	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.Url, requestBody)
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
 	}
-	request, err := http.NewRequest(httpVal.Method, httpVal.Url, nil)
+	requestJsonBytes, _ := json.Marshal(requestBody)
+	requestReader := bytes.NewReader(requestJsonBytes)
+	request, err := http.NewRequest(httpVal.Method, httpVal.Url, requestReader)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +37,7 @@ func (httpVal HttpVal) DoExecute() (interface{}, error) {
 	if resp.StatusCode != 200 {
 		data, _ := ioutil.ReadAll(resp.Body)
 		err := errors.New(string(data))
-		log.Println("Unable to execute \t", httpVal.Url," with error message",err)
+		log.Println("Unable to execute \t", httpVal.Url, " with error message", err)
 		return nil, err
 	}
 	data, _ := ioutil.ReadAll(resp.Body)

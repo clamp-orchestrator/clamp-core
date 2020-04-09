@@ -81,11 +81,11 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	assert.NotNil(t, resp.ServiceRequestId)
 	assert.NotNil(t, resp.Steps)
 	assert.Equal(t, stepsStatusReq.Status, resp.Steps[0].Status)
-	assert.Equal(t, stepsStatusReq.StepName,resp.Steps[0].Name)
-	assert.Equal(t, stepsStatusReq.TotalTimeInMs,resp.Steps[0].TimeTaken)
+	assert.Equal(t, stepsStatusReq.StepName, resp.Steps[0].Name)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[0].TimeTaken)
 	assert.Equal(t, stepsStatusReq.Status, resp.Steps[1].Status)
-	assert.Equal(t, "step2",resp.Steps[1].Name)
-	assert.Equal(t, stepsStatusReq.TotalTimeInMs,resp.Steps[1].TimeTaken)
+	assert.Equal(t, "step2", resp.Steps[1].Name)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[1].TimeTaken)
 
 	queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
 		return result, errors.New("select query failed")
