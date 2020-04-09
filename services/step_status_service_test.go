@@ -77,7 +77,7 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	assert.Equal(t, stepsStatusReq.WorkflowName, resp.WorkflowName)
 	assert.Equal(t, stepsStatusReq.Status, resp.Status)
 	//assert.Equal(t, stepsStatusReq.ServiceRequestId, resp.ServiceRequestId)
-	assert.Equal(t, int64(20000), resp.TotalTimeInMs)
+	assert.Equal(t, int64(20), resp.TotalTimeInMs)
 	assert.NotNil(t, resp.ServiceRequestId)
 	assert.NotNil(t, resp.Steps)
 	assert.Equal(t, stepsStatusReq.Status, resp.Steps[0].Status)

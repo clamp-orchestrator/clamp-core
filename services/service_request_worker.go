@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"log"
+	"net/http"
 	"sync"
 	"time"
 )
@@ -90,16 +91,16 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 		}
 		if resp != nil {
 			log.Printf("%s Received %s", prefix, resp.(string))
-			var responsePayload map[string]interface{}
-			json.Unmarshal([]byte(resp.(string)), &responsePayload)
-			stepStatus.Payload.Response = responsePayload
-			recordStepCompletionStatus(stepStatus, stepStartTime)
+			recordStepCompletionStatus(stepStatus, resp.(string), stepStartTime)
 		}
 	}
 }
 
-func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepCompletionStatus(stepStatus models.StepsStatus, successResponse string, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
+	var responsePayload map[string]interface{}
+	json.Unmarshal([]byte(successResponse), &responsePayload)
+	stepStatus.Payload.Response = responsePayload
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }
@@ -111,7 +112,17 @@ func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.T
 }
 
 func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
+	log.Println("Inside Record Step Failed Status")
 	stepStatus.Status = models.STATUS_FAILED
+	clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+	marshal, marshalErr := json.Marshal(clampErrorResponse)
+	log.Println("================= clampErrorResponse: Marshal string ===================",string(marshal))
+	log.Println("================= clampErrorResponse: Marshal error ===================",marshalErr)
+	var responsePayload map[string]interface{}
+	unmarshalErr := json.Unmarshal(marshal, &responsePayload)
+	log.Println("================= clampErrorResponse: UnMarshal string ===================",responsePayload)
+	log.Println("================= clampErrorResponse: UnMarshal error ===================",unmarshalErr)
+	stepStatus.Payload.Response = responsePayload
 	stepStatus.Reason = err.Error()
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
