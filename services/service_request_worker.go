@@ -116,17 +116,15 @@ func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.T
 }
 
 func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
-	log.Println("Inside Record Step Failed Status")
 	stepStatus.Status = models.STATUS_FAILED
 	clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	marshal, marshalErr := json.Marshal(clampErrorResponse)
-	log.Println("================= clampErrorResponse: Marshal string ===================",string(marshal))
-	log.Println("================= clampErrorResponse: Marshal error ===================",marshalErr)
+	log.Println("clampErrorResponse: Marshal error",marshalErr)
 	var responsePayload map[string]interface{}
 	unmarshalErr := json.Unmarshal(marshal, &responsePayload)
-	log.Println("================= clampErrorResponse: UnMarshal string ===================",responsePayload)
-	log.Println("================= clampErrorResponse: UnMarshal error ===================",unmarshalErr)
-	stepStatus.Payload.Response = responsePayload
+	log.Println("clampErrorResponse: UnMarshal error",unmarshalErr)
+	errPayload := map[string]interface{}{"errors":responsePayload}
+	stepStatus.Payload.Response = errPayload
 	stepStatus.Reason = err.Error()
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
