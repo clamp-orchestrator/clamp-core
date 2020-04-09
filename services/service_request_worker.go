@@ -95,20 +95,20 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_STARTED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
 	stepStatus.Status = models.STATUS_FAILED
 	stepStatus.Reason = err.Error()
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }
 

@@ -56,6 +56,7 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 			Name:      stepsStatus.StepName,
 			Status:    stepsStatus.Status,
 			TimeTaken: stepsStatus.TotalTimeInMs,
+			Payload: stepsStatus.Payload,
 		}
 	}
 
@@ -65,7 +66,7 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 	stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
 	stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
 	timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
-	stepsStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / 1000
+	stepsStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / 1000000
 	stepsStatusRes.Steps = steps
 	return stepsStatusRes
 }

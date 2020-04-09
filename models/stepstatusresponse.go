@@ -18,4 +18,5 @@ type StepResponse struct {
 	Name      string `json:"name"`
 	Status    Status    `json:"status"`
 	TimeTaken int64 `json:"timeTaken"`
+	Payload      map[string]interface{}   `json:"payload"`
 }
