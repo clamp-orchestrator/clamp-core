@@ -73,14 +73,17 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 }
 
 func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepStatus models.StepsStatus) {
+	previousStepResponse := stepStatus.Payload.Request
 	for _, step := range workflow.Steps {
+		stepStatus.Payload.Request = previousStepResponse
+		stepStatus.Payload.Response = nil
 		stepStartTime := time.Now()
 		log.Printf("%s Started executing step id %s\n", prefix, step.Id)
 		stepStatus.StepName = step.Name
 		recordStepStartedStatus(stepStatus, stepStartTime)
 		oldPrefix := log.Prefix()
 		log.SetPrefix(oldPrefix + prefix)
-		resp, err := step.DoExecute()
+		resp, err := step.DoExecute(stepStatus.Payload.Request)
 		log.SetPrefix(oldPrefix)
 		if err != nil {
 			log.Println("Inside error block", err)
@@ -94,6 +97,7 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 			json.Unmarshal([]byte(resp.(string)), &responsePayload)
 			stepStatus.Payload.Response = responsePayload
 			recordStepCompletionStatus(stepStatus, stepStartTime)
+			previousStepResponse = responsePayload
 		}
 	}
 }

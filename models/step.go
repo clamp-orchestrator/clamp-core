@@ -19,14 +19,14 @@ type Step struct {
 	Enabled   bool   `json:"enabled"`
 }
 
-func (step Step) DoExecute() (interface{}, error) {
+func (step Step) DoExecute(requestBody interface{}) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
 		log.Println("Inside HTTP Execute")
-		return step.Val.(*executors.HttpVal).DoExecute()
+		return step.Val.(*executors.HttpVal).DoExecute(requestBody)
 	case "QUEUE":
 		log.Println("Inside QUEUE Execute")
-		return step.Val.(executors.QueueVal).DoExecute()
+		return step.Val.(*executors.QueueVal).DoExecute()
 	}
 	panic("Invalid mode specified")
 }

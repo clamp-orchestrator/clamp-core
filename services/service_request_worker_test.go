@@ -23,7 +23,7 @@ func (s mockRepoImpl) whereQuery(model interface{}, condition string, params ...
 		Mode:      "HTTP",
 		Transform: false,
 		Enabled:   false,
-		Val: executors.HttpVal{
+		Val: &executors.HttpVal{
 			Method:  "POST",
 			Url:     "http://35.166.176.234:3333/api/v1/login",
 			Headers: "",
