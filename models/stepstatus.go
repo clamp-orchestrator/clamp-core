@@ -5,6 +5,11 @@ import (
 	"time"
 )
 
+type Payload struct {
+	Request  map[string]interface{} `json:"request"`
+	Response map[string]interface{} `json:"response"`
+}
+
 //Step Status is a structure to store the service request steps details
 type StepsStatus struct {
 	ID           			   string `json:"id"`
@@ -15,7 +20,7 @@ type StepsStatus struct {
 	TotalTimeInMs    		   int64   `json:"totalTimeInMs"`
 	StepName   				   string   `json:"stepName"`
 	Reason   				   string    `json:"reason"`
-	Payload      			   map[string]interface{}   `json:"payload"`
+	Payload      			   Payload   `json:"payload"`
 }
 
 func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
@@ -38,7 +43,7 @@ type PGStepStatus struct {
 	TotalTimeInMs    		   int64
 	StepName   				   string
 	Reason   				   string
-	Payload      			   map[string]interface{}
+	Payload      			   Payload
 }
 
 func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {

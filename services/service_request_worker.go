@@ -2,6 +2,7 @@ package services
 
 import (
 	"clamp-core/models"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -52,7 +53,8 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	defer catchErrors(prefix, serviceReq.ID)
 	stepStatus.ServiceRequestId = serviceReq.ID
 	stepStatus.WorkflowName = serviceReq.WorkflowName
-	stepStatus.Payload = serviceReq.Payload
+
+	stepStatus.Payload.Request = serviceReq.Payload
 
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
@@ -88,6 +90,9 @@ func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepSt
 		}
 		if resp != nil {
 			log.Printf("%s Received %s", prefix, resp.(string))
+			var responsePayload map[string]interface{}
+			json.Unmarshal([]byte(resp.(string)), &responsePayload)
+			stepStatus.Payload.Response = responsePayload
 			recordStepCompletionStatus(stepStatus, stepStartTime)
 		}
 	}
