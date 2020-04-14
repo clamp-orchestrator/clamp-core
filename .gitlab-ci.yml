@@ -1,12 +1,13 @@
 stages:
   - test
   - build
+  - integration-test
 
 test:
   stage: test
   image: golang:1.13.5
   script:
-    - go test ./...
+    - go test clamp-core/executors clamp-core/models clamp-core/services
   only:
     - merge_requests
     - master
@@ -19,5 +20,13 @@ build:
   artifacts:
     paths:
       - ./clamp-core
+  only:
+    - master
+
+integration-test:
+  stage: integration-test
+  image: golang:1.13.5
+  script:
+    - go test clamp-core/handlers
   only:
     - master
