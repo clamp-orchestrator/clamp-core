@@ -1,11 +1,14 @@
 image: golang:1.13.5
 
-cache:
-  paths:
-    - /go/src/github.com
-    - /go/src/golang.org
-    - /go/src/google.golang.org
-    - /go/src/gopkg.in
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    paths:
+      - .go/pkg/mod/
+
 
 stages:
   - test
@@ -13,6 +16,7 @@ stages:
   - integration-test
 
 test:
+  extends: .go-cache
   stage: test
   script:
     - go test clamp-core/executors clamp-core/models clamp-core/services
@@ -21,6 +25,7 @@ test:
     - master
 
 build:
+  extends: .go-cache
   stage: build
   script:
     - go build
@@ -31,6 +36,7 @@ build:
     - master
 
 integration-test:
+  extends: .go-cache
   stage: integration-test
   script:
     - go test clamp-core/handlers
