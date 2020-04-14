@@ -1,3 +1,12 @@
+image: golang:1.13.5
+
+cache:
+  paths:
+    - /go/src/github.com
+    - /go/src/golang.org
+    - /go/src/google.golang.org
+    - /go/src/gopkg.in
+
 stages:
   - test
   - build
@@ -5,7 +14,6 @@ stages:
 
 test:
   stage: test
-  image: golang:1.13.5
   script:
     - go test clamp-core/executors clamp-core/models clamp-core/services
   only:
@@ -14,7 +22,6 @@ test:
 
 build:
   stage: build
-  image: golang:1.13.5
   script:
     - go build
   artifacts:
@@ -25,7 +32,6 @@ build:
 
 integration-test:
   stage: integration-test
-  image: golang:1.13.5
   script:
     - go test clamp-core/handlers
   only:
