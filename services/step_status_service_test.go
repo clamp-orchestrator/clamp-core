@@ -24,10 +24,8 @@ func prepareStepsStatus() models.StepsStatus {
 func TestSaveStepsStatus(t *testing.T) {
 
 	stepsStatusReq := prepareStepsStatus()
-	repo = mockGenericRepoImpl{}
-
-	insertQueryMock = func(model interface{}) error {
-		return nil
+	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
+		return stepStatus, nil
 	}
 	response, err := SaveStepStatus(stepsStatusReq)
 	assert.NotNil(t, response)
@@ -37,42 +35,37 @@ func TestSaveStepsStatus(t *testing.T) {
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, response.TotalTimeInMs, fmt.Sprintf("Expected Total time in ms to be %d but was %d", stepsStatusReq.TotalTimeInMs, response.TotalTimeInMs))
 	assert.Equal(t, stepsStatusReq.Status, response.Status, fmt.Sprintf("Expected Step status to be %s but was %s", stepsStatusReq.Status, response.Status))
 
-	insertQueryMock = func(model interface{}) error {
-		return errors.New("insertion failed")
+	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
+		return status, errors.New("insertion failed")
 	}
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("Saving Steps Status should have panicked!")
-		}
-	}()
 	response, err = SaveStepStatus(stepsStatusReq)
+	assert.NotNil(t, err)
 }
 
 func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	stepsStatusReq := prepareStepsStatus()
-	repo = mockGenericRepoImpl{}
-
-	queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
+	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 		step2Time := time.Date(2020, time.April, 07, 16, 32, 00, 20000000, time.UTC)
 
-		test := model.(*[]models.StepsStatus)
-		*test = make([]models.StepsStatus, 2)
-		(*test)[0].WorkflowName = stepsStatusReq.WorkflowName
-		(*test)[0].ID = stepsStatusReq.ID
-		(*test)[0].Status = stepsStatusReq.Status
-		(*test)[0].StepName = stepsStatusReq.StepName
-		(*test)[0].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
-		(*test)[0].CreatedAt = step1Time
-		(*test)[1].WorkflowName = stepsStatusReq.WorkflowName
-		(*test)[1].ID = "2"
-		(*test)[1].Status = stepsStatusReq.Status
-		(*test)[1].StepName = "step2"
-		(*test)[1].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
-		(*test)[1].CreatedAt = step2Time
-		return result, err
+		statuses = make([]models.StepsStatus, 2)
+		statuses[0].WorkflowName = stepsStatusReq.WorkflowName
+		statuses[0].ID = stepsStatusReq.ID
+		statuses[0].Status = stepsStatusReq.Status
+		statuses[0].StepName = stepsStatusReq.StepName
+		statuses[0].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
+		statuses[0].CreatedAt = step1Time
+		statuses[1].WorkflowName = stepsStatusReq.WorkflowName
+		statuses[1].ID = "2"
+		statuses[1].Status = stepsStatusReq.Status
+		statuses[1].StepName = "step2"
+		statuses[1].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
+		statuses[1].CreatedAt = step2Time
+		return statuses, err
 	}
-	resp, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+
+	stepsStatus, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	resp := PrepareStepStatusResponse(stepsStatus)
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, resp.WorkflowName)
 	assert.Equal(t, stepsStatusReq.Status, resp.Status)
@@ -87,8 +80,8 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	assert.Equal(t, "step2", resp.Steps[1].Name)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[1].TimeTaken)
 
-	queryMock = func(model interface{}, query interface{}, param interface{}) (result Result, err error) {
-		return result, errors.New("select query failed")
+	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+		return statuses, errors.New("select query failed")
 	}
 	_, err = FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
 	assert.NotNil(t, err)

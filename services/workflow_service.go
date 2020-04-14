@@ -2,23 +2,24 @@ package services
 
 import (
 	"clamp-core/models"
+	"clamp-core/repository"
 	"log"
 )
 
 func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
-	pgWorkflow := workflowReq.ToPGWorkflow()
-	err := repo.insertQuery(&pgWorkflow)
-
+	log.Printf("Saving worflow %v", workflowReq)
+	workflow, err := repository.DB.SaveWorkflow(workflowReq)
 	if err != nil {
-		log.Printf("Failed to save workflow: %v, error: %s\n", pgWorkflow, err.Error())
+		log.Printf("Failed to save workflow: %v, error: %s\n", workflow, err.Error())
+	} else {
+		log.Printf("Saved worflow %v", workflow)
 	}
-	log.Printf("Saved worflow %v", pgWorkflow)
-	return pgWorkflow.ToWorkflow(), err
+	return workflow, err
 }
 
-func FindWorkflowByName(workflowName string) (*models.Workflow, error) {
-	workflow := new(models.Workflow)
-	err := repo.whereQuery(workflow, "workflow.name = ?", workflowName)
+func FindWorkflowByName(workflowName string) (models.Workflow, error) {
+	log.Printf("Finding workflow by name : %s", workflowName)
+	workflow, err := repository.GetDB().FindWorkflowByName(workflowName)
 	if err != nil {
 		log.Printf("No record found with given workflow name %s, error: %s\n", workflowName, err.Error())
 	}

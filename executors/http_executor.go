@@ -17,7 +17,7 @@ type HttpVal struct {
 }
 
 func (httpVal HttpVal) DoExecute(requestBody interface{}) (interface{}, error) {
-	log.Println("Inside HTTP Do Execute function")
+	//log.Println("Inside HTTP Do Execute function")
 	prefix := log.Prefix()
 	log.SetPrefix("")
 	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.Url, requestBody)

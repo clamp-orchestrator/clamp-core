@@ -59,7 +59,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
-	if err == nil && workflow != nil {
+	if err == nil {
 		executeWorkflowStepsInSync(workflow, prefix, stepStatus)
 	}
 	elapsed := time.Since(start)
@@ -73,7 +73,7 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 	}
 }
 
-func executeWorkflowStepsInSync(workflow *models.Workflow, prefix string, stepStatus models.StepsStatus) {
+func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
 	previousStepResponse := stepStatus.Payload.Request
 	for _, step := range workflow.Steps {
 		stepStatus.Payload.Request = previousStepResponse
@@ -119,11 +119,11 @@ func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartT
 	stepStatus.Status = models.STATUS_FAILED
 	clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	marshal, marshalErr := json.Marshal(clampErrorResponse)
-	log.Println("clampErrorResponse: Marshal error",marshalErr)
+	log.Println("clampErrorResponse: Marshal error", marshalErr)
 	var responsePayload map[string]interface{}
 	unmarshalErr := json.Unmarshal(marshal, &responsePayload)
-	log.Println("clampErrorResponse: UnMarshal error",unmarshalErr)
-	errPayload := map[string]interface{}{"errors":responsePayload}
+	log.Println("clampErrorResponse: UnMarshal error", unmarshalErr)
+	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
 	stepStatus.Reason = err.Error()
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000

@@ -1,18 +1,17 @@
 package repository
 
 import (
+	"clamp-core/models"
 	"context"
 	"github.com/go-pg/pg/v9"
+	"github.com/google/uuid"
 	"log"
 	"sync"
 )
 
 const LogSQLQueries bool = true
 
-var (
-	singletonDB   *pg.DB
-	singletonOnce sync.Once
-)
+var singletonOnce sync.Once
 
 type dbLogger struct{}
 
@@ -38,18 +37,66 @@ func connectDB() (db *pg.DB) {
 	return db
 }
 
-func CloseDB() {
-	if singletonDB != nil {
-		log.Println("Disconnecting from DB")
-		singletonDB.Close()
-	}
+type postgres struct {
+	db *pg.DB
 }
 
-// GetDB gets the db singleton
-func GetDB() *pg.DB {
+func (p *postgres) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
+	var pgStepStatus []models.PGStepStatus
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestId).Select()
+	var stepStatuses []models.StepsStatus
+	for _, status := range pgStepStatus {
+		stepStatuses = append(stepStatuses, status.ToStepStatus())
+	}
+	return stepStatuses, err
+}
+
+func (p *postgres) SaveStepStatus(stepStatus models.StepsStatus) (models.StepsStatus, error) {
+	pgStepStatusReq := stepStatus.ToPgStepStatus()
+	err := p.getDb().Insert(&pgStepStatusReq)
+	return pgStepStatusReq.ToStepStatus(), err
+}
+
+func (p *postgres) FindWorkflowByName(workflowName string) (models.Workflow, error) {
+	pgWorkflow := new(models.PGWorkflow)
+	err := p.getDb().Model(pgWorkflow).Where("name = ?", workflowName).Select()
+	return (*pgWorkflow).ToWorkflow(), err
+}
+
+func (p *postgres) SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
+	pgWorkflow := workflowReq.ToPGWorkflow()
+	log.Printf("pgworfklow: %v", pgWorkflow)
+	err := p.getDb().Insert(&pgWorkflow)
+	return pgWorkflow.ToWorkflow(), err
+}
+
+func (p *postgres) FindServiceRequestById(serviceRequestId uuid.UUID) (models.ServiceRequest, error) {
+	pgServiceRequest := &models.PGServiceRequest{ID: serviceRequestId}
+	err := p.getDb().Select(pgServiceRequest)
+	if err != nil {
+		panic(err)
+	}
+	return (*pgServiceRequest).ToServiceRequest(), err
+}
+
+func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest, error) {
+	pgServReq := serviceReq.ToPgServiceRequest()
+	db := p.getDb()
+	err := db.Insert(&pgServReq)
+	return pgServReq.ToServiceRequest(), err
+}
+
+func (p *postgres) getDb() *pg.DB {
 	singletonOnce.Do(func() {
 		log.Println("Connecting to DB")
-		singletonDB = connectDB()
+		p.db = connectDB()
 	})
-	return singletonDB
+	return p.db
+}
+
+func (p *postgres) closeDB() {
+	if p.db != nil {
+		log.Println("Disconnecting from DB")
+		p.db.Close()
+	}
 }

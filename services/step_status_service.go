@@ -2,72 +2,60 @@ package services
 
 import (
 	"clamp-core/models"
-	"fmt"
+	"clamp-core/repository"
 	"github.com/google/uuid"
 	"log"
 	"time"
 )
 
 func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error) {
-	pgStepStatusReq := stepStatusReq.ToPgStepStatus()
-	err := repo.insertQuery(&pgStepStatusReq)
-
+	log.Printf("Saving step status : %v", stepStatusReq)
+	stepStatusReq, err := repository.GetDB().SaveStepStatus(stepStatusReq)
 	if err != nil {
-		panic(err)
+		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
 	return stepStatusReq, err
 }
 
-func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) (models.StepsStatusResponse, error) {
-	serviceRequestReq := models.StepsStatus{ServiceRequestId: serviceRequestId}
-	log.Println("Service Request request is -- ", serviceRequestReq)
-	var stepsStatus []models.StepsStatus
-
-	_, err := repo.query(&stepsStatus, "select * from steps_status where service_request_id = ?", serviceRequestId)
-
-	log.Println("Steps Status Where Query Response is ", stepsStatus)
+func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
+	log.Printf("Find step statues by request id : %s ", serviceRequestId)
+	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestId(serviceRequestId)
 	if err != nil {
-		fmt.Errorf("No record found with given service request id %s", serviceRequestId)
-		return models.StepsStatusResponse{}, err
+		log.Printf("No record found with given service request id %s", serviceRequestId)
+		return []models.StepsStatus{}, err
 	}
-
-	stepStatusRes := PrepareStepStatusResponse(stepsStatus)
-	//stepStatusRes := models.StepsStatusResponse{}
-
-	log.Println("Steps Status Response is ", stepStatusRes)
-	log.Println("Service request id is ", serviceRequestReq.ServiceRequestId)
-	return stepStatusRes, err
+	return stepsStatuses, err
 }
 
 func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.StepsStatusResponse {
 	var stepsStatusRes models.StepsStatusResponse
 	steps := make([]models.StepResponse, len(stepsStatusArr))
-	var statusFlag = true
+	if len(stepsStatusArr) > 0 {
+		var statusFlag = true
 
-	for i := range stepsStatusArr {
-		stepsStatus := models.StepsStatus{}
-		stepsStatus = stepsStatusArr[i]
-		stepsStatusRes.Reason = stepsStatus.Reason
-		if stepsStatus.Status == models.STATUS_FAILED {
-			statusFlag = false
-			stepsStatusRes.Status = stepsStatus.Status
+		for i, stepsStatus := range stepsStatusArr {
+			stepsStatusRes.Reason = stepsStatus.Reason
+			if models.STATUS_FAILED == stepsStatus.Status {
+				statusFlag = false
+				stepsStatusRes.Status = stepsStatus.Status
+			}
+			steps[i] = models.StepResponse{
+				Name:      stepsStatus.StepName,
+				Status:    stepsStatus.Status,
+				TimeTaken: stepsStatus.TotalTimeInMs,
+				Payload:   stepsStatus.Payload,
+			}
 		}
-		steps[i] = models.StepResponse{
-			Name:      stepsStatus.StepName,
-			Status:    stepsStatus.Status,
-			TimeTaken: stepsStatus.TotalTimeInMs,
-			Payload: stepsStatus.Payload,
-		}
-	}
 
-	if statusFlag {
-		stepsStatusRes.Status = models.STATUS_COMPLETED
+		if statusFlag {
+			stepsStatusRes.Status = models.STATUS_COMPLETED
+		}
+		stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
+		stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
+		timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
+		stepsStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / 1000000
+		stepsStatusRes.Steps = steps
 	}
-	stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
-	stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
-	timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
-	stepsStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / 1000000
-	stepsStatusRes.Steps = steps
 	return stepsStatusRes
 }
 

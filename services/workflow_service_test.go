@@ -29,10 +29,8 @@ func prepareWorkflow() models.Workflow {
 func TestSaveWorkflow(t *testing.T) {
 
 	workflow := prepareWorkflow()
-	repo = mockGenericRepoImpl{}
-
-	insertQueryMock = func(model interface{}) error {
-		return nil
+	SaveWorkflowMock = func(workflow models.Workflow) (models.Workflow, error) {
+		return workflow, nil
 	}
 	response, err := SaveWorkflow(workflow)
 	assert.NotNil(t, response)
@@ -42,8 +40,8 @@ func TestSaveWorkflow(t *testing.T) {
 	assert.Equal(t, workflow.Name, response.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", workflow.Name, response.Name))
 	assert.Equal(t, workflow.Steps[0].Name, response.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", workflow.Steps[0].Name, response.Steps[0].Name))
 
-	insertQueryMock = func(model interface{}) error {
-		return errors.New("insertion failed")
+	SaveWorkflowMock = func(workflow models.Workflow) (models.Workflow, error) {
+		return workflow, errors.New("insertion failed")
 	}
 	response, err = SaveWorkflow(workflow)
 	assert.NotNil(t, err)
@@ -52,21 +50,15 @@ func TestSaveWorkflow(t *testing.T) {
 func TestFindWorkflowByWorkflowName(t *testing.T) {
 	workflow := prepareWorkflow()
 
-	repo = mockGenericRepoImpl{}
-
-	whereQueryMock = func(model interface{}, cond string, params ...interface{}) error {
-		workFlowReq := model.(*models.Workflow)
-		workFlowReq.Name = workflow.Name
-		workFlowReq.Steps = workflow.Steps
-		return nil
+	findWorkflowByNameMock = func(workflowName string) (models.Workflow, error) {
+		return workflow, nil
 	}
 	resp, err := FindWorkflowByName(workflow.Name)
 	assert.Nil(t, err)
 	assert.Equal(t, workflow.Name, resp.Name)
 	assert.NotNil(t, resp.Steps)
-
-	whereQueryMock = func(model interface{}, cond string, params ...interface{}) error {
-		return errors.New("select query failed")
+	findWorkflowByNameMock = func(workflowName string) (models.Workflow, error) {
+		return workflow, errors.New("select query failed")
 	}
 	_, err = FindWorkflowByName(workflow.Name)
 	assert.NotNil(t, err)

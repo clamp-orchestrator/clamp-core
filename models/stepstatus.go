@@ -60,7 +60,7 @@ func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 	}
 }
 
-func (pgStepStatus PGStepStatus) toStepStatus() StepsStatus {
+func (pgStepStatus PGStepStatus) ToStepStatus() StepsStatus {
 	return StepsStatus{
 		ID:               pgStepStatus.ID,
 		ServiceRequestId: pgStepStatus.ServiceRequestId,

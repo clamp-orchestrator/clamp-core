@@ -19,7 +19,7 @@ func createWorkflowHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
-		log.Printf("Create workflowReq workflowReq : %v \n", workflowReq)
+		log.Printf("Create workflow request : %v \n", workflowReq)
 		serviceFlowRes := models.CreateWorkflow(workflowReq)
 		serviceFlowRes, err = services.SaveWorkflow(serviceFlowRes)
 		if err != nil {
