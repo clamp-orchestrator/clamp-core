@@ -12,6 +12,7 @@ type Val interface {
 type Step struct {
 	Id        string `json:"id"`
 	Name      string `json:"name" binding:"required"`
+	StepType      string `json:"type" binding:"required,oneof=SYNC ASYNC"`
 	Mode      string `json:"mode" binding:"required,oneof=HTTP QUEUE"`
 	Val       Val    `json:"val" binding:"required"`
 	Transform bool   `json:"transform"`
