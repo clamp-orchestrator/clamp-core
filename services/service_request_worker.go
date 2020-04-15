@@ -76,14 +76,18 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 
 func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
 	previousStepResponse := stepStatus.Payload.Request
+	var wg sync.WaitGroup
 	for _, step := range workflow.Steps {
+		wg.Add(1)
+		defer wg.Done()
 		if step.StepType == "SYNC" {
 			ExecuteWorkflowStep(stepStatus, previousStepResponse, prefix, step)
 		} else {
 			go ExecuteWorkflowStep(stepStatus, previousStepResponse, prefix, step)
 		}
-
 	}
+	// Wait for all the steps calls to finish
+	wg.Wait()
 }
 
 func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map[string]interface{}, prefix string, step models.Step) {
