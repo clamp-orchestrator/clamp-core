@@ -106,15 +106,15 @@ func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 }
 
 func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
-	queue := executors.QueueVal{
-		URL:    "http://35.166.176.234:3333",
-		Topics: "topic-a",
+	queue := executors.AMQPVal{
+		ConnectionURL: "http://35.166.176.234:3333",
+		QueueName:     "topic-a",
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
 		Id:      "firstStep",
 		Name:    "firstStep",
-		Mode:    "QUEUE",
+		Mode:    "AMQP",
 		Val:     queue,
 		Enabled: true,
 	}
@@ -146,7 +146,7 @@ func TestShouldThrowErrorIfGetHTTPValUrlIsEmpty(t *testing.T) {
 	steps[0] = Step{
 		Id:      "firstStep",
 		Name:    "firstStep",
-		Mode:    "QUEUE",
+		Mode:    "AMQP",
 		Val:     http,
 		Enabled: true,
 	}
