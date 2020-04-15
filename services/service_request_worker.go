@@ -60,7 +60,8 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
-		executeWorkflowStepsInSync(workflow, prefix, stepStatus)
+		log.Println("Inside Async Execution mode")
+		executeWorkflowStepsInASyncMode(workflow, prefix, stepStatus)
 	}
 	elapsed := time.Since(start)
 	log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
@@ -100,6 +101,52 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepSta
 			recordStepCompletionStatus(stepStatus, stepStartTime)
 			previousStepResponse = responsePayload
 		}
+	}
+}
+
+func executeWorkflowStepsInASyncMode(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
+	stepsResponseChannel := make(chan models.StepsStatus)
+	for _, step := range workflow.Steps {
+		go ExecuteWorkflowStep(stepStatus, prefix, step)
+	}
+	log.Println("Out of for loop execution")
+	// Wait for all the checkWebsite calls to finish
+	result := make([]models.StepsStatus, len(workflow.Steps))
+	for i, _ := range result {
+		log.Println("Inside Result print function")
+		result[i] = <-stepsResponseChannel
+		if result[i].Status == models.STATUS_FAILED {
+			log.Println("Execution failed")
+			fmt.Println(result[i].StepName, " failed to execute!!")
+		} else {
+			log.Println("Execution Success")
+			fmt.Println(result[i].StepName, " is Executed successfully")
+		}
+	}
+}
+
+func ExecuteWorkflowStep(stepStatus models.StepsStatus, prefix string, step models.Step) {
+	stepStatus.Payload.Response = nil
+	stepStartTime := time.Now()
+	log.Printf("%s Started executing step id %s\n", prefix, step.Id)
+	stepStatus.StepName = step.Name
+	recordStepStartedStatus(stepStatus, stepStartTime)
+	oldPrefix := log.Prefix()
+	log.SetPrefix(oldPrefix + prefix)
+	resp, err := step.DoExecute(stepStatus.Payload.Request)
+	log.SetPrefix(oldPrefix)
+	if err != nil {
+		log.Println("Inside error block", err)
+		recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
+		//errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+		//panic(errFmt)
+	}
+	if resp != nil {
+		log.Printf("%s Received %s", prefix, resp.(string))
+		var responsePayload map[string]interface{}
+		json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		stepStatus.Payload.Response = responsePayload
+		recordStepCompletionStatus(stepStatus, stepStartTime)
 	}
 }
 
