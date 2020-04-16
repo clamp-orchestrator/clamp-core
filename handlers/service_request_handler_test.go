@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/services"
 	"encoding/json"
@@ -15,8 +16,23 @@ import (
 const workflowName string = "testWF"
 
 func setUp() {
+	step := models.Step{
+		Id:        "1",
+		Name:      "1",
+		StepType:  "SYNC",
+		Mode:      "HTTP",
+		Transform: false,
+		Enabled:   false,
+		Val: &executors.HttpVal{
+			Method:  "POST",
+			Url:     "http://35.166.176.234:3333/api/v1/login",
+			Headers: "",
+		},
+	}
+
 	workflow := models.Workflow{
 		Name: workflowName,
+		Steps: []models.Step{step},
 	}
 	resp, err := services.FindWorkflowByName(workflowName)
 	log.Println(resp)

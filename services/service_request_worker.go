@@ -76,18 +76,25 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 
 func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
 	previousStepResponse := stepStatus.Payload.Request
-	var wg sync.WaitGroup
 	for _, step := range workflow.Steps {
-		wg.Add(1)
-		defer wg.Done()
 		if step.StepType == "SYNC" {
 			ExecuteWorkflowStep(stepStatus, previousStepResponse, prefix, step)
 		} else {
-			go ExecuteWorkflowStep(stepStatus, previousStepResponse, prefix, step)
+			asyncStepExecutionRequest := PrepareAsyncStepExecutionRequest(stepStatus, step, previousStepResponse, prefix)
+			AddAsyncStepExecutionRequestToChannel(asyncStepExecutionRequest)
+			return
 		}
 	}
-	// Wait for all the steps calls to finish
-	wg.Wait()
+}
+
+func PrepareAsyncStepExecutionRequest(stepStatus models.StepsStatus, step models.Step, previousStepResponse map[string]interface{}, prefix string) models.AsyncStepExecutionRequest {
+	asyncStepExecutionRequest := models.AsyncStepExecutionRequest{
+		StepStatus: stepStatus,
+		Step:       step,
+		Payload:    previousStepResponse,
+		Prefix:     prefix,
+	}
+	return asyncStepExecutionRequest
 }
 
 func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map[string]interface{}, prefix string, step models.Step) {
@@ -117,54 +124,14 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 	}
 }
 
-//func executeWorkflowStepsInASyncMode(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
-//	stepsResponseChannel := make(chan models.StepsStatus)
-//	for _, step := range workflow.Steps {
-//		go ExecuteWorkflowStep(stepStatus, prefix, step)
-//	}
-//	log.Println("Out of for loop execution")
-//	// Wait for all the checkWebsite calls to finish
-//	result := make([]models.StepsStatus, len(workflow.Steps))
-//	for i, _ := range result {
-//		log.Println("Inside Result print function")
-//		result[i] = <-stepsResponseChannel
-//		if result[i].Status == models.STATUS_FAILED {
-//			log.Println("Execution failed")
-//			fmt.Println(result[i].StepName, " failed to execute!!")
-//		} else {
-//			log.Println("Execution Success")
-//			fmt.Println(result[i].StepName, " is Executed successfully")
-//		}
-//	}
-//}
-
-//func ExecuteWorkflowStep(stepStatus models.StepsStatus, prefix string, step models.Step) {
-//	stepStatus.Payload.Response = nil
-//	stepStartTime := time.Now()
-//	log.Printf("%s Started executing step id %s\n", prefix, step.Id)
-//	stepStatus.StepName = step.Name
-//	recordStepStartedStatus(stepStatus, stepStartTime)
-//	oldPrefix := log.Prefix()
-//	log.SetPrefix(oldPrefix + prefix)
-//	resp, err := step.DoExecute(stepStatus.Payload.Request)
-//	log.SetPrefix(oldPrefix)
-//	if err != nil {
-//		log.Println("Inside error block", err)
-//		recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
-//		//errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-//		//panic(errFmt)
-//	}
-//	if resp != nil {
-//		log.Printf("%s Received %s", prefix, resp.(string))
-//		var responsePayload map[string]interface{}
-//		json.Unmarshal([]byte(resp.(string)), &responsePayload)
-//		stepStatus.Payload.Response = responsePayload
-//		recordStepCompletionStatus(stepStatus, stepStartTime)
-//	}
-//}
-
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	SaveStepStatus(stepStatus)
+}
+
+func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+	stepStatus.Status = models.STATUS_PAUSED
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }

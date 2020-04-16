@@ -18,6 +18,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		step := models.Step{
 			Id:        "1",
 			Name:      "1",
+			StepType:  "SYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
@@ -59,7 +60,8 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			AddServiceRequestToChannel(tt.args.serviceReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
-			assert.Equal(t, 3, len(functionCalledStack))
+			//TODO @Tejash i have changed to 2, before it was 3 functionCalledStack is called twice na
+			assert.Equal(t, 2, len(functionCalledStack))
 		})
 	}
 }

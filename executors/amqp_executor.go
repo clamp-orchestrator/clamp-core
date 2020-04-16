@@ -97,7 +97,7 @@ func sendMessageToQueue(ch *amqp.Channel, val AMQPVal, body interface{}, prefix 
 	} else {
 		log.Printf("%s AMQP Executor: pushed message successfully", prefix)
 	}
-	return `{"msg":"AMQP-pushed message successfully"}`, nil
+	return nil, nil
 }
 
 func sendMessageToExchange(ch *amqp.Channel, val AMQPVal, body interface{}, prefix string) (interface{}, error) {
@@ -128,7 +128,7 @@ func sendMessageToExchange(ch *amqp.Channel, val AMQPVal, body interface{}, pref
 	} else {
 		log.Printf("%s AMQP Executor: pushed message successfully", prefix)
 	}
-	return `{"msg":"AMQP-pushed message successfully"}`, nil
+	return nil, nil
 }
 
 func (val AMQPVal) getName() string {

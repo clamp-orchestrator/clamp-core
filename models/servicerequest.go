@@ -19,6 +19,7 @@ type Status string
 const (
 	STATUS_NEW       Status = "NEW"
 	STATUS_STARTED   Status = "STARTED"
+	STATUS_PAUSED    Status = "PAUSED"
 	STATUS_COMPLETED Status = "COMPLETED"
 	STATUS_FAILED    Status = "FAILED"
 )

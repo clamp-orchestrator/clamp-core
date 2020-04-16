@@ -41,6 +41,7 @@ func setUpWorkflowRequest() models.Workflow {
 	steps[0] = models.Step{
 		Id:        "firstStep",
 		Name:      "firstStep",
+		StepType:  "SYNC",
 		Mode:      "HTTP",
 		Val:       httpVal,
 		Transform: false,

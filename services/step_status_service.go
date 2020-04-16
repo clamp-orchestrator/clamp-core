@@ -47,8 +47,10 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 			}
 		}
 
-		if statusFlag {
+		if statusFlag && len(stepsStatusArr)/2 != 0{
 			stepsStatusRes.Status = models.STATUS_COMPLETED
+		}else {
+			stepsStatusRes.Status = models.STATUS_PAUSED
 		}
 		stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
 		stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
