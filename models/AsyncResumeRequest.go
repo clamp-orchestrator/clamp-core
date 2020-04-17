@@ -6,7 +6,7 @@ import (
 
 type AsyncResumeStepExecutionRequest struct {
 	ServiceRequestId uuid.UUID              `json:"id"`
-	StepId           string                 `json:"stepId"`
+	StepId           int                 `json:"stepId"`
 	Payload          map[string]interface{} `json:"payload"`
 	StepProcessed    bool                   `json:"stepProcessed" binding:default:"false"`
 }

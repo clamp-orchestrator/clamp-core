@@ -6,7 +6,7 @@ import (
 )
 
 type ResumeServiceRequest struct {
-	StepId  string `json:"stepId"`
+	StepId  int `json:"stepId"`
 }
 
 //ServiceRequest is a structure to store the service request details
