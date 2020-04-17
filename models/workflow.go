@@ -17,6 +17,9 @@ type Workflow struct {
 
 //Create a new work flow for a given service flow and return service flow details
 func CreateWorkflow(workflowRequest Workflow) Workflow {
+	for i := 0; i < len(workflowRequest.Steps); i++ {
+		workflowRequest.Steps[i].Id = i + 1
+	}
 	return newServiceFlow(workflowRequest)
 }
 
