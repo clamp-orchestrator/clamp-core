@@ -10,6 +10,7 @@ func setupRouter() *gin.Engine {
 	r.GET("/serviceRequest/:serviceRequestId", getServiceRequestStatusHandler())
 	r.POST("/workflow", createWorkflowHandler())
 	r.GET("/workflow/:workflow", fetchWorkflowBasedOnWorkflowName())
+	r.POST("/stepResponse", createStepResponseHandler())
 	return r
 }
 

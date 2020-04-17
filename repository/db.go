@@ -19,7 +19,7 @@ type dbInterface interface {
 var DB dbInterface
 
 func init() {
-	switch config.Config.DBDriver {
+	switch config.ENV.DBDriver {
 	case "postgres":
 		DB = &postgres{}
 	}
