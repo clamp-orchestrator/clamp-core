@@ -10,7 +10,7 @@ import (
 
 func createStepResponseHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request models.AsyncResumeStepExecutionRequest
+		var request models.ResumeStepResponse
 		err := c.ShouldBindJSON(&request)
 		if err != nil {
 			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())

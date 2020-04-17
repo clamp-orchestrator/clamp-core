@@ -57,7 +57,7 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 			}
 		}
 
-		if statusFlag && len(stepsStatusArr)/2 == 0{
+		if statusFlag && len(stepsStatusArr)%2 == 0{
 			stepsStatusRes.Status = models.STATUS_COMPLETED
 		}else if !statusFlag{
 			stepsStatusRes.Status = models.STATUS_FAILED

@@ -8,12 +8,14 @@ import (
 
 type mockDB struct{}
 
+
 var saveServiceRequestMock func(serReq models.ServiceRequest) (models.ServiceRequest, error)
 var saveStepStatusMock func(stepStatus models.StepsStatus) (models.StepsStatus, error)
 var SaveWorkflowMock func(workflow models.Workflow) (models.Workflow, error)
 var findServiceRequestByIdMock func(uuid.UUID) (models.ServiceRequest, error)
 var findWorkflowByNameMock func(workflowName string) (models.Workflow, error)
 var findStepStatusByServiceRequestIdMock func(serviceRequestId uuid.UUID) ([]models.StepsStatus, error)
+var findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock func(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error)
 
 func (m mockDB) SaveServiceRequest(serReq models.ServiceRequest) (models.ServiceRequest, error) {
 	return saveServiceRequestMock(serReq)
@@ -37,6 +39,10 @@ func (m mockDB) SaveStepStatus(stepStatus models.StepsStatus) (models.StepsStatu
 
 func (m mockDB) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIdMock(serviceRequestId)
+}
+
+func (m mockDB) FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error) {
+	return findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock(serviceRequestId, status)
 }
 
 func init() {

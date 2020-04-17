@@ -110,7 +110,12 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 	recordStepStartedStatus(stepStatus, stepStartTime)
 	oldPrefix := log.Prefix()
 	log.SetPrefix(oldPrefix + prefix)
-	resp, err := step.DoExecute(stepStatus.Payload.Request)
+	request := models.StepRequest{
+		ServiceRequestId: stepStatus.ServiceRequestId,
+		StepId:           step.Id,
+		Payload:          stepStatus.Payload.Request,
+	}
+	resp, err := step.DoExecute(request)
 	log.SetPrefix(oldPrefix)
 	if err != nil {
 		log.Println("Inside error block", err)

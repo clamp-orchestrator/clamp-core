@@ -54,7 +54,7 @@ func (amqpListener amqpListener) Listen() {
 
 		go func() {
 			for d := range msgs {
-				var req models.AsyncResumeStepExecutionRequest
+				var req models.ResumeStepResponse
 				err = json.Unmarshal(d.Body, &req)
 				if err != nil {
 					log.Printf("[AMQP Consumer] : Message recieved is not in proper format %s: %s", d.Body, err.Error())
