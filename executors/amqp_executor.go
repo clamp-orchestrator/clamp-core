@@ -8,36 +8,12 @@ import (
 )
 
 type AMQPVal struct {
-	ConnectionURL string     `json:"connection_url" binding:"required"`
-	QueueName     string     `json:"queue_name"`
-	ExchangeName  string     `json:"exchange_name"`
-	RoutingKey    string     `json:"routing_key"`
-	ExchangeType  string     `json:"exchange_type"`
-	Durable       bool       `json:"durable"`
-	AutoDelete    bool       `json:"auto_delete"`
-	Internal      bool       `json:"internal"`
-	NoWait        bool       `json:"no_wait"`
-	Exclusive     bool       `json:"exclusive"`
-	Mandatory     bool       `json:"mandatory"`
-	Immediate     bool       `json:"immediate"`
-	ContentType   string     `json:"content_type"`
-	Arguments     amqp.Table `json:"arguments"`
+	ConnectionURL string `json:"connection_url" binding:"required"`
+	QueueName     string `json:"queue_name"`
+	ExchangeName  string `json:"exchange_name"`
+	RoutingKey    string `json:"routing_key"`
+	ContentType   string `json:"content_type"`
 }
-
-/*
-{
-"connection_url":"amqp://guest:guest@localhost:5672/",
-"queue_name":"clamp",
-"durable": true
-"auto_delete":false,
-"internal":false,
-"no_wait":false,
-"arguments":nil,
-content_type":"text/plain",
-"mandatory":false,
-"immediate":false
-}
-*/
 
 func (val AMQPVal) DoExecute(requestBody interface{}) (interface{}, error) {
 	prefix := log.Prefix()
@@ -68,24 +44,13 @@ func (val AMQPVal) DoExecute(requestBody interface{}) (interface{}, error) {
 }
 
 func sendMessageToQueue(ch *amqp.Channel, val AMQPVal, body interface{}, prefix string) (interface{}, error) {
-	q, err := ch.QueueDeclare(
-		val.QueueName,
-		val.Durable,
-		val.AutoDelete,
-		val.Exclusive,
-		val.NoWait,
-		val.Arguments,
-	)
-	if err != nil {
-		return nil, err
-	}
 	bytes, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	err = ch.Publish(
 		"",
-		q.Name,
+		val.QueueName,
 		false,
 		false,
 		amqp.Publishing{
@@ -101,24 +66,12 @@ func sendMessageToQueue(ch *amqp.Channel, val AMQPVal, body interface{}, prefix 
 }
 
 func sendMessageToExchange(ch *amqp.Channel, val AMQPVal, body interface{}, prefix string) (interface{}, error) {
-	err := ch.ExchangeDeclare(
-		val.ExchangeName,
-		val.ExchangeType,
-		val.Durable,
-		val.AutoDelete,
-		val.Internal,
-		val.NoWait,
-		val.Arguments,
-	)
-	if err != nil {
-		return nil, err
-	}
 	bytes, err := json.Marshal(body)
 	err = ch.Publish(
 		val.ExchangeName,
 		val.RoutingKey,
-		val.Mandatory,
-		val.Immediate,
+		false,
+		false,
 		amqp.Publishing{
 			ContentType: val.ContentType,
 			Body:        bytes,
