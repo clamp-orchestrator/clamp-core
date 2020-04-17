@@ -18,7 +18,6 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
 		StepType: "SYNC",
 		Mode:    "HTTP",
@@ -54,7 +53,6 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 func TestShouldNotCreateWorkflowIfStepValIsNotPresent(t *testing.T) {
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
 		StepType: "SYNC",
 		Mode:    "HTTP",
@@ -85,7 +83,6 @@ func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 	steps := []Step{{}}
 	const InvalidMode = "xyz"
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
 		StepType: "SYNC",
 		Mode:    InvalidMode,
@@ -115,7 +112,6 @@ func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
 		StepType: "ASYNC",
 		Mode:    "AMQP",
@@ -148,7 +144,6 @@ func TestShouldThrowErrorIfGetHTTPValUrlIsEmpty(t *testing.T) {
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
 		StepType: "ASYNC",
 		Mode:    "AMQP",

@@ -16,7 +16,6 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
 		workflow.Id = "TEST_WF"
 		step := models.Step{
-			Id:        "1",
 			Name:      "1",
 			StepType:  "SYNC",
 			Mode:      "HTTP",

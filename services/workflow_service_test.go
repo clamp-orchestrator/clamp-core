@@ -12,7 +12,6 @@ func prepareWorkflow() models.Workflow {
 	steps := []models.Step{models.Step{}}
 
 	steps[0] = models.Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
 		Enabled: true,
 	}

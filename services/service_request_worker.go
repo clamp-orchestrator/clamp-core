@@ -50,12 +50,7 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	prefix = prefix[:len(prefix)-2] + fmt.Sprintf("[REQUEST_ID: %s]", serviceReq.ID)
 	log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
-	var stepStatus models.StepsStatus
 	defer catchErrors(prefix, serviceReq.ID)
-	stepStatus.ServiceRequestId = serviceReq.ID
-	stepStatus.WorkflowName = serviceReq.WorkflowName
-
-	stepStatus.Payload.Request = serviceReq.Payload
 
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
@@ -111,7 +106,6 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 	stepStatus.Payload.Request = previousStepResponse
 	stepStatus.Payload.Response = nil
 	stepStartTime := time.Now()
-	log.Printf("%s Started executing step id %s\n", prefix, step.Id)
 	stepStatus.StepName = step.Name
 	recordStepStartedStatus(stepStatus, stepStartTime)
 	oldPrefix := log.Prefix()
