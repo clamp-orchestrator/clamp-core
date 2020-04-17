@@ -114,7 +114,8 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 	log.SetPrefix(oldPrefix)
 	if err != nil {
 		log.Println("Inside error block", err)
-		recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
+		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
 		panic(errFmt)
 	}
@@ -147,9 +148,8 @@ func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.T
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
+func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_FAILED
-	clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	marshal, marshalErr := json.Marshal(clampErrorResponse)
 	log.Println("clampErrorResponse: Marshal error", marshalErr)
 	var responsePayload map[string]interface{}
@@ -157,7 +157,7 @@ func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartT
 	log.Println("clampErrorResponse: UnMarshal error", unmarshalErr)
 	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
-	stepStatus.Reason = err.Error()
+	stepStatus.Reason = clampErrorResponse.Message
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
 	SaveStepStatus(stepStatus)
 }

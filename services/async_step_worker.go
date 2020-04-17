@@ -44,7 +44,7 @@ func asyncWorker(workerId int, asyncServiceReqChan <-chan models.AsyncStepExecut
 		if asyncStepResponse != nil {
 			var responsePayload map[string]interface{}
 			json.Unmarshal([]byte(asyncStepResponse.(string)), &responsePayload)
-			resumeRequest := models.AsyncResumeStepExecutionRequest{
+			resumeRequest := models.ResumeStepResponse{
 				ServiceRequestId: asyncServiceReq.StepStatus.ServiceRequestId,
 				StepId:           asyncServiceReq.Step.Id,
 				Payload:          responsePayload,

@@ -41,6 +41,12 @@ type postgres struct {
 	db *pg.DB
 }
 
+func (p *postgres) FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error) {
+	var pgStepStatus []models.PGStepStatus
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ? order by created_at desc", serviceRequestId, status).Select()
+	return pgStepStatus[0].ToStepStatus(), err
+}
+
 func (p *postgres) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestId).Select()

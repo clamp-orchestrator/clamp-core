@@ -4,9 +4,10 @@ import (
 	"github.com/google/uuid"
 )
 
-type AsyncResumeStepExecutionRequest struct {
+type ResumeStepResponse struct {
 	ServiceRequestId uuid.UUID              `json:"id"`
 	StepId           int                    `json:"stepId"`
 	Payload          map[string]interface{} `json:"payload"`
 	StepProcessed    bool                   `json:"stepProcessed" binding:default:"false"`
+	Errors           ClampErrorResponse     `json:"errors"`
 }

@@ -6,19 +6,20 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 )
 //TODO Channel name to be changed
 const AsyncResumeStepExecutionChannelSize = 1000
 const AsyncResumeStepExecutionWorkersSize = 100
 
 var (
-	asyncResumeStepExecutionChannel chan models.AsyncResumeStepExecutionRequest
+	asyncResumeStepExecutionChannel chan models.ResumeStepResponse
 	singleton        sync.Once
 )
 
-func CreateAsyncResumeStepExecutionChannel() chan models.AsyncResumeStepExecutionRequest {
+func CreateAsyncResumeStepExecutionChannel() chan models.ResumeStepResponse {
 	singleton.Do(func() {
-		asyncResumeStepExecutionChannel = make(chan models.AsyncResumeStepExecutionRequest, AsyncResumeStepExecutionChannelSize)
+		asyncResumeStepExecutionChannel = make(chan models.ResumeStepResponse, AsyncResumeStepExecutionChannelSize)
 	})
 	return asyncResumeStepExecutionChannel
 }
@@ -34,38 +35,41 @@ func CreateAsyncResumeStepExecutionWorkers() {
 	}
 }
 
-func asyncResumeWorker(workerId int, asyncResumeReqChan <-chan models.AsyncResumeStepExecutionRequest) {
+func asyncResumeWorker(workerId int, resumeStepResponsesChan <-chan models.ResumeStepResponse) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
-	for resumeRequest := range asyncResumeReqChan {
-		log.Println("------------- Resume Request --------------", resumeRequest)
-		//TODO Step Processed will be set to false by default, if async http has response then it will be set to true,
-		if !resumeRequest.StepProcessed {
-
+	for resumeStepResponse := range resumeStepResponsesChan {
+		stepStartTime := time.Now()
+		if !resumeStepResponse.StepProcessed {
+			//Fetch from DB the last step executed
+			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(resumeStepResponse.ServiceRequestId, models.STATUS_STARTED)
+			if (models.ClampErrorResponse{}) != resumeStepResponse.Errors {
+				currentStepStatus.Payload.Response = resumeStepResponse.Payload
+				recordStepCompletionStatus(currentStepStatus, stepStartTime)
+			}else{
+				recordStepFailedStatus(currentStepStatus,resumeStepResponse.Errors,stepStartTime)
+				return
+			}
 		}
-		//if true then skip marking that step as Completed
-		// Instead directly call next step to execute
-		// Check if payload contains error block
-		// if so then mark step as failed and stop.....
-		serviceRequest, err := FindServiceRequestByID(resumeRequest.ServiceRequestId)
+		serviceRequest, err := FindServiceRequestByID(resumeStepResponse.ServiceRequestId)
 		if err == nil {
-			// TODO Handle error case
+			//TODO
 		}
-		serviceRequest.Payload = resumeRequest.Payload
-		serviceRequest.CurrentStepId = resumeRequest.StepId
+		serviceRequest.Payload = resumeStepResponse.Payload
+		serviceRequest.CurrentStepId = resumeStepResponse.StepId
 		AddServiceRequestToChannel(serviceRequest)
 	}
 }
 
-func GetAsyncResumeStepExecutionChannel() chan models.AsyncResumeStepExecutionRequest {
+func GetAsyncResumeStepExecutionChannel() chan models.ResumeStepResponse {
 	if asyncResumeStepExecutionChannel == nil {
 		panic(errors.New("async service request channel not initialized"))
 	}
 	return asyncResumeStepExecutionChannel
 }
 
-func AddAsyncResumeStepExecutionRequestToChannel(asyncResumeStepExecutionRequest models.AsyncResumeStepExecutionRequest) {
+func AddAsyncResumeStepExecutionRequestToChannel(asyncResumeStepExecutionRequest models.ResumeStepResponse) {
 	channel := GetAsyncResumeStepExecutionChannel()
 	channel <- asyncResumeStepExecutionRequest
 }
