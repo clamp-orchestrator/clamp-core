@@ -7,7 +7,7 @@ import (
 	"log"
 	"sync"
 )
-
+//TODO Channel name to be changed
 const AsyncResumeStepExecutionChannelSize = 1000
 const AsyncResumeStepExecutionWorkersSize = 100
 
@@ -34,13 +34,17 @@ func CreateAsyncResumeStepExecutionWorkers() {
 	}
 }
 
-func asyncResumeWorker(workerId int, asyncServiceReqChan <-chan models.AsyncResumeStepExecutionRequest) {
+func asyncResumeWorker(workerId int, asyncResumeReqChan <-chan models.AsyncResumeStepExecutionRequest) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
-	for asyncServiceReq := range asyncServiceReqChan {
-		log.Println("Async Service Request -", asyncServiceReq)
-		//ExecuteWorkflowStep(asyncServiceReq.StepStatus,asyncServiceReq.Payload,asyncServiceReq.Prefix, asyncServiceReq.Step)
+	for resumeRequest := range asyncResumeReqChan {
+		log.Println("------------- Resume Request --------------", resumeRequest)
+		//TODO Step Processed will be set to false by default, if async http has response then it will be set to true,
+		//if true then skip marking that step as Completed
+		// Instead directly call next step to execute
+		// Check if payload contains error block
+		// if so then mark step as failed and stop.....
 	}
 }
 

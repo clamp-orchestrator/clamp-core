@@ -97,7 +97,7 @@ func PrepareAsyncStepExecutionRequest(stepStatus models.StepsStatus, step models
 	return asyncStepExecutionRequest
 }
 
-func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map[string]interface{}, prefix string, step models.Step) {
+func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map[string]interface{}, prefix string, step models.Step) (interface{}, error) {
 	stepStatus.Payload.Request = previousStepResponse
 	stepStatus.Payload.Response = nil
 	stepStartTime := time.Now()
@@ -122,6 +122,7 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 		recordStepCompletionStatus(stepStatus, stepStartTime)
 		previousStepResponse = responsePayload
 	}
+	return resp, err
 }
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {

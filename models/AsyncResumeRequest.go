@@ -5,7 +5,8 @@ import (
 )
 
 type AsyncResumeStepExecutionRequest struct {
-	ServiceRequestId           uuid.UUID `json:"id"`
-	StepId string    `json:"stepId"`
-	Payload      map[string]interface{}   `json:"payload"`
+	ServiceRequestId uuid.UUID              `json:"id"`
+	StepId           string                 `json:"stepId"`
+	Payload          map[string]interface{} `json:"payload"`
+	StepProcessed    bool                   `json:"stepProcessed" binding:default:"false"`
 }

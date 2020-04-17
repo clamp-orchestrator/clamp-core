@@ -2,6 +2,7 @@ package services
 
 import (
 	"clamp-core/models"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -39,8 +40,19 @@ func asyncWorker(workerId int, asyncServiceReqChan <-chan models.AsyncStepExecut
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
 	for asyncServiceReq := range asyncServiceReqChan {
-		log.Println("Async Service Request -", asyncServiceReq)
-		ExecuteWorkflowStep(asyncServiceReq.StepStatus,asyncServiceReq.Payload,asyncServiceReq.Prefix, asyncServiceReq.Step)
+		asyncStepResponse, _ := ExecuteWorkflowStep(asyncServiceReq.StepStatus, asyncServiceReq.Payload, asyncServiceReq.Prefix, asyncServiceReq.Step)
+		if asyncStepResponse != nil {
+			var responsePayload map[string]interface{}
+			json.Unmarshal([]byte(asyncStepResponse.(string)), &responsePayload)
+			resumeRequest := models.AsyncResumeStepExecutionRequest{
+				ServiceRequestId: asyncServiceReq.StepStatus.ServiceRequestId,
+				StepId:           asyncServiceReq.Step.Id,
+				Payload:          responsePayload,
+				StepProcessed:    true,
+			}
+			AddAsyncResumeStepExecutionRequestToChannel(resumeRequest)
+			return
+		}
 	}
 }
 
