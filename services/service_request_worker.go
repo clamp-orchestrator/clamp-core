@@ -61,7 +61,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
 		log.Println("Inside Async Execution mode")
-		executeWorkflowStepsInSync(workflow, prefix, stepStatus)
+		executeWorkflowStepsInSync(workflow, prefix, stepStatus, serviceReq.ResumeServiceRequest)
 	}
 	elapsed := time.Since(start)
 	log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
@@ -74,9 +74,15 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 	}
 }
 
-func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
+func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepStatus models.StepsStatus, resumeServiceRequest models.ResumeServiceRequest) {
 	previousStepResponse := stepStatus.Payload.Request
 	for _, step := range workflow.Steps {
+		if (models.ResumeServiceRequest{}) != resumeServiceRequest {
+			if step.Id == resumeServiceRequest.StepId{
+				resumeServiceRequest = models.ResumeServiceRequest{}
+			}
+			continue
+		}
 		if step.StepType == "SYNC" {
 			ExecuteWorkflowStep(stepStatus, previousStepResponse, prefix, step)
 		} else {

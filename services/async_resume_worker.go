@@ -45,6 +45,13 @@ func asyncResumeWorker(workerId int, asyncResumeReqChan <-chan models.AsyncResum
 		// Instead directly call next step to execute
 		// Check if payload contains error block
 		// if so then mark step as failed and stop.....
+		serviceRequest, err := FindServiceRequestByID(resumeRequest.ServiceRequestId)
+		if err == nil {
+			// TODO Handle error case
+		}
+		serviceRequest.Payload = resumeRequest.Payload
+		serviceRequest.ResumeServiceRequest.StepId = resumeRequest.StepId
+		AddServiceRequestToChannel(serviceRequest)
 	}
 }
 

@@ -49,7 +49,9 @@ func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.Steps
 
 		if statusFlag && len(stepsStatusArr)/2 != 0{
 			stepsStatusRes.Status = models.STATUS_COMPLETED
-		}else {
+		}else if !statusFlag{
+			stepsStatusRes.Status = models.STATUS_FAILED
+		} else {
 			stepsStatusRes.Status = models.STATUS_PAUSED
 		}
 		stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId

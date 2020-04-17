@@ -5,13 +5,18 @@ import (
 	"time"
 )
 
+type ResumeServiceRequest struct {
+	StepId  string `json:"stepId"`
+}
+
 //ServiceRequest is a structure to store the service request details
 type ServiceRequest struct {
-	ID           uuid.UUID `json:"id"`
-	WorkflowName string    `json:"workflowName"`
-	Status       Status    `json:"status"`
-	CreatedAt    time.Time    `json:"createdAt"`
-	Payload      map[string]interface{}   `json:"payload"`
+	ID                   uuid.UUID              `json:"id"`
+	WorkflowName         string                 `json:"workflowName"`
+	Status               Status                 `json:"status"`
+	CreatedAt            time.Time              `json:"createdAt"`
+	Payload              map[string]interface{} `json:"payload"`
+	ResumeServiceRequest ResumeServiceRequest   `json:resumeServiceRequest,omitempty`
 }
 
 type Status string
@@ -19,6 +24,7 @@ type Status string
 const (
 	STATUS_NEW       Status = "NEW"
 	STATUS_STARTED   Status = "STARTED"
+	STATUS_RESUMED   Status = "RESUMED"
 	STATUS_PAUSED    Status = "PAUSED"
 	STATUS_COMPLETED Status = "COMPLETED"
 	STATUS_FAILED    Status = "FAILED"
