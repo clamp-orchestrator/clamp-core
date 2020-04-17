@@ -41,6 +41,9 @@ func asyncResumeWorker(workerId int, asyncResumeReqChan <-chan models.AsyncResum
 	for resumeRequest := range asyncResumeReqChan {
 		log.Println("------------- Resume Request --------------", resumeRequest)
 		//TODO Step Processed will be set to false by default, if async http has response then it will be set to true,
+		if !resumeRequest.StepProcessed {
+
+		}
 		//if true then skip marking that step as Completed
 		// Instead directly call next step to execute
 		// Check if payload contains error block
@@ -50,7 +53,7 @@ func asyncResumeWorker(workerId int, asyncResumeReqChan <-chan models.AsyncResum
 			// TODO Handle error case
 		}
 		serviceRequest.Payload = resumeRequest.Payload
-		serviceRequest.ResumeServiceRequest.StepId = resumeRequest.StepId
+		serviceRequest.CurrentStepId = resumeRequest.StepId
 		AddServiceRequestToChannel(serviceRequest)
 	}
 }
