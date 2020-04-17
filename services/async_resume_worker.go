@@ -44,7 +44,9 @@ func asyncResumeWorker(workerId int, resumeStepResponsesChan <-chan models.Resum
 		if !resumeStepResponse.StepProcessed {
 			//Fetch from DB the last step executed
 			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(resumeStepResponse.ServiceRequestId, models.STATUS_STARTED)
-			if (models.ClampErrorResponse{}) != resumeStepResponse.Errors {
+			currentStepStatus.ID = ""
+			//TODO Setting Id empty and also errors validations
+			if resumeStepResponse.Errors.Code == 0 {
 				currentStepStatus.Payload.Response = resumeStepResponse.Payload
 				recordStepCompletionStatus(currentStepStatus, stepStartTime)
 			}else{

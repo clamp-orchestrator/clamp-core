@@ -5,7 +5,7 @@ import (
 )
 
 type ResumeStepResponse struct {
-	ServiceRequestId uuid.UUID              `json:"id"`
+	ServiceRequestId uuid.UUID              `json:"serviceRequestId"`
 	StepId           int                    `json:"stepId"`
 	Payload          map[string]interface{} `json:"payload"`
 	StepProcessed    bool                   `json:"stepProcessed" binding:default:"false"`

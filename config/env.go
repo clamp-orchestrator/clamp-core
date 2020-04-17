@@ -23,7 +23,7 @@ var ENV = struct {
 
 	*/
 	QueueDriver        string `env:"CLAMP_QUEUE_DRIVER" envDefault:"amqp"`
-	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://guest:guest@localhost:5672/"`
+	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@34.222.238.234:5672/"`
 	QueueName          string `env:"CLAMP_QUEUE_NAME" envDefault:"clamp_steps_response"`
 }{}
 
