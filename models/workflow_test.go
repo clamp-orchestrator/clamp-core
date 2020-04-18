@@ -13,7 +13,7 @@ import (
 func TestShouldCreateANewWorkflow(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://35.166.176.234:3333/api/v1/user",
+		Url:     "http://34.222.238.234:3333/api/v1/user",
 		Headers: "",
 	}
 	steps := []Step{{}}
@@ -46,7 +46,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
 	assert.Equal(t, serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name))
 	assert.Equal(t, "GET", workflowResponse.Steps[0].getHttpVal().Method)
-	assert.Equal(t, "http://35.166.176.234:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
+	assert.Equal(t, "http://34.222.238.234:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
 	assert.Equal(t, "", workflowResponse.Steps[0].getHttpVal().Headers)
 }
 
@@ -77,7 +77,7 @@ func TestShouldNotCreateWorkflowIfStepValIsNotPresent(t *testing.T) {
 func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://35.166.176.234:3333/api/v1/user",
+		Url:     "http://34.222.238.234:3333/api/v1/user",
 		Headers: "",
 	}
 	steps := []Step{{}}
@@ -107,7 +107,7 @@ func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 
 func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
 	queue := executors.AMQPVal{
-		ConnectionURL: "http://35.166.176.234:3333",
+		ConnectionURL: "http://34.222.238.234:3333",
 		QueueName:     "topic-a",
 	}
 	steps := []Step{{}}

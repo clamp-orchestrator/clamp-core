@@ -55,8 +55,10 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
-		log.Println("Inside Async Execution mode")
-		executeWorkflowStepsInSync(workflow, prefix, serviceReq)
+		if serviceReq.CurrentStepId < len(workflow.Steps){
+			log.Println("+++++++++++++++ Service REQUST STEP ID", serviceReq.CurrentStepId)
+			executeWorkflowStepsInSync(workflow, prefix, serviceReq)
+		}
 	}
 	elapsed := time.Since(start)
 	log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
@@ -70,6 +72,7 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 }
 
 func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) {
+	log.Println("+++++++++++++++ Inside executeWorkflowStepsInSync ++++++++++++++++ with service request :", serviceRequest)
 	previousStepResponse := serviceRequest.Payload
 	var stepStatus models.StepsStatus
 	stepStatus.WorkflowName = serviceRequest.WorkflowName

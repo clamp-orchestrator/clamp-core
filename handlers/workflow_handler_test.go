@@ -35,7 +35,7 @@ func setUpWorkflowRequest() models.Workflow {
 	steps := make([]models.Step, 1)
 	httpVal := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http: //35.166.176.234:3333/api/v1/user",
+		Url:     "http: //34.222.238.234:3333/api/v1/user",
 		Headers: "",
 	}
 	steps[0] = models.Step{

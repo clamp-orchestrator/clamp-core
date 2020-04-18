@@ -24,7 +24,7 @@ func setUp() {
 		Enabled:   false,
 		Val: &executors.HttpVal{
 			Method:  "POST",
-			Url:     "http://35.166.176.234:3333/api/v1/login",
+			Url:     "http://34.222.238.234:3333/api/v1/login",
 			Headers: "",
 		},
 	}
