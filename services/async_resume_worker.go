@@ -9,33 +9,33 @@ import (
 	"time"
 )
 //TODO Channel name to be changed
-const AsyncResumeStepExecutionChannelSize = 1000
-const AsyncResumeStepExecutionWorkersSize = 100
+const ResumeStepResponseChannelSize = 1000
+const ResumeStepResponseWorkersSize = 100
 
 var (
-	asyncResumeStepExecutionChannel chan models.ResumeStepResponse
-	singleton        sync.Once
+	resumeStepResponseChannel chan models.ResumeStepResponse
+	singleton                 sync.Once
 )
 
-func CreateAsyncResumeStepExecutionChannel() chan models.ResumeStepResponse {
+func CreateResumeStepResponseChannel() chan models.ResumeStepResponse {
 	singleton.Do(func() {
-		asyncResumeStepExecutionChannel = make(chan models.ResumeStepResponse, AsyncResumeStepExecutionChannelSize)
+		resumeStepResponseChannel = make(chan models.ResumeStepResponse, ResumeStepResponseChannelSize)
 	})
-	return asyncResumeStepExecutionChannel
+	return resumeStepResponseChannel
 }
 
 func init() {
-	CreateAsyncResumeStepExecutionChannel()
-	CreateAsyncResumeStepExecutionWorkers()
+	CreateResumeStepResponseChannel()
+	CreateResumeStepResponseWorkers()
 }
 
-func CreateAsyncResumeStepExecutionWorkers() {
-	for i := 0; i < AsyncResumeStepExecutionWorkersSize; i++ {
-		go asyncResumeWorker(i, asyncResumeStepExecutionChannel)
+func CreateResumeStepResponseWorkers() {
+	for i := 0; i < ResumeStepResponseWorkersSize; i++ {
+		go resumeStepResponseWorker(i, resumeStepResponseChannel)
 	}
 }
 
-func asyncResumeWorker(workerId int, resumeStepResponsesChan <-chan models.ResumeStepResponse) {
+func resumeStepResponseWorker(workerId int, resumeStepResponsesChan <-chan models.ResumeStepResponse) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
@@ -64,14 +64,14 @@ func asyncResumeWorker(workerId int, resumeStepResponsesChan <-chan models.Resum
 	}
 }
 
-func GetAsyncResumeStepExecutionChannel() chan models.ResumeStepResponse {
-	if asyncResumeStepExecutionChannel == nil {
+func GetResumeStepResponseChannel() chan models.ResumeStepResponse {
+	if resumeStepResponseChannel == nil {
 		panic(errors.New("async service request channel not initialized"))
 	}
-	return asyncResumeStepExecutionChannel
+	return resumeStepResponseChannel
 }
 
-func AddAsyncResumeStepExecutionRequestToChannel(asyncResumeStepExecutionRequest models.ResumeStepResponse) {
-	channel := GetAsyncResumeStepExecutionChannel()
+func AddResumeStepResponseToChannel(asyncResumeStepExecutionRequest models.ResumeStepResponse) {
+	channel := GetResumeStepResponseChannel()
 	channel <- asyncResumeStepExecutionRequest
 }

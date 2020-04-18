@@ -20,7 +20,7 @@ func createStepResponseHandler() gin.HandlerFunc {
 		}
 		log.Printf("[HTTP Consumer] : Received step completed response: %v", request)
 		log.Printf("[HTTP Consumer] : Pushing step completed response to channel")
-		services.AddAsyncResumeStepExecutionRequestToChannel(request)
+		services.AddResumeStepResponseToChannel(request)
 		c.JSON(http.StatusOK, models.CreateSuccessResponse(http.StatusOK, "success"))
 	}
 }

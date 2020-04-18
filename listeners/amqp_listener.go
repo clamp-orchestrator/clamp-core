@@ -65,7 +65,7 @@ func (amqpListener amqpListener) Listen() {
 					}
 					log.Printf("[AMQP Consumer] : Received step completed response: %v", req)
 					log.Printf("[AMQP Consumer] : Pushing step completed response to channel")
-					services.AddAsyncResumeStepExecutionRequestToChannel(req)
+					services.AddResumeStepResponseToChannel(req)
 				}
 			}
 		}()

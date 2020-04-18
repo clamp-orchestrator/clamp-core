@@ -86,14 +86,14 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 			ExecuteWorkflowStep(stepStatus, previousStepResponse, prefix, step)
 		} else {
 			asyncStepExecutionRequest := PrepareAsyncStepExecutionRequest(stepStatus, step, previousStepResponse, prefix)
-			AddAsyncStepExecutionRequestToChannel(asyncStepExecutionRequest)
+			AddAsyncStepExecutorRequestToChannel(asyncStepExecutionRequest)
 			return
 		}
 	}
 }
 
-func PrepareAsyncStepExecutionRequest(stepStatus models.StepsStatus, step models.Step, previousStepResponse map[string]interface{}, prefix string) models.AsyncStepExecutionRequest {
-	asyncStepExecutionRequest := models.AsyncStepExecutionRequest{
+func PrepareAsyncStepExecutionRequest(stepStatus models.StepsStatus, step models.Step, previousStepResponse map[string]interface{}, prefix string) models.AsyncStepRequest {
+	asyncStepExecutionRequest := models.AsyncStepRequest{
 		StepStatus: stepStatus,
 		Step:       step,
 		Payload:    previousStepResponse,

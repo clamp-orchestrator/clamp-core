@@ -9,33 +9,33 @@ import (
 	"sync"
 )
 
-const AsyncStepExecutionChannelSize = 1000
-const AsyncStepExecutionWorkersSize = 100
+const AsyncStepExecutorChannelSize = 1000
+const AsyncStepExecutorWorkersSize = 100
 
 var (
-	asyncChannel chan models.AsyncStepExecutionRequest
+	asyncChannel chan models.AsyncStepRequest
 	singletonAsyncStepExecutor        sync.Once
 )
 
-func CreateAsyncStepExecutionChannel() chan models.AsyncStepExecutionRequest {
+func CreateAsyncStepExecutorChannel() chan models.AsyncStepRequest {
 	singletonAsyncStepExecutor.Do(func() {
-		asyncChannel = make(chan models.AsyncStepExecutionRequest, AsyncStepExecutionChannelSize)
+		asyncChannel = make(chan models.AsyncStepRequest, AsyncStepExecutorChannelSize)
 	})
 	return asyncChannel
 }
 
 func init() {
-	CreateAsyncStepExecutionChannel()
-	CreateAsyncStepExecutionWorkers()
+	CreateAsyncStepExecutorChannel()
+	CreateAsyncStepExecutorWorkers()
 }
 
-func CreateAsyncStepExecutionWorkers() {
-	for i := 0; i < AsyncStepExecutionWorkersSize; i++ {
+func CreateAsyncStepExecutorWorkers() {
+	for i := 0; i < AsyncStepExecutorWorkersSize; i++ {
 		go asyncWorker(i, asyncChannel)
 	}
 }
 
-func asyncWorker(workerId int, asyncServiceReqChan <-chan models.AsyncStepExecutionRequest) {
+func asyncWorker(workerId int, asyncServiceReqChan <-chan models.AsyncStepRequest) {
 	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
@@ -50,20 +50,20 @@ func asyncWorker(workerId int, asyncServiceReqChan <-chan models.AsyncStepExecut
 				Payload:          responsePayload,
 				StepProcessed:    true,
 			}
-			AddAsyncResumeStepExecutionRequestToChannel(resumeRequest)
+			AddResumeStepResponseToChannel(resumeRequest)
 			return
 		}
 	}
 }
 
-func GetAsyncStepExecutionChannel() chan models.AsyncStepExecutionRequest {
+func GetAsyncStepExecutorChannel() chan models.AsyncStepRequest {
 	if asyncChannel == nil {
 		panic(errors.New("async service request channel not initialized"))
 	}
 	return asyncChannel
 }
 
-func AddAsyncStepExecutionRequestToChannel(asyncStepExecutionRequest models.AsyncStepExecutionRequest) {
-	channel := GetAsyncStepExecutionChannel()
-	channel <- asyncStepExecutionRequest
+func AddAsyncStepExecutorRequestToChannel(asyncStepExecutorRequest models.AsyncStepRequest) {
+	channel := GetAsyncStepExecutorChannel()
+	channel <- asyncStepExecutorRequest
 }
