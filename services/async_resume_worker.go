@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"sync"
+	"time"
 )
 
 //TODO Channel name to be changed
@@ -48,9 +49,9 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 			//TODO Setting Id empty and also errors validations
 			if stepResponse.Errors.Code == 0 {
 				currentStepStatus.Payload.Response = stepResponse.Payload
-				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt)
+				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 			} else {
-				recordStepFailedStatus(currentStepStatus, stepResponse.Errors, currentStepStatus.CreatedAt)
+				recordStepFailedStatus(currentStepStatus, resumeStepResponse.Errors, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 				return
 			}
 		}
