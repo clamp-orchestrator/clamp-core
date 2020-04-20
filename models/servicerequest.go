@@ -18,17 +18,18 @@ type ServiceRequest struct {
 type Status string
 
 const (
-	STATUS_NEW       Status = "NEW"
-	STATUS_STARTED   Status = "STARTED"
-	STATUS_RESUMED   Status = "RESUMED"
-	STATUS_PAUSED    Status = "PAUSED"
-	STATUS_COMPLETED Status = "COMPLETED"
-	STATUS_FAILED    Status = "FAILED"
+	STATUS_NEW        Status = "NEW"
+	STATUS_STARTED    Status = "STARTED"
+	STATUS_RESUMED    Status = "RESUMED"
+	STATUS_PAUSED     Status = "PAUSED"
+	STATUS_COMPLETED  Status = "COMPLETED"
+	STATUS_FAILED     Status = "FAILED"
+	STATUS_INPROGRESS Status = "INPROGRESS"
 )
 
 func NewServiceRequest(workflowName string, payload map[string]interface{}) ServiceRequest {
 	currentTime := time.Now()
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt:currentTime, Payload:payload}
+	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt: currentTime, Payload: payload}
 }
 
 type PGServiceRequest struct {
@@ -37,7 +38,7 @@ type PGServiceRequest struct {
 	WorkflowName string
 	Status       Status
 	CreatedAt    time.Time
-	Payload      map[string]interface{}   `json:"payload"`
+	Payload      map[string]interface{} `json:"payload"`
 }
 
 func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
@@ -45,8 +46,8 @@ func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
 		ID:           serviceReq.ID,
 		WorkflowName: serviceReq.WorkflowName,
 		Status:       serviceReq.Status,
-		CreatedAt:       serviceReq.CreatedAt,
-		Payload:       serviceReq.Payload,
+		CreatedAt:    serviceReq.CreatedAt,
+		Payload:      serviceReq.Payload,
 	}
 }
 
@@ -55,7 +56,7 @@ func (pgServReq PGServiceRequest) ToServiceRequest() ServiceRequest {
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,
 		Status:       pgServReq.Status,
-		CreatedAt:       pgServReq.CreatedAt,
-		Payload:       pgServReq.Payload,
+		CreatedAt:    pgServReq.CreatedAt,
+		Payload:      pgServReq.Payload,
 	}
 }

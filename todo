@@ -1,0 +1,14 @@
+- generate step id
+- creation of async channel & workers
+- for async step: record and push async step to channel (sr_id, step_id, payload)
+- create steps_response channel and workers
+- doExecute to send {sr_id, step_id, payload} (in body or headers)
+- aync channel workers func: execute the step (ExecuteStep, {sr_id, step_id, payload}) and for http step push the response to steps_response channel
+- contract for http& consumer messages(success & failure)
+- create a rabbitmq consumer to receive step response and push the msg to steps_response channel (sr_id, step_id, payload)
+- create a http api to receive step response and push the msg to steps_response channel (sr_id, step_id, payload)
+- service_request workers needs to updated to resume the workflow from a give step
+- steps_response channel workers: if message is success: to push a message to serivce_request channel to resume the workflow ()
+- steps_response channel workers: if message is failure: mark workflow failure
+
+

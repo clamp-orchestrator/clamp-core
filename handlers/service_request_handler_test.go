@@ -6,14 +6,16 @@ import (
 	"clamp-core/services"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
-const workflowName string = "testWF"
+const workflowName string = "testWorkflow"
 
 func setUp() {
 	step := models.Step{
@@ -30,7 +32,7 @@ func setUp() {
 	}
 
 	workflow := models.Workflow{
-		Name: workflowName,
+		Name:  workflowName,
 		Steps: []models.Step{step},
 	}
 	resp, err := services.FindWorkflowByName(workflowName)
@@ -43,12 +45,7 @@ func setUp() {
 func TestCreateNewServiceRequestRoute(t *testing.T) {
 	setUp()
 
-	router := setupRouter()
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/serviceRequest/"+workflowName, nil)
-	router.ServeHTTP(w, req)
-
-	bodyStr := w.Body.String()
+	w, bodyStr := callCreateServiceRequest(workflowName)
 	var jsonResp models.ServiceRequest
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
@@ -58,15 +55,45 @@ func TestCreateNewServiceRequestRoute(t *testing.T) {
 	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
-func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
+func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/serviceRequest/InvalidWF", nil)
+	req, _ := http.NewRequest("POST", "/serviceRequest/"+wfName, nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
+	return w, bodyStr
+}
+
+func callGetServiceRequestStatus(serviceRequestId uuid.UUID) (*httptest.ResponseRecorder, string) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestId.String(), nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	return w, bodyStr
+}
+
+func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
+	setUp()
+	_, bodyStr := callCreateServiceRequest("InvalidWF")
 	var jsonResp models.ClampErrorResponse
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
 	assert.Equal(t, "No record found with given workflow name : InvalidWF", jsonResp.Message)
+}
+
+func TestShouldGetServiceRequestStatus(t *testing.T) {
+	setUp()
+	_, bodyStr := callCreateServiceRequest(workflowName)
+	var serviceReq models.ServiceRequest
+	json.Unmarshal([]byte(bodyStr), &serviceReq)
+	time.Sleep(time.Second * 5)
+	status, body := callGetServiceRequestStatus(serviceReq.ID)
+	var response models.ServiceRequestStatusResponse
+	json.Unmarshal([]byte(body), &response)
+	assert.Equal(t, 200, status.Code)
+	assert.Equal(t, models.STATUS_COMPLETED, response.Status)
+	assert.Equal(t, 2, len(response.Steps))
 }

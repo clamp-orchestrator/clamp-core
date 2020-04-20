@@ -55,7 +55,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
-		if serviceReq.CurrentStepId < len(workflow.Steps){
+		if serviceReq.CurrentStepId < len(workflow.Steps) {
 			executeWorkflowStepsInSync(workflow, prefix, serviceReq)
 		}
 	}
@@ -78,7 +78,7 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 
 	for _, step := range workflow.Steps {
 		if serviceRequest.CurrentStepId != 0 {
-			if step.Id == serviceRequest.CurrentStepId{
+			if step.Id == serviceRequest.CurrentStepId {
 				serviceRequest.CurrentStepId = 0
 			}
 			continue
@@ -125,7 +125,7 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 		panic(errFmt)
 	}
 	if resp != nil {
-		log.Printf("%s Received %s", prefix, resp.(string))
+		log.Printf("%s Step response received: %s", prefix, resp.(string))
 		var responsePayload map[string]interface{}
 		json.Unmarshal([]byte(resp.(string)), &responsePayload)
 		stepStatus.Payload.Response = responsePayload
@@ -137,19 +137,19 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_PAUSED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_STARTED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
@@ -163,7 +163,7 @@ func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse mo
 	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
 	stepStatus.Reason = clampErrorResponse.Message
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 

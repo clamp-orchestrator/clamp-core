@@ -4,10 +4,12 @@ import (
 	"clamp-core/models"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"sync"
 	"time"
 )
+
 //TODO Channel name to be changed
 const ResumeStepResponseChannelSize = 1000
 const ResumeStepResponseWorkersSize = 100
@@ -49,8 +51,8 @@ func resumeStepResponseWorker(workerId int, resumeStepResponsesChan <-chan model
 			if resumeStepResponse.Errors.Code == 0 {
 				currentStepStatus.Payload.Response = resumeStepResponse.Payload
 				recordStepCompletionStatus(currentStepStatus, stepStartTime)
-			}else{
-				recordStepFailedStatus(currentStepStatus,resumeStepResponse.Errors,stepStartTime)
+			} else {
+				recordStepFailedStatus(currentStepStatus, resumeStepResponse.Errors, stepStartTime)
 				return
 			}
 		}
@@ -71,7 +73,11 @@ func GetResumeStepResponseChannel() chan models.ResumeStepResponse {
 	return resumeStepResponseChannel
 }
 
-func AddResumeStepResponseToChannel(asyncResumeStepExecutionRequest models.ResumeStepResponse) {
+func AddResumeStepResponseToChannel(request models.ResumeStepResponse) {
+	if request.ServiceRequestId == uuid.Nil || request.StepId == 0 || request.Payload == nil {
+		log.Printf("Invalid step resume request received %v", request)
+		return
+	}
 	channel := GetResumeStepResponseChannel()
-	channel <- asyncResumeStepExecutionRequest
+	channel <- request
 }

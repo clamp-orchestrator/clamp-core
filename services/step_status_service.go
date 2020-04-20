@@ -37,43 +37,50 @@ func FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceReques
 	return stepsStatuses, err
 }
 
-func PrepareStepStatusResponse(stepsStatusArr []models.StepsStatus) models.StepsStatusResponse {
-	var stepsStatusRes models.StepsStatusResponse
-	steps := make([]models.StepResponse, len(stepsStatusArr))
+func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, stepsStatusArr []models.StepsStatus) models.ServiceRequestStatusResponse {
+	var srvReqStatusRes models.ServiceRequestStatusResponse
+	srvReqStatusRes.ServiceRequestId = srvReqId
+	srvReqStatusRes.WorkflowName = workflow.Name
+	stepsStatusRes := make([]models.StepStatusResponse, len(stepsStatusArr))
+	stepsCount := len(workflow.Steps)
 	if len(stepsStatusArr) > 0 {
-		var statusFlag = true
-
+		var startedStepsCount, completedStepsCount, failedStepsCount, pausedStepsCount int
 		for i, stepsStatus := range stepsStatusArr {
-			stepsStatusRes.Reason = stepsStatus.Reason
-			if models.STATUS_FAILED == stepsStatus.Status {
-				statusFlag = false
-				stepsStatusRes.Status = stepsStatus.Status
-			}
-			steps[i] = models.StepResponse{
+			stepsStatusRes[i] = models.StepStatusResponse{
 				Name:      stepsStatus.StepName,
 				Status:    stepsStatus.Status,
 				TimeTaken: stepsStatus.TotalTimeInMs,
 				Payload:   stepsStatus.Payload,
 			}
+			switch stepsStatus.Status {
+			case models.STATUS_STARTED:
+				startedStepsCount++
+			case models.STATUS_COMPLETED:
+				completedStepsCount++
+			case models.STATUS_FAILED:
+				failedStepsCount++
+			case models.STATUS_PAUSED:
+				pausedStepsCount++
+			}
 		}
 
-		if statusFlag && len(stepsStatusArr)%2 == 0{
-			stepsStatusRes.Status = models.STATUS_COMPLETED
-		}else if !statusFlag{
-			stepsStatusRes.Status = models.STATUS_FAILED
-		} else {
-			stepsStatusRes.Status = models.STATUS_PAUSED
+		if completedStepsCount == stepsCount {
+			srvReqStatusRes.Status = models.STATUS_COMPLETED
+		} else if failedStepsCount > 0 {
+			srvReqStatusRes.Status = models.STATUS_FAILED
+		} else if pausedStepsCount > 0 {
+			srvReqStatusRes.Status = models.STATUS_PAUSED
+		} else if startedStepsCount != stepsCount || completedStepsCount != stepsCount {
+			srvReqStatusRes.Status = models.STATUS_INPROGRESS
 		}
-		stepsStatusRes.ServiceRequestId = stepsStatusArr[0].ServiceRequestId
-		stepsStatusRes.WorkflowName = stepsStatusArr[0].WorkflowName
 		timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
-		stepsStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / 1000000
-		stepsStatusRes.Steps = steps
+		srvReqStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / models.MilliSecondsDivisor
+		srvReqStatusRes.Steps = stepsStatusRes
 	}
-	return stepsStatusRes
+	return srvReqStatusRes
 }
 
 func calculateTimeTaken(startTime time.Time, endTime time.Time) time.Duration {
-	log.Println("Time Difference is == ", endTime.Sub(startTime))
+	//log.Println("Time Difference is == ", endTime.Sub(startTime))
 	return endTime.Sub(startTime)
 }
