@@ -8,6 +8,10 @@ import (
 
 type mockDB struct{}
 
+func (m mockDB) FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error) {
+	return findStepStatusByServiceRequestIdAndStepIdAndStatusMock(serviceRequestId, stepId, status)
+}
+
 func (m mockDB) FindStepStatusByServiceRequestIdAndStepNameAndStatus(serviceRequestId uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIdAndStepNameAndStatusMock(serviceRequestId, stepName, status)
 }
@@ -20,6 +24,7 @@ var findWorkflowByNameMock func(workflowName string) (models.Workflow, error)
 var findStepStatusByServiceRequestIdMock func(serviceRequestId uuid.UUID) ([]models.StepsStatus, error)
 var findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock func(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error)
 var findStepStatusByServiceRequestIdAndStepNameAndStatusMock func(serviceRequestId uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error)
+var findStepStatusByServiceRequestIdAndStepIdAndStatusMock func(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error)
 
 func (m mockDB) SaveServiceRequest(serReq models.ServiceRequest) (models.ServiceRequest, error) {
 	return saveServiceRequestMock(serReq)
