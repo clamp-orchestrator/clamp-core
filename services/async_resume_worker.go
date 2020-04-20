@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"sync"
+	"time"
 )
 
 //TODO Channel name to be changed
@@ -43,14 +44,15 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 	for stepResponse := range resumeStepsChannel {
 		if !stepResponse.StepProcessed {
 			//Fetch from DB the last step executed
-			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStepNameAndStatus(stepResponse.ServiceRequestId, "stepResponse.StepId", models.STATUS_STARTED)
+			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStepIdAndStatus(stepResponse.ServiceRequestId, stepResponse.StepId, models.STATUS_STARTED)
 			currentStepStatus.ID = ""
 			//TODO Setting Id empty and also errors validations
 			if stepResponse.Errors.Code == 0 {
 				currentStepStatus.Payload.Response = stepResponse.Payload
-				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt)
+				//TODO subtracting -5.30 since time is stored in GMT in PSql
+				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 			} else {
-				recordStepFailedStatus(currentStepStatus, stepResponse.Errors, currentStepStatus.CreatedAt)
+				recordStepFailedStatus(currentStepStatus, stepResponse.Errors, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 				return
 			}
 		}

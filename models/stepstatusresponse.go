@@ -6,17 +6,18 @@ import (
 
 //Step Status Response is a structure to display status of Service request id to the users
 type ServiceRequestStatusResponse struct {
-	ServiceRequestId uuid.UUID            `json:"serviceRequestId"`
-	WorkflowName     string               `json:"workflowName"`
+	ServiceRequestId uuid.UUID            `json:"service_request_id"`
+	WorkflowName     string               `json:"workflow_name"`
 	Status           Status               `json:"status"`
-	TotalTimeInMs    int64                `json:"totalTimeInMs"`
+	TotalTimeInMs    int64                `json:"total_time_in_ms"`
 	Steps            []StepStatusResponse `json:"steps"`
 	Reason           string               `json:"reason"`
 }
 
 type StepStatusResponse struct {
+	Id        int     `json:"id"`
 	Name      string  `json:"name"`
 	Status    Status  `json:"status"`
-	TimeTaken int64   `json:"timeTaken"`
+	TimeTaken int64   `json:"time_taken"`
 	Payload   Payload `json:"payload"`
 }
