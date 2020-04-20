@@ -14,6 +14,7 @@ func prepareStepsStatus() models.StepsStatus {
 	stepsStatus := models.StepsStatus{
 		ID:               "1",
 		ServiceRequestId: uuid.New(),
+		WorkflowName: workflowName,
 		Status:           models.STATUS_COMPLETED,
 		CreatedAt:        time.Now(),
 		StepName:         "Testing",
@@ -231,4 +232,73 @@ func TestShouldReturnStatusInprogress(t *testing.T) {
 	resp := PrepareStepStatusResponse(serviceReqID, workflow, stepsStatus)
 	assert.Nil(t, err)
 	assert.Equal(t, models.STATUS_INPROGRESS, resp.Status)
+}
+
+func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testing.T) {
+	stepsStatusReq := prepareStepsStatus()
+	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = models.StepsStatus{}
+		statuses.WorkflowName = "testWF"
+		statuses.ID = "1"
+		statuses.Status = models.STATUS_STARTED
+		statuses.StepName = "step1"
+		statuses.TotalTimeInMs = 10
+		statuses.CreatedAt = step1Time
+		return statuses, err
+	}
+
+	stepsStatus, err := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId,models.STATUS_STARTED)
+
+	assert.Nil(t, err)
+	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
+	assert.Equal(t, models.STATUS_STARTED, stepsStatus.Status)
+	//assert.Equal(t, stepsStatusReq.ServiceRequestId, resp.ServiceRequestId)
+	assert.Equal(t, int64(10), stepsStatus.TotalTimeInMs)
+	assert.NotNil(t, stepsStatus.ServiceRequestId)
+
+	assert.Equal(t, "step1", stepsStatus.StepName)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
+
+	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses models.StepsStatus, err error) {
+		return statuses, errors.New("select query failed")
+	}
+	_, err = FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	assert.NotNil(t, err)
+}
+
+
+func TestFindStepStatusByServiceRequestIdAndStepNameAndStatus(t *testing.T) {
+	stepsStatusReq := prepareStepsStatus()
+	findStepStatusByServiceRequestIdAndStepNameAndStatusMock = func(serviceRequestId uuid.UUID, stepName string, status models.Status) (statuses models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = models.StepsStatus{}
+		statuses.WorkflowName = "testWF"
+		statuses.ID = "1"
+		statuses.Status = models.STATUS_STARTED
+		statuses.StepName = "step1"
+		statuses.TotalTimeInMs = 10
+		statuses.CreatedAt = step1Time
+		return statuses, err
+	}
+
+	stepsStatus, err := FindStepStatusByServiceRequestIdAndStepNameAndStatus(stepsStatusReq.ServiceRequestId,"step1",models.STATUS_STARTED)
+
+	assert.Nil(t, err)
+	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
+	assert.Equal(t, models.STATUS_STARTED, stepsStatus.Status)
+	//assert.Equal(t, stepsStatusReq.ServiceRequestId, resp.ServiceRequestId)
+	assert.Equal(t, int64(10), stepsStatus.TotalTimeInMs)
+	assert.NotNil(t, stepsStatus.ServiceRequestId)
+
+	assert.Equal(t, "step1", stepsStatus.StepName)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
+
+	findStepStatusByServiceRequestIdAndStepNameAndStatusMock = func(serviceRequestId uuid.UUID, stepName string, status models.Status) (statuses models.StepsStatus, err error) {
+		return statuses, errors.New("select query failed")
+	}
+	_, err = FindStepStatusByServiceRequestIdAndStepNameAndStatus(stepsStatusReq.ServiceRequestId,"step1",models.STATUS_STARTED)
+	assert.NotNil(t, err)
 }
