@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 )
+
 //TODO Channel name to be changed
 const ResumeStepResponseChannelSize = 1000
 const ResumeStepResponseWorkersSize = 100
@@ -40,7 +41,7 @@ func resumeStepResponseWorker(workerId int, resumeStepResponsesChan <-chan model
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
 	for resumeStepResponse := range resumeStepResponsesChan {
-		stepStartTime := time.Now()
+
 		if !resumeStepResponse.StepProcessed {
 			//Fetch from DB the last step executed
 			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(resumeStepResponse.ServiceRequestId, models.STATUS_STARTED)
@@ -48,9 +49,9 @@ func resumeStepResponseWorker(workerId int, resumeStepResponsesChan <-chan model
 			//TODO Setting Id empty and also errors validations
 			if resumeStepResponse.Errors.Code == 0 {
 				currentStepStatus.Payload.Response = resumeStepResponse.Payload
-				recordStepCompletionStatus(currentStepStatus, stepStartTime)
-			}else{
-				recordStepFailedStatus(currentStepStatus,resumeStepResponse.Errors,stepStartTime)
+				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
+			} else {
+				recordStepFailedStatus(currentStepStatus, resumeStepResponse.Errors, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 				return
 			}
 		}
