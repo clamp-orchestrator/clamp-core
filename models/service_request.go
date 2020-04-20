@@ -8,11 +8,11 @@ import (
 //ServiceRequest is a structure to store the service request details
 type ServiceRequest struct {
 	ID            uuid.UUID              `json:"id"`
-	WorkflowName  string                 `json:"workflowName"`
+	WorkflowName  string                 `json:"workflow_name"`
 	Status        Status                 `json:"status"`
-	CreatedAt     time.Time              `json:"createdAt"`
+	CreatedAt     time.Time              `json:"created_at"`
 	Payload       map[string]interface{} `json:"payload"`
-	CurrentStepId int                    `json:"currentStepId",omitempty`
+	CurrentStepId int                    `json:"current_step_id",binding:"omitempty"`
 }
 
 type Status string
