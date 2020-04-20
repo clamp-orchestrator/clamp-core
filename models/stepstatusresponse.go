@@ -15,6 +15,7 @@ type ServiceRequestStatusResponse struct {
 }
 
 type StepStatusResponse struct {
+	Id        int     `json:"id"`
 	Name      string  `json:"name"`
 	Status    Status  `json:"status"`
 	TimeTaken int64   `json:"timeTaken"`

@@ -108,6 +108,7 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 	stepStatus.Payload.Response = nil
 	stepStartTime := time.Now()
 	stepStatus.StepName = step.Name
+	stepStatus.StepId = step.Id
 	recordStepStartedStatus(stepStatus, stepStartTime)
 	oldPrefix := log.Prefix()
 	log.SetPrefix(oldPrefix + prefix)

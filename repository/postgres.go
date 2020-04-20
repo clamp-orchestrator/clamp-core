@@ -41,10 +41,10 @@ type postgres struct {
 	db *pg.DB
 }
 
-func (p *postgres) FindStepStatusByServiceRequestIdAndStepNameAndStatus(serviceRequestId uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error) {
+func (p *postgres) FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error) {
 	var pgStepStatus models.PGStepStatus
 	var stepStatuses models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_name = ? and status = ?", serviceRequestId, stepName, status).Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ? and status = ?", serviceRequestId, stepId, status).Select()
 	if err != nil {
 		return stepStatuses, err
 	}
