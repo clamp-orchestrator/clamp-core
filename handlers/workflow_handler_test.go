@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -145,4 +146,44 @@ func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
 	errorMessages := strings.Split(jsonResp.Message, "\n")
 	assert.Equal(t, "Key: 'Workflow.Steps[0].Name' Error:Field validation for 'Name' failed on the 'required' tag", errorMessages[0])
+}
+
+func TestShouldReturnCreatedWorkflowSuccessfullyByWorkflowNameRoute(t *testing.T) {
+	workflowReg := setUpWorkflowRequest()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflow/"+workflowName, nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.Workflow
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, workflowName, jsonResp.Name, fmt.Sprintf("The expected name was %s but we got %s", workflowReg.Name, jsonResp.Name))
+	assert.NotNil(t, jsonResp.Steps)
+}
+
+func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *testing.T) {
+	workflowReg := setUpWorkflowRequest()
+	workflowReg.Name = workflowName
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	workflowJsonReg, _ := json.Marshal(workflowReg)
+	requestReader := bytes.NewReader(workflowJsonReg)
+
+	req, _ := http.NewRequest("POST", "/workflow", requestReader)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var errorJsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &errorJsonResp)
+	log.Println("++++++++=errorJsonResp.Code+++++++++++",errorJsonResp.Code)
+	log.Println("++++++++=errorJsonResp.Message+++++++++++",errorJsonResp.Message)
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, errorJsonResp.Code)
+	assert.NotNil(t, errorJsonResp.Message)
+	assert.Equal(t, "ERROR #23505 duplicate key value violates unique constraint \"workflow_name_index\"", errorJsonResp.Message)
 }
