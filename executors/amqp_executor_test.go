@@ -75,7 +75,7 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 				RoutingKey:    tt.fields.RoutingKey,
 				ContentType:   tt.fields.ContentType,
 			}
-			got, err := val.DoExecute(tt.args.requestBody)
+			got, err := val.DoExecute(tt.args.requestBody, "")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DoExecute() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -17,9 +17,7 @@ func TestRecordStepResponse(t *testing.T) {
 	res := models.AsyncStepResponse{
 		ServiceRequestId: uuid.UUID{},
 		StepId:           0,
-		Payload:          nil,
-		Errors:           models.ClampErrorResponse{},
-		StepProcessed:    false,
+		Response:         nil,
 	}
 	workflowJsonReg, _ := json.Marshal(res)
 	requestReader := bytes.NewReader(workflowJsonReg)

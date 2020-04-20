@@ -69,7 +69,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 				Url:     tt.fields.Url,
 				Headers: tt.fields.Headers,
 			}
-			got, err := httpVal.DoExecute(tt.args.requestBody)
+			got, err := httpVal.DoExecute(tt.args.requestBody, "")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DoExecute() error = %v, wantErr %v", err, tt.wantErr)
 				return

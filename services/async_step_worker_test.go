@@ -16,7 +16,7 @@ func TestAddAsyncStepExecutorRequestToChannel(t *testing.T) {
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
 		workflow.Id = "TEST_WF"
 		step := models.Step{
-			Id : 1,
+			Id:        1,
 			Name:      "1",
 			StepType:  "ASYNC",
 			Mode:      "HTTP",
@@ -35,6 +35,9 @@ func TestAddAsyncStepExecutorRequestToChannel(t *testing.T) {
 	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		return status, nil
+	}
+	findAllStepStatusByServiceRequestIdAndStepIdMock = func(serviceRequestId uuid.UUID, stepId int) (statuses []models.StepsStatus, err error) {
+		return statuses, err
 	}
 	type args struct {
 		serviceReq models.ServiceRequest
