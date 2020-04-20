@@ -51,7 +51,7 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 				currentStepStatus.Payload.Response = stepResponse.Payload
 				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 			} else {
-				recordStepFailedStatus(currentStepStatus, resumeStepResponse.Errors, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
+				recordStepFailedStatus(currentStepStatus, stepResponse.Errors, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 				return
 			}
 		}
