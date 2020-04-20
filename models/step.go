@@ -22,10 +22,8 @@ type Step struct {
 func (step Step) DoExecute(requestBody interface{}) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
-		//log.Println("Inside HTTP Execute")
 		return step.Val.(*executors.HttpVal).DoExecute(requestBody)
 	case "AMQP":
-		//log.Println("Inside QUEUE Execute")
 		return step.Val.(*executors.AMQPVal).DoExecute(requestBody)
 	}
 	panic("Invalid mode specified")

@@ -43,7 +43,11 @@ type postgres struct {
 
 func (p *postgres) FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
+	var stepStatuses models.StepsStatus
 	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestId, status).Order("created_at DESC").Select()
+	if err == nil {
+		return stepStatuses,err
+	}
 	return pgStepStatus[0].ToStepStatus(), err
 }
 

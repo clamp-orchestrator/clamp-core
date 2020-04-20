@@ -56,7 +56,6 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
 		if serviceReq.CurrentStepId < len(workflow.Steps){
-			log.Println("+++++++++++++++ Service REQUST STEP ID", serviceReq.CurrentStepId)
 			executeWorkflowStepsInSync(workflow, prefix, serviceReq)
 		}
 	}
@@ -72,7 +71,6 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 }
 
 func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) {
-	log.Println("+++++++++++++++ Inside executeWorkflowStepsInSync ++++++++++++++++ with service request :", serviceRequest)
 	previousStepResponse := serviceRequest.Payload
 	var stepStatus models.StepsStatus
 	stepStatus.WorkflowName = serviceRequest.WorkflowName
@@ -121,7 +119,6 @@ func ExecuteWorkflowStep(stepStatus models.StepsStatus, previousStepResponse map
 	resp, err := step.DoExecute(request)
 	log.SetPrefix(oldPrefix)
 	if err != nil {
-		log.Println("Inside error block", err)
 		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
