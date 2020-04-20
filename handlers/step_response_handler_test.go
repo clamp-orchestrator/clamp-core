@@ -14,7 +14,7 @@ import (
 func TestRecordStepResponse(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	res := models.ResumeStepResponse{
+	res := models.AsyncStepResponse{
 		ServiceRequestId: uuid.UUID{},
 		StepId:           0,
 		Payload:          nil,

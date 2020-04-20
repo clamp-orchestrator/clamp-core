@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type ResumeStepResponse struct {
+type AsyncStepResponse struct {
 	ServiceRequestId uuid.UUID              `json:"serviceRequestId"`
 	StepId           int                    `json:"stepId"`
 	Payload          map[string]interface{} `json:"payload"`

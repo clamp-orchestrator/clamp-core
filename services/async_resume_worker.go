@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"log"
 	"sync"
-	"time"
 )
 
 //TODO Channel name to be changed
@@ -15,69 +14,68 @@ const ResumeStepResponseChannelSize = 1000
 const ResumeStepResponseWorkersSize = 100
 
 var (
-	resumeStepResponseChannel chan models.ResumeStepResponse
-	singleton                 sync.Once
+	resumeStepsChannel chan models.AsyncStepResponse
+	singleton          sync.Once
 )
 
-func CreateResumeStepResponseChannel() chan models.ResumeStepResponse {
+func createResumeStepsChannel() chan models.AsyncStepResponse {
 	singleton.Do(func() {
-		resumeStepResponseChannel = make(chan models.ResumeStepResponse, ResumeStepResponseChannelSize)
+		resumeStepsChannel = make(chan models.AsyncStepResponse, ResumeStepResponseChannelSize)
 	})
-	return resumeStepResponseChannel
+	return resumeStepsChannel
 }
 
 func init() {
-	CreateResumeStepResponseChannel()
-	CreateResumeStepResponseWorkers()
+	createResumeStepsChannel()
+	createResumeStepsWorkers()
 }
 
-func CreateResumeStepResponseWorkers() {
+func createResumeStepsWorkers() {
 	for i := 0; i < ResumeStepResponseWorkersSize; i++ {
-		go resumeStepResponseWorker(i, resumeStepResponseChannel)
+		go resumeSteps(i, resumeStepsChannel)
 	}
 }
 
-func resumeStepResponseWorker(workerId int, resumeStepResponsesChan <-chan models.ResumeStepResponse) {
-	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
+func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepResponse) {
+	prefix := fmt.Sprintf("[RESUME_STEP_WORKER_%d] : ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s Started listening to service request channel\n", prefix)
-	for resumeStepResponse := range resumeStepResponsesChan {
-		stepStartTime := time.Now()
-		if !resumeStepResponse.StepProcessed {
+	for stepResponse := range resumeStepsChannel {
+		if !stepResponse.StepProcessed {
 			//Fetch from DB the last step executed
-			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(resumeStepResponse.ServiceRequestId, models.STATUS_STARTED)
+			currentStepStatus, _ := FindStepStatusByServiceRequestIdAndStepNameAndStatus(stepResponse.ServiceRequestId, "stepResponse.StepId", models.STATUS_STARTED)
 			currentStepStatus.ID = ""
 			//TODO Setting Id empty and also errors validations
-			if resumeStepResponse.Errors.Code == 0 {
-				currentStepStatus.Payload.Response = resumeStepResponse.Payload
-				recordStepCompletionStatus(currentStepStatus, stepStartTime)
+			if stepResponse.Errors.Code == 0 {
+				currentStepStatus.Payload.Response = stepResponse.Payload
+				recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt)
 			} else {
-				recordStepFailedStatus(currentStepStatus, resumeStepResponse.Errors, stepStartTime)
+				recordStepFailedStatus(currentStepStatus, stepResponse.Errors, currentStepStatus.CreatedAt)
 				return
 			}
 		}
-		serviceRequest, err := FindServiceRequestByID(resumeStepResponse.ServiceRequestId)
+		serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestId)
 		if err == nil {
 			//TODO
 		}
-		serviceRequest.Payload = resumeStepResponse.Payload
-		serviceRequest.CurrentStepId = resumeStepResponse.StepId
+		serviceRequest.Payload = stepResponse.Payload
+		serviceRequest.CurrentStepId = stepResponse.StepId
 		AddServiceRequestToChannel(serviceRequest)
 	}
 }
 
-func GetResumeStepResponseChannel() chan models.ResumeStepResponse {
-	if resumeStepResponseChannel == nil {
+func getResumeStepResponseChannel() chan models.AsyncStepResponse {
+	if resumeStepsChannel == nil {
 		panic(errors.New("async service request channel not initialized"))
 	}
-	return resumeStepResponseChannel
+	return resumeStepsChannel
 }
 
-func AddResumeStepResponseToChannel(request models.ResumeStepResponse) {
-	if request.ServiceRequestId == uuid.Nil || request.StepId == 0 || request.Payload == nil {
-		log.Printf("Invalid step resume request received %v", request)
+func AddStepResponseToResumeChannel(response models.AsyncStepResponse) {
+	if response.ServiceRequestId == uuid.Nil || response.StepId == 0 || response.Payload == nil {
+		log.Printf("Invalid step resume request received %v", response)
 		return
 	}
-	channel := GetResumeStepResponseChannel()
-	channel <- request
+	channel := getResumeStepResponseChannel()
+	channel <- response
 }

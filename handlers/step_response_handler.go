@@ -10,17 +10,17 @@ import (
 
 func createStepResponseHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var request models.ResumeStepResponse
-		err := c.ShouldBindJSON(&request)
+		var res models.AsyncStepResponse
+		err := c.ShouldBindJSON(&res)
 		if err != nil {
 			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 			log.Println(err)
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
-		log.Printf("[HTTP Consumer] : Received step completed response: %v", request)
+		log.Printf("[HTTP Consumer] : Received step completed response: %v", res)
 		log.Printf("[HTTP Consumer] : Pushing step completed response to channel")
-		services.AddResumeStepResponseToChannel(request)
+		services.AddStepResponseToResumeChannel(res)
 		c.JSON(http.StatusOK, models.CreateSuccessResponse(http.StatusOK, "success"))
 	}
 }

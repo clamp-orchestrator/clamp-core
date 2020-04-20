@@ -37,6 +37,16 @@ func FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceReques
 	return stepsStatuses, err
 }
 
+func FindStepStatusByServiceRequestIdAndStepNameAndStatus(serviceRequestId uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error) {
+	log.Printf("Find step statues by request id : %s and step name : %s", serviceRequestId, stepName)
+	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestIdAndStepNameAndStatus(serviceRequestId, stepName, status)
+	if err != nil {
+		log.Printf("No record found with given service request id %s", serviceRequestId)
+		return models.StepsStatus{}, err
+	}
+	return stepsStatuses, err
+}
+
 func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, stepsStatusArr []models.StepsStatus) models.ServiceRequestStatusResponse {
 	var srvReqStatusRes models.ServiceRequestStatusResponse
 	srvReqStatusRes.ServiceRequestId = srvReqId
