@@ -45,7 +45,7 @@ func (p *postgres) FindStepStatusByServiceRequestIdAndStepNameAndStatus(serviceR
 	var pgStepStatus models.PGStepStatus
 	var stepStatuses models.StepsStatus
 	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_name = ? and status = ?", serviceRequestId, stepName, status).Select()
-	if err == nil {
+	if err != nil {
 		return stepStatuses, err
 	}
 	return pgStepStatus.ToStepStatus(), err
