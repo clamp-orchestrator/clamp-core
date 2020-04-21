@@ -15,9 +15,7 @@ type AMQPVal struct {
 	ContentType   string `json:"content_type"`
 }
 
-func (val AMQPVal) DoExecute(requestBody interface{}) (interface{}, error) {
-	prefix := log.Prefix()
-	log.SetPrefix("")
+func (val AMQPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s AMQP Executor: Executing amqp %s body:%v", prefix, val.getName(), requestBody)
 
 	conn, err := amqp.Dial(val.ConnectionURL)

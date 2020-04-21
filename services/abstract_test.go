@@ -23,6 +23,7 @@ var findServiceRequestByIdMock func(uuid.UUID) (models.ServiceRequest, error)
 var findWorkflowByNameMock func(workflowName string) (models.Workflow, error)
 var findStepStatusByServiceRequestIdMock func(serviceRequestId uuid.UUID) ([]models.StepsStatus, error)
 var findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock func(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error)
+var findAllStepStatusByServiceRequestIdAndStepIdMock func(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error)
 var findStepStatusByServiceRequestIdAndStepNameAndStatusMock func(serviceRequestId uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error)
 var findStepStatusByServiceRequestIdAndStepIdAndStatusMock func(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error)
 
@@ -52,6 +53,10 @@ func (m mockDB) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]
 
 func (m mockDB) FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock(serviceRequestId, status)
+}
+
+func (m mockDB) FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error) {
+	return findAllStepStatusByServiceRequestIdAndStepIdMock(serviceRequestId, stepId)
 }
 
 func init() {

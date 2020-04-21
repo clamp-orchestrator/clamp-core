@@ -7,12 +7,13 @@ import (
 
 //ServiceRequest is a structure to store the service request details
 type ServiceRequest struct {
-	ID            uuid.UUID              `json:"id"`
-	WorkflowName  string                 `json:"workflow_name"`
-	Status        Status                 `json:"status"`
-	CreatedAt     time.Time              `json:"created_at"`
-	Payload       map[string]interface{} `json:"payload"`
-	CurrentStepId int                    `json:"current_step_id",binding:"omitempty"`
+	ID           uuid.UUID              `json:"id"`
+	WorkflowName string                 `json:"workflow_name"`
+	Status       Status                 `json:"status"`
+	CreatedAt    time.Time              `json:"created_at"`
+	Payload      map[string]interface{} `json:"payload"`
+	//TODO: rename to last step id executed
+	CurrentStepId int `json:"current_step_id",binding:"omitempty"`
 }
 
 type Status string
@@ -24,7 +25,7 @@ const (
 	STATUS_PAUSED     Status = "PAUSED"
 	STATUS_COMPLETED  Status = "COMPLETED"
 	STATUS_FAILED     Status = "FAILED"
-	STATUS_INPROGRESS Status = "INPROGRESS"
+	STATUS_INPROGRESS Status = "IN_PROGRESS"
 )
 
 func NewServiceRequest(workflowName string, payload map[string]interface{}) ServiceRequest {

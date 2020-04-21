@@ -19,12 +19,12 @@ type Step struct {
 	Enabled   bool   `json:"enabled"`
 }
 
-func (step Step) DoExecute(requestBody interface{}) (interface{}, error) {
+func (step Step) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
-		return step.Val.(*executors.HttpVal).DoExecute(requestBody)
+		return step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
 	case "AMQP":
-		return step.Val.(*executors.AMQPVal).DoExecute(requestBody)
+		return step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
 	}
 	panic("Invalid mode specified")
 }

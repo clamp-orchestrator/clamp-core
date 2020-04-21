@@ -2,7 +2,6 @@ package services
 
 import (
 	"clamp-core/models"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -36,22 +35,22 @@ func createAsyncStepExecutors() {
 }
 
 func executeStep(workerId int, asyncStepExecutorChannel <-chan models.AsyncStepRequest) {
-	prefix := fmt.Sprintf("[ASYNC_STEP_EXECUTOR_%d] : ", workerId)
+	prefix := fmt.Sprintf("[ASYNC_STEP_EXECUTOR_%d] ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
-	log.Printf("%s Started listening to service request channel\n", prefix)
+	log.Printf("%s : Started listening to async steps executor channel\n", prefix)
 	for asyncStepReq := range asyncStepExecutorChannel {
-		asyncStepResponse, _ := ExecuteWorkflowStep(asyncStepReq.StepStatus, asyncStepReq.Payload, asyncStepReq.Prefix, asyncStepReq.Step)
-		if asyncStepResponse != nil {
-			var responsePayload map[string]interface{}
-			json.Unmarshal([]byte(asyncStepResponse.(string)), &responsePayload)
+		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, asyncStepReq.ServiceRequestId)
+		log.Printf("%s : Received async step to execute %v\n", prefix, asyncStepReq)
+		asyncStepResponse, err := ExecuteWorkflowStep(asyncStepReq.Payload, asyncStepReq.ServiceRequestId, asyncStepReq.WorkflowName, asyncStepReq.Step, prefix)
+		if !err.IsNil() || asyncStepResponse != nil {
 			asyncStepRes := models.AsyncStepResponse{
-				ServiceRequestId: asyncStepReq.StepStatus.ServiceRequestId,
+				ServiceRequestId: asyncStepReq.ServiceRequestId,
 				StepId:           asyncStepReq.Step.Id,
-				Payload:          responsePayload,
-				StepProcessed:    true,
+				Response:         asyncStepResponse,
+				Error:            err,
 			}
+			asyncStepRes.SetStepStatusRecorded(true)
 			AddStepResponseToResumeChannel(asyncStepRes)
-			return
 		}
 	}
 }
