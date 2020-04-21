@@ -66,9 +66,8 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 				asyncStepResponseReq: models.AsyncStepResponse{
 					ServiceRequestId: serviceRequestId,
 					StepId:           1,
-					Payload:          prepareResponsePayload(),
-					StepProcessed:    false,
-					Errors:           models.ClampErrorResponse{},
+					Response:          prepareResponsePayload(),
+					Error:           models.ClampErrorResponse{},
 				},
 			},
 		},
@@ -87,7 +86,8 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		return serviceRequest, err
 	}
 
-	findStepStatusByServiceRequestIdAndStepIdAndStatusMock = func(serviceRequestId uuid.UUID, stepId int, status models.Status) (stepsStatus models.StepsStatus, err error) {
+	findAllStepStatusByServiceRequestIdAndStepIdMock = func(serviceRequestId uuid.UUID, stepId int) (stepsStatus []models.StepsStatus, err error) {
+		var statuses = make([]models.StepsStatus, 1)
 		stepStatus := models.StepsStatus{
 			ID:               "2",
 			ServiceRequestId: serviceRequestId,
@@ -103,8 +103,9 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			},
 			StepId:           1,
 		}
+		statuses[0] = stepStatus
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")
-		return stepStatus,err
+		return statuses,err
 	}
 
 	for _, tt := range tests {
@@ -156,9 +157,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 				asyncStepResponseReq: models.AsyncStepResponse{
 					ServiceRequestId: serviceRequestId,
 					StepId:           1,
-					Payload:          prepareResponsePayload(),
-					StepProcessed:    false,
-					Errors:           models.ClampErrorResponse{
+					Response:          prepareResponsePayload(),
+					Error:           models.ClampErrorResponse{
 						Code:    400,
 						Message: "Failed to process due to internal failure",
 					},
@@ -167,7 +167,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		},
 	}
 
-	findStepStatusByServiceRequestIdAndStepIdAndStatusMock = func(serviceRequestId uuid.UUID, stepId int, status models.Status) (stepsStatus models.StepsStatus, err error) {
+	findAllStepStatusByServiceRequestIdAndStepIdMock = func(serviceRequestId uuid.UUID, stepId int) (stepsStatus []models.StepsStatus, err error) {
+		var statuses = make([]models.StepsStatus, 1)
 		stepStatus := models.StepsStatus{
 			ID:               "2",
 			ServiceRequestId: serviceRequestId,
@@ -183,8 +184,9 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			},
 			StepId:           1,
 		}
+		statuses[0] = stepStatus
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")
-		return stepStatus,err
+		return statuses,err
 	}
 
 	for _, tt := range tests {
