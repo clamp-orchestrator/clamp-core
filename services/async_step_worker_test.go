@@ -9,15 +9,16 @@ import (
 	"time"
 )
 
-const workflowName string = "testWF"
+var step models.Step
 
-func TestAddServiceRequestToChannel(t *testing.T) {
+func TestAddAsyncStepExecutorRequestToChannel(t *testing.T) {
 	var functionCalledStack []string
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
 		workflow.Id = "TEST_WF"
 		step := models.Step{
+			Id:        1,
 			Name:      "1",
-			StepType:  "SYNC",
+			StepType:  "ASYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
@@ -35,9 +36,13 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		return status, nil
 	}
+	findAllStepStatusByServiceRequestIdAndStepIdMock = func(serviceRequestId uuid.UUID, stepId int) (statuses []models.StepsStatus, err error) {
+		return statuses, err
+	}
 	type args struct {
 		serviceReq models.ServiceRequest
 	}
+	var serviceRequestId = uuid.New()
 	tests := []struct {
 		name string
 		args args
@@ -46,7 +51,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			name: "Should process service request",
 			args: args{
 				serviceReq: models.ServiceRequest{
-					ID:           uuid.New(),
+					ID:           serviceRequestId,
 					WorkflowName: workflowName,
 					Status:       models.STATUS_NEW,
 				},
@@ -54,12 +59,25 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		},
 	}
 
+	findServiceRequestByIdMock = func(u uuid.UUID) (request models.ServiceRequest, err error) {
+		serviceRequest := models.ServiceRequest{
+			ID:            serviceRequestId,
+			WorkflowName:  workflowName,
+			Status:        models.STATUS_NEW,
+			CreatedAt:     time.Time{},
+			Payload:       nil,
+			CurrentStepId: 1,
+		}
+		functionCalledStack = append(functionCalledStack, "findServiceRequestById")
+		return serviceRequest, err
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(tt.args.serviceReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
-			assert.Equal(t, 3, len(functionCalledStack))
+			assert.Equal(t, 5, len(functionCalledStack))
 		})
 	}
 }

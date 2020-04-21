@@ -14,6 +14,7 @@ func prepareStepsStatus() models.StepsStatus {
 	stepsStatus := models.StepsStatus{
 		ID:               "1",
 		ServiceRequestId: uuid.New(),
+		WorkflowName:     workflowName,
 		Status:           models.STATUS_COMPLETED,
 		CreatedAt:        time.Now(),
 		StepName:         "Testing",
@@ -65,7 +66,15 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	}
 
 	stepsStatus, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
-	resp := PrepareStepStatusResponse(stepsStatus)
+	workflow := models.Workflow{
+		Name:        stepsStatusReq.WorkflowName,
+		Description: "",
+		Enabled:     false,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+		Steps:       make([]models.Step, 2),
+	}
+	resp := PrepareStepStatusResponse(stepsStatusReq.ServiceRequestId, workflow, stepsStatus)
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, resp.WorkflowName)
 	assert.Equal(t, stepsStatusReq.Status, resp.Status)
@@ -84,5 +93,210 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 		return statuses, errors.New("select query failed")
 	}
 	_, err = FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	assert.NotNil(t, err)
+}
+
+func TestShouldReturnStatusCompletedForAllStepsCompleted(t *testing.T) {
+	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = make([]models.StepsStatus, 4)
+		workflowName := "testWF"
+		statuses[0].WorkflowName = workflowName
+		statuses[0].ID = "1"
+		statuses[0].Status = models.STATUS_STARTED
+		statuses[0].StepName = "step1"
+		statuses[0].TotalTimeInMs = 10
+		statuses[0].CreatedAt = step1Time
+		statuses[1].WorkflowName = workflowName
+		statuses[1].ID = "2"
+		statuses[1].Status = models.STATUS_COMPLETED
+		statuses[1].StepName = "step1"
+		statuses[1].TotalTimeInMs = 20
+		statuses[1].CreatedAt = step1Time.Add(time.Second * 10)
+
+		statuses[2].WorkflowName = workflowName
+		statuses[2].ID = "3"
+		statuses[2].Status = models.STATUS_STARTED
+		statuses[2].StepName = "step2"
+		statuses[2].TotalTimeInMs = 10
+		statuses[2].CreatedAt = step1Time.Add(time.Second * 20)
+		statuses[3].WorkflowName = workflowName
+		statuses[3].ID = "4"
+		statuses[3].Status = models.STATUS_COMPLETED
+		statuses[3].StepName = "step2"
+		statuses[3].TotalTimeInMs = 20
+		statuses[3].CreatedAt = step1Time.Add(time.Second * 30)
+		return statuses, err
+	}
+
+	serviceReqID := uuid.New()
+	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	workflow := models.Workflow{
+		Name:        workflowName,
+		Description: "",
+		Enabled:     false,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+		Steps:       make([]models.Step, 2),
+	}
+	resp := PrepareStepStatusResponse(serviceReqID, workflow, stepsStatus)
+	assert.Nil(t, err)
+	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
+}
+
+func TestShouldReturnStatusFailed(t *testing.T) {
+	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = make([]models.StepsStatus, 4)
+		statuses[0].WorkflowName = "testWF"
+		statuses[0].ID = "1"
+		statuses[0].Status = models.STATUS_STARTED
+		statuses[0].StepName = "step1"
+		statuses[0].TotalTimeInMs = 10
+		statuses[0].CreatedAt = step1Time
+		statuses[1].WorkflowName = "testWF"
+		statuses[1].ID = "2"
+		statuses[1].Status = models.STATUS_COMPLETED
+		statuses[1].StepName = "step1"
+		statuses[1].TotalTimeInMs = 20
+		statuses[1].CreatedAt = step1Time.Add(time.Second * 10)
+
+		statuses[2].WorkflowName = "testWF"
+		statuses[2].ID = "3"
+		statuses[2].Status = models.STATUS_STARTED
+		statuses[2].StepName = "step2"
+		statuses[2].TotalTimeInMs = 10
+		statuses[2].CreatedAt = step1Time.Add(time.Second * 20)
+		statuses[3].WorkflowName = "testWF"
+		statuses[3].ID = "4"
+		statuses[3].Status = models.STATUS_FAILED
+		statuses[3].StepName = "step2"
+		statuses[3].TotalTimeInMs = 20
+		statuses[3].CreatedAt = step1Time.Add(time.Second * 30)
+		return statuses, err
+	}
+	serviceReqID := uuid.New()
+	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	workflow := models.Workflow{
+		Name:        workflowName,
+		Description: "",
+		Enabled:     false,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+		Steps:       make([]models.Step, 2),
+	}
+	resp := PrepareStepStatusResponse(serviceReqID, workflow, stepsStatus)
+	assert.Nil(t, err)
+	assert.Equal(t, models.STATUS_FAILED, resp.Status)
+}
+
+func TestShouldReturnStatusInprogress(t *testing.T) {
+	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = make([]models.StepsStatus, 4)
+		statuses[0].WorkflowName = "testWF"
+		statuses[0].ID = "1"
+		statuses[0].Status = models.STATUS_STARTED
+		statuses[0].StepName = "step1"
+		statuses[0].TotalTimeInMs = 10
+		statuses[0].CreatedAt = step1Time
+		statuses[1].WorkflowName = "testWF"
+		statuses[1].ID = "2"
+		statuses[1].Status = models.STATUS_COMPLETED
+		statuses[1].StepName = "step1"
+		statuses[1].TotalTimeInMs = 20
+		statuses[1].CreatedAt = step1Time.Add(time.Second * 10)
+
+		statuses[2].WorkflowName = "testWF"
+		statuses[2].ID = "3"
+		statuses[2].Status = models.STATUS_STARTED
+		statuses[2].StepName = "step2"
+		statuses[2].TotalTimeInMs = 10
+		statuses[2].CreatedAt = step1Time.Add(time.Second * 20)
+		return statuses, err
+	}
+
+	serviceReqID := uuid.New()
+	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	workflow := models.Workflow{
+		Name:        workflowName,
+		Description: "",
+		Enabled:     false,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+		Steps:       make([]models.Step, 2),
+	}
+	resp := PrepareStepStatusResponse(serviceReqID, workflow, stepsStatus)
+	assert.Nil(t, err)
+	assert.Equal(t, models.STATUS_INPROGRESS, resp.Status)
+}
+
+func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testing.T) {
+	stepsStatusReq := prepareStepsStatus()
+	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = models.StepsStatus{}
+		statuses.WorkflowName = "testWF"
+		statuses.ID = "1"
+		statuses.Status = models.STATUS_STARTED
+		statuses.StepName = "step1"
+		statuses.TotalTimeInMs = 10
+		statuses.CreatedAt = step1Time
+		return statuses, err
+	}
+
+	stepsStatus, err := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+
+	assert.Nil(t, err)
+	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
+	assert.Equal(t, models.STATUS_STARTED, stepsStatus.Status)
+	assert.Equal(t, int64(10), stepsStatus.TotalTimeInMs)
+	assert.NotNil(t, stepsStatus.ServiceRequestId)
+
+	assert.Equal(t, "step1", stepsStatus.StepName)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
+
+	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses models.StepsStatus, err error) {
+		return statuses, errors.New("select query failed")
+	}
+	_, err = FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	assert.NotNil(t, err)
+}
+
+func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
+	stepsStatusReq := prepareStepsStatus()
+	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = models.StepsStatus{}
+		statuses.WorkflowName = "testWF"
+		statuses.ID = "1"
+		statuses.Status = models.STATUS_STARTED
+		statuses.StepName = "step1"
+		statuses.StepId = 1
+		statuses.TotalTimeInMs = 10
+		statuses.CreatedAt = step1Time
+		return statuses, err
+	}
+
+	stepsStatus, err := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+
+	assert.Nil(t, err)
+	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
+	assert.Equal(t, models.STATUS_STARTED, stepsStatus.Status)
+	assert.Equal(t, int64(10), stepsStatus.TotalTimeInMs)
+	assert.NotNil(t, stepsStatus.ServiceRequestId)
+
+	assert.Equal(t, "step1", stepsStatus.StepName)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
+
+	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses models.StepsStatus, err error) {
+		return statuses, errors.New("select query failed")
+	}
+	_, err = FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
 	assert.NotNil(t, err)
 }

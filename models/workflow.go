@@ -10,13 +10,16 @@ type Workflow struct {
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description"`
 	Enabled     bool      `json:"enabled"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 	Steps       []Step    `json:"steps" binding:"required,gt=0,dive"`
 }
 
 //Create a new work flow for a given service flow and return service flow details
 func CreateWorkflow(workflowRequest Workflow) Workflow {
+	for i := 0; i < len(workflowRequest.Steps); i++ {
+		workflowRequest.Steps[i].Id = i + 1
+	}
 	return newServiceFlow(workflowRequest)
 }
 

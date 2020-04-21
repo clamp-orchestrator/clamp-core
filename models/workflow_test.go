@@ -13,13 +13,13 @@ import (
 func TestShouldCreateANewWorkflow(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://35.166.176.234:3333/api/v1/user",
+		Url:     "http://34.222.238.234:3333/api/v1/user",
 		Headers: "",
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
+		StepType: "SYNC",
 		Mode:    "HTTP",
 		Val:     http,
 		Enabled: true,
@@ -46,15 +46,15 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
 	assert.Equal(t, serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name))
 	assert.Equal(t, "GET", workflowResponse.Steps[0].getHttpVal().Method)
-	assert.Equal(t, "http://35.166.176.234:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
+	assert.Equal(t, "http://34.222.238.234:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
 	assert.Equal(t, "", workflowResponse.Steps[0].getHttpVal().Headers)
 }
 
 func TestShouldNotCreateWorkflowIfStepValIsNotPresent(t *testing.T) {
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
+		StepType: "SYNC",
 		Mode:    "HTTP",
 		Enabled: true,
 	}
@@ -77,14 +77,14 @@ func TestShouldNotCreateWorkflowIfStepValIsNotPresent(t *testing.T) {
 func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://35.166.176.234:3333/api/v1/user",
+		Url:     "http://34.222.238.234:3333/api/v1/user",
 		Headers: "",
 	}
 	steps := []Step{{}}
 	const InvalidMode = "xyz"
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
+		StepType: "SYNC",
 		Mode:    InvalidMode,
 		Val:     http,
 		Enabled: true,
@@ -106,15 +106,15 @@ func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 }
 
 func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
-	queue := executors.QueueVal{
-		URL:    "http://35.166.176.234:3333",
-		Topics: "topic-a",
+	queue := executors.AMQPVal{
+		ConnectionURL: "http://34.222.238.234:3333",
+		QueueName:     "topic-a",
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
-		Mode:    "QUEUE",
+		StepType: "ASYNC",
+		Mode:    "AMQP",
 		Val:     queue,
 		Enabled: true,
 	}
@@ -144,9 +144,9 @@ func TestShouldThrowErrorIfGetHTTPValUrlIsEmpty(t *testing.T) {
 	}
 	steps := []Step{{}}
 	steps[0] = Step{
-		Id:      "firstStep",
 		Name:    "firstStep",
-		Mode:    "QUEUE",
+		StepType: "ASYNC",
+		Mode:    "AMQP",
 		Val:     http,
 		Enabled: true,
 	}

@@ -11,16 +11,18 @@ type Payload struct {
 }
 
 //Step Status is a structure to store the service request steps details
+//TODO: remove step_name field
 type StepsStatus struct {
 	ID               string    `json:"id"`
-	ServiceRequestId uuid.UUID `json:"serviceRequestId"`
-	WorkflowName     string    `json:"workflowName"`
+	ServiceRequestId uuid.UUID `json:"service_request_id"`
+	WorkflowName     string    `json:"workflow_name"`
 	Status           Status    `json:"status"`
-	CreatedAt        time.Time `json:"createdAt"`
-	TotalTimeInMs    int64     `json:"totalTimeInMs"`
-	StepName         string    `json:"stepName"`
+	CreatedAt        time.Time `json:"created_at"`
+	TotalTimeInMs    int64     `json:"total_time_in_ms"`
+	StepName         string    `json:"step_name"`
 	Reason           string    `json:"reason"`
 	Payload          Payload   `json:"payload"`
+	StepId           int       `json:"step_id"`
 }
 
 func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
@@ -44,6 +46,7 @@ type PGStepStatus struct {
 	StepName         string
 	Reason           string
 	Payload          Payload
+	StepId           int
 }
 
 func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
@@ -57,6 +60,7 @@ func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 		StepName:         stepStatus.StepName,
 		Reason:           stepStatus.Reason,
 		Payload:          stepStatus.Payload,
+		StepId:           stepStatus.StepId,
 	}
 }
 
@@ -71,5 +75,6 @@ func (pgStepStatus PGStepStatus) ToStepStatus() StepsStatus {
 		StepName:         pgStepStatus.StepName,
 		Reason:           pgStepStatus.Reason,
 		Payload:          pgStepStatus.Payload,
+		StepId:           pgStepStatus.StepId,
 	}
 }

@@ -41,6 +41,36 @@ type postgres struct {
 	db *pg.DB
 }
 
+func (p *postgres) FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error) {
+	var pgStepStatus []models.PGStepStatus
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ?", serviceRequestId, stepId).Select()
+	var stepStatuses []models.StepsStatus
+	for _, status := range pgStepStatus {
+		stepStatuses = append(stepStatuses, status.ToStepStatus())
+	}
+	return stepStatuses, err
+}
+
+func (p *postgres) FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error) {
+	var pgStepStatus models.PGStepStatus
+	var stepStatuses models.StepsStatus
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ? and status = ?", serviceRequestId, stepId, status).Select()
+	if err != nil {
+		return stepStatuses, err
+	}
+	return pgStepStatus.ToStepStatus(), err
+}
+
+func (p *postgres) FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error) {
+	var pgStepStatus []models.PGStepStatus
+	var stepStatuses models.StepsStatus
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestId, status).Order("created_at DESC").Select()
+	if err != nil {
+		return stepStatuses, err
+	}
+	return pgStepStatus[0].ToStepStatus(), err
+}
+
 func (p *postgres) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestId).Select()

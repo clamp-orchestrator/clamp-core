@@ -39,28 +39,28 @@ func createServiceRequestWorkers() {
 }
 
 func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
-	prefix := fmt.Sprintf("[WORKER_%d] : ", workerId)
+	prefix := fmt.Sprintf("[WORKER_%d] ", workerId)
 	prefix = fmt.Sprintf("%15s", prefix)
-	log.Printf("%s Started listening to service request channel\n", prefix)
+	log.Printf("%s : Started listening to service request channel\n", prefix)
 	for serviceReq := range serviceReqChan {
 		executeWorkflow(serviceReq, prefix)
 	}
 }
 
 func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
-	prefix = prefix[:len(prefix)-2] + fmt.Sprintf("[REQUEST_ID: %s]", serviceReq.ID)
+	prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, serviceReq.ID)
 	log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
-	var stepStatus models.StepsStatus
 	defer catchErrors(prefix, serviceReq.ID)
-	stepStatus.ServiceRequestId = serviceReq.ID
-	stepStatus.WorkflowName = serviceReq.WorkflowName
-
-	stepStatus.Payload.Request = serviceReq.Payload
 
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
-		executeWorkflowStepsInSync(workflow, prefix, stepStatus)
+		lastStep := workflow.Steps[len(workflow.Steps)-1]
+		if serviceReq.CurrentStepId == 0 || serviceReq.CurrentStepId != lastStep.Id {
+			executeWorkflowStepsInSync(workflow, prefix, serviceReq)
+		} else {
+			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
+		}
 	}
 	elapsed := time.Since(start)
 	log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
@@ -73,51 +73,93 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 	}
 }
 
-func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, stepStatus models.StepsStatus) {
-	previousStepResponse := stepStatus.Payload.Request
-	for _, step := range workflow.Steps {
-		stepStatus.Payload.Request = previousStepResponse
-		stepStatus.Payload.Response = nil
-		stepStartTime := time.Now()
-		log.Printf("%s Started executing step id %s\n", prefix, step.Id)
-		stepStatus.StepName = step.Name
-		recordStepStartedStatus(stepStatus, stepStartTime)
-		oldPrefix := log.Prefix()
-		log.SetPrefix(oldPrefix + prefix)
-		resp, err := step.DoExecute(stepStatus.Payload.Request)
-		log.SetPrefix(oldPrefix)
-		if err != nil {
-			log.Println("Inside error block", err)
-			recordStepFailedStatus(stepStatus, err, stepStartTime, prefix)
-			errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-			panic(errFmt)
-		}
-		if resp != nil {
-			log.Printf("%s Received %s", prefix, resp.(string))
-			var responsePayload map[string]interface{}
-			json.Unmarshal([]byte(resp.(string)), &responsePayload)
-			stepStatus.Payload.Response = responsePayload
-			recordStepCompletionStatus(stepStatus, stepStartTime)
-			previousStepResponse = responsePayload
+func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) {
+	stepRequestPayload := serviceRequest.Payload
+	lastStepExecuted := serviceRequest.CurrentStepId
+	executeStepsFromIndex := 0
+	if lastStepExecuted > 0 {
+		executeStepsFromIndex = lastStepExecuted
+		log.Printf("%s Skipping steps till  step id %d\n", prefix, executeStepsFromIndex)
+	}
+	for _, step := range workflow.Steps[executeStepsFromIndex:] {
+		if step.StepType == "SYNC" {
+			stepRequestPayload, _ = ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix)
+		} else {
+			asyncStepExecutionRequest := prepareAsyncStepExecutionRequest(step, stepRequestPayload, serviceRequest)
+			AddAsyncStepToExecutorChannel(asyncStepExecutionRequest)
+			return
 		}
 	}
 }
 
+func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map[string]interface{}, serviceReq models.ServiceRequest) models.AsyncStepRequest {
+	asyncStepExecutionRequest := models.AsyncStepRequest{
+		Step:             step,
+		Payload:          previousStepResponse,
+		ServiceRequestId: serviceReq.ID,
+		WorkflowName:     serviceReq.WorkflowName,
+	}
+	return asyncStepExecutionRequest
+}
+
+//TODO: replace prefix with other standard way like MDC
+func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceRequestId uuid.UUID, workflowName string, step models.Step, prefix string) (map[string]interface{}, models.ClampErrorResponse) {
+	stepStartTime := time.Now()
+	stepStatus := models.StepsStatus{
+		ServiceRequestId: serviceRequestId,
+		WorkflowName:     workflowName,
+		StepName:         step.Name,
+		Payload: models.Payload{
+			Request:  stepRequestPayload,
+			Response: nil,
+		},
+		StepId: step.Id,
+	}
+	recordStepStartedStatus(stepStatus, stepStartTime)
+	request := models.StepRequest{
+		ServiceRequestId: stepStatus.ServiceRequestId,
+		StepId:           step.Id,
+		Payload:          stepStatus.Payload.Request,
+	}
+	resp, err := step.DoExecute(request, prefix)
+	if err != nil {
+		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
+		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+		panic(errFmt)
+		return nil, *clampErrorResponse
+	}
+	if resp != nil {
+		log.Printf("%s Step response received: %s", prefix, resp.(string))
+		var responsePayload map[string]interface{}
+		json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		stepStatus.Payload.Response = responsePayload
+		recordStepCompletionStatus(stepStatus, stepStartTime)
+		return responsePayload, models.EmptyErrorResponse()
+	}
+	return nil, models.EmptyErrorResponse()
+}
+
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	SaveStepStatus(stepStatus)
+}
+
+func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+	stepStatus.Status = models.STATUS_PAUSED
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_STARTED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartTime time.Time, prefix string) {
+func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_FAILED
-	clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 	marshal, marshalErr := json.Marshal(clampErrorResponse)
 	log.Println("clampErrorResponse: Marshal error", marshalErr)
 	var responsePayload map[string]interface{}
@@ -125,8 +167,8 @@ func recordStepFailedStatus(stepStatus models.StepsStatus, err error, stepStartT
 	log.Println("clampErrorResponse: UnMarshal error", unmarshalErr)
 	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
-	stepStatus.Reason = err.Error()
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / 1000000
+	stepStatus.Reason = clampErrorResponse.Message
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 

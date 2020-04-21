@@ -13,12 +13,15 @@ type dbInterface interface {
 	FindWorkflowByName(string) (models.Workflow, error)
 	SaveStepStatus(models.StepsStatus) (models.StepsStatus, error)
 	FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error)
+	FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(serviceRequestId uuid.UUID, status models.Status) (models.StepsStatus, error)
+	FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error)
+	FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error)
 }
 
 var DB dbInterface
 
 func init() {
-	switch config.Config.DBDriver {
+	switch config.ENV.DBDriver {
 	case "postgres":
 		DB = &postgres{}
 	}

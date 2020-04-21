@@ -53,8 +53,14 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		serviceRequestId := c.Param("serviceRequestId")
 
+		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestId))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, CreateErrorResponse(http.StatusBadRequest, err.Error()))
+			return
+		}
+		workflow, _ := services.FindWorkflowByName(serviceRequest.WorkflowName)
 		stepsStatues, _ := services.FindStepStatusByServiceRequestId(uuid.MustParse(serviceRequestId))
-		stepsStatusResponse := services.PrepareStepStatusResponse(stepsStatues)
+		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestId), workflow, stepsStatues)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		c.JSON(http.StatusOK, stepsStatusResponse)
 	}

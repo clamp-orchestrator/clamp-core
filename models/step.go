@@ -10,22 +10,21 @@ type Val interface {
 }
 
 type Step struct {
-	Id        string `json:"id"`
+	Id        int    `json:"id"`
 	Name      string `json:"name" binding:"required"`
-	Mode      string `json:"mode" binding:"required,oneof=HTTP QUEUE"`
+	StepType  string `json:"type" binding:"required,oneof=SYNC ASYNC"`
+	Mode      string `json:"mode" binding:"required,oneof=HTTP AMQP"`
 	Val       Val    `json:"val" binding:"required"`
 	Transform bool   `json:"transform"`
 	Enabled   bool   `json:"enabled"`
 }
 
-func (step Step) DoExecute(requestBody interface{}) (interface{}, error) {
+func (step Step) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
-		//log.Println("Inside HTTP Execute")
-		return step.Val.(*executors.HttpVal).DoExecute(requestBody)
-	case "QUEUE":
-		//log.Println("Inside QUEUE Execute")
-		return step.Val.(*executors.QueueVal).DoExecute()
+		return step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
+	case "AMQP":
+		return step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
 	}
 	panic("Invalid mode specified")
 }
@@ -39,8 +38,8 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 	switch mode {
 	case "HTTP":
 		step.Val = &executors.HttpVal{}
-	case "QUEUE":
-		step.Val = &executors.QueueVal{}
+	case "AMQP":
+		step.Val = &executors.AMQPVal{}
 	default:
 		return fmt.Errorf("%s is an invalid Mode", mode)
 	}

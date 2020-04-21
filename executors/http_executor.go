@@ -16,10 +16,7 @@ type HttpVal struct {
 	Headers string `json:"headers"`
 }
 
-func (httpVal HttpVal) DoExecute(requestBody interface{}) (interface{}, error) {
-	//log.Println("Inside HTTP Do Execute function")
-	prefix := log.Prefix()
-	log.SetPrefix("")
+func (httpVal HttpVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.Url, requestBody)
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
