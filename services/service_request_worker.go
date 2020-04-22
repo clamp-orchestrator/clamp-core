@@ -50,8 +50,6 @@ func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
 func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, serviceReq.ID)
 	log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
-	defer catchErrors(prefix, serviceReq.ID)
-
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
@@ -104,6 +102,7 @@ func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map
 
 //TODO: replace prefix with other standard way like MDC
 func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceRequestId uuid.UUID, workflowName string, step models.Step, prefix string) (map[string]interface{}, models.ClampErrorResponse) {
+	defer catchErrors(prefix, serviceRequestId)
 	stepStartTime := time.Now()
 	stepStatus := models.StepsStatus{
 		ServiceRequestId: serviceRequestId,
