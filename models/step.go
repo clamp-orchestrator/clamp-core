@@ -19,7 +19,7 @@ type Step struct {
 	Enabled   bool   `json:"enabled"`
 }
 
-func (step Step) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
+func (step *Step) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
 		return step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
