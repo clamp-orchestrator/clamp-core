@@ -120,21 +120,26 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 		StepId:           step.Id,
 		Payload:          stepStatus.Payload.Request,
 	}
-	resp, err := step.DoExecute(request, prefix)
-	if err != nil {
-		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
-		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-		panic(errFmt)
-		return nil, *clampErrorResponse
-	}
-	if resp != nil {
-		log.Printf("%s Step response received: %s", prefix, resp.(string))
-		var responsePayload map[string]interface{}
-		json.Unmarshal([]byte(resp.(string)), &responsePayload)
-		stepStatus.Payload.Response = responsePayload
-		recordStepCompletionStatus(stepStatus, stepStartTime)
-		return responsePayload, models.EmptyErrorResponse()
+	stepExecutionSkipped, resp, err := step.DoExecute(request, prefix)
+	if !stepExecutionSkipped {
+		if err != nil {
+			clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+			recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
+			errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+			panic(errFmt)
+			return nil, *clampErrorResponse
+		}
+		if resp != nil {
+			log.Printf("%s Step response received: %s", prefix, resp.(string))
+			var responsePayload map[string]interface{}
+			json.Unmarshal([]byte(resp.(string)), &responsePayload)
+			stepStatus.Payload.Response = responsePayload
+			recordStepCompletionStatus(stepStatus, stepStartTime)
+			return responsePayload, models.EmptyErrorResponse()
+		}
+	} else {
+		//record step skipped
+		return stepRequestPayload, models.EmptyErrorResponse()
 	}
 	return nil, models.EmptyErrorResponse()
 }
