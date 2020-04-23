@@ -9,8 +9,8 @@ type StepResponseListenerInterface interface {
 var StepResponseListener StepResponseListenerInterface
 
 func init() {
-	switch config.ENV.DBDriver {
-	case "postgres":
+	switch config.ENV.QueueDriver {
+	case "amqp":
 		StepResponseListener = &amqpListener{}
 	}
 }
