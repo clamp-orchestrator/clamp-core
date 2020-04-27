@@ -14,6 +14,7 @@ type ServiceRequest struct {
 	Payload      map[string]interface{} `json:"payload"`
 	//TODO: rename to last step id executed
 	CurrentStepId int `json:"current_step_id",binding:"omitempty"`
+	RequestContext RequestContext
 }
 
 type Status string

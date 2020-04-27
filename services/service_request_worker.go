@@ -79,15 +79,33 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 		executeStepsFromIndex = lastStepExecuted
 		log.Printf("%s Skipping steps till  step id %d\n", prefix, executeStepsFromIndex)
 	}
+	var requestContext models.RequestContext
+	requestContext.ServiceRequestId = serviceRequest.ID
+	requestContext.WorkflowName = serviceRequest.WorkflowName
+	requestResponsePayload := make(map[string]models.RequestResponse)
+	serviceRequest.RequestContext = requestContext
 	for _, step := range workflow.Steps[executeStepsFromIndex:] {
 		if step.StepType == "SYNC" {
-			stepRequestPayload, _ = ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix)
+			stepResponsePayload, _ := ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix)
+			UpdateStepRequestResponseInRequestContext(step, serviceRequest, stepResponsePayload, requestResponsePayload, requestContext)
 		} else {
 			asyncStepExecutionRequest := prepareAsyncStepExecutionRequest(step, stepRequestPayload, serviceRequest)
+			UpdateStepRequestResponseInRequestContext(step, serviceRequest, nil, requestResponsePayload, requestContext)
 			AddAsyncStepToExecutorChannel(asyncStepExecutionRequest)
 			return
 		}
+		requestContext.Payload = requestResponsePayload
+		log.Println(" ----========= Request Context Object Payload ----=========", requestContext.Payload)
+		serviceRequest.RequestContext = requestContext
 	}
+}
+
+func UpdateStepRequestResponseInRequestContext(step models.Step, serviceRequest models.ServiceRequest, stepResponsePayload map[string]interface{}, requestResponsePayload map[string]models.RequestResponse, requestContext models.RequestContext) {
+	stepRequestResponse := map[string]models.RequestResponse{step.Name: {
+		Request:  serviceRequest.Payload,
+		Response: stepResponsePayload,
+	}}
+	requestResponsePayload[step.Name] = stepRequestResponse[step.Name]
 }
 
 func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map[string]interface{}, serviceReq models.ServiceRequest) models.AsyncStepRequest {
