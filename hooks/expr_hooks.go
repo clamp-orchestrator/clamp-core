@@ -16,7 +16,7 @@ func (e *ExprHook) TransformRequest(m map[string]interface{}, s string) (map[str
 func (e *ExprHook) ShouldStepExecute(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
 	log.Printf("%s Pre-step execution for step is in progress", prefix)
 	env := map[string]interface{}{
-		"request": stepRequest,
+		"context": stepRequest,
 	}
 	// Compile code into bytecode. This step can be done once and program may be reused.
 	// Specify environment for type check.

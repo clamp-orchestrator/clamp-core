@@ -95,20 +95,23 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 			}
 		}
 	}
-	serviceRequest.RequestContext = requestContext
+	var stepResponsePayload map[string]interface{}
 	for _, step := range workflow.Steps[executeStepsFromIndex:] {
 		if step.StepType == "SYNC" {
-			stepResponsePayload, _ := ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix)
+			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
+			requestContext.Payload = stepsRequestResponsePayload
+			stepResponsePayload, _ := ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix,requestContext)
 			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
 		} else {
+			//TODO Need to put request in one more channel
 			asyncStepExecutionRequest := prepareAsyncStepExecutionRequest(step, stepRequestPayload, serviceRequest)
-			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, nil, stepsRequestResponsePayload, requestContext)
+			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
+			requestContext.Payload = stepsRequestResponsePayload
 			AddAsyncStepToExecutorChannel(asyncStepExecutionRequest)
 			return
 		}
 		requestContext.Payload = stepsRequestResponsePayload
 		log.Println(" ----========= Request Context Object Payload ----=========", requestContext.Payload)
-		serviceRequest.RequestContext = requestContext
 	}
 }
 
@@ -131,7 +134,7 @@ func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map
 }
 
 //TODO: replace prefix with other standard way like MDC
-func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceRequestId uuid.UUID, workflowName string, step models.Step, prefix string) (map[string]interface{}, models.ClampErrorResponse) {
+func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceRequestId uuid.UUID, workflowName string, step models.Step, prefix string, requestContext models.RequestContext) (map[string]interface{}, models.ClampErrorResponse) {
 	defer catchErrors(prefix, serviceRequestId)
 	stepStartTime := time.Now()
 	stepStatus := models.StepsStatus{
@@ -150,7 +153,7 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 		StepId:           step.Id,
 		Payload:          stepStatus.Payload.Request,
 	}
-	resp, err := step.DoExecute(request, prefix)
+	resp, err := step.DoExecute(request, prefix, requestContext)
 	if step.DidStepExecute() {
 		if err != nil {
 			clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
@@ -169,6 +172,7 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 		}
 	} else {
 		//record step skipped
+		recordStepSkippedStatus(stepStatus,stepStartTime)
 		return stepRequestPayload, models.EmptyErrorResponse()
 	}
 	return nil, models.EmptyErrorResponse()
@@ -176,6 +180,12 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	SaveStepStatus(stepStatus)
+}
+
+func recordStepSkippedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+	stepStatus.Status = models.STATUS_SKIPPED
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }

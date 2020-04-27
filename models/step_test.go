@@ -7,6 +7,23 @@ import (
 	"testing"
 )
 
+func prepareStepRequestResponse() map[string]RequestResponse {
+	stepRequestResponse := map[string]RequestResponse{"dummyStep": {
+		Request:  map[string]interface{}{"user_type": "admin"},
+		Response: nil,
+	}}
+	return stepRequestResponse
+}
+
+func prepareRequestContextForTests() RequestContext {
+	reqCtx := RequestContext{
+		ServiceRequestId: uuid.UUID{},
+		WorkflowName:     "",
+		Payload:          prepareStepRequestResponse(),
+	}
+	return reqCtx
+}
+
 func TestStep_DoExecute(t *testing.T) {
 	type fields struct {
 		Id             int
@@ -22,6 +39,7 @@ func TestStep_DoExecute(t *testing.T) {
 	type args struct {
 		requestBody StepRequest
 		prefix      string
+		requestContext RequestContext
 	}
 	tests := []struct {
 		name    string
@@ -43,7 +61,7 @@ func TestStep_DoExecute(t *testing.T) {
 				},
 				Transform: false,
 				Enabled:   true,
-				When:      "request.user_type == 'admin'",
+				When:      "context.dummyStep.request.user_type == 'admin'",
 			},
 			args: args{
 				requestBody: StepRequest{
@@ -71,7 +89,7 @@ func TestStep_DoExecute(t *testing.T) {
 				},
 				Transform: false,
 				Enabled:   true,
-				When:      "request.user_type == 'user'",
+				When:      "context.dummyStep.request.user_type == 'user'",
 			},
 			args: args{
 				requestBody: StepRequest{
@@ -80,6 +98,11 @@ func TestStep_DoExecute(t *testing.T) {
 					Payload:          map[string]interface{}{"user_type": "admin"},
 				},
 				prefix: "",
+				requestContext : RequestContext{
+					ServiceRequestId: uuid.UUID{},
+					WorkflowName:     "",
+					Payload:          prepareStepRequestResponse(),
+				},
 			},
 			want: func(step Step) {
 				assert.False(t, step.canStepExecute)
@@ -100,7 +123,9 @@ func TestStep_DoExecute(t *testing.T) {
 				When:           tt.fields.When,
 				canStepExecute: tt.fields.canStepExecute,
 			}
-			_, err := step.DoExecute(tt.args.requestBody, tt.args.prefix)
+
+			reqCtx := prepareRequestContextForTests()
+			_, err := step.DoExecute(tt.args.requestBody, tt.args.prefix, reqCtx)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DoExecute() error = %v, wantErr %v", err, tt.wantErr)
 				return

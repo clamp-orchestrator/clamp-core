@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 )
 
 type Val interface {
@@ -29,10 +30,15 @@ func (step *Step) DidStepExecute() bool {
 	return step.canStepExecute
 }
 
-func (step *Step) preStepExecution(requestBody StepRequest, prefix string) (err error) {
+func (step *Step) preStepExecution(contextPayload map[string]RequestResponse, prefix string) (err error) {
 	step.canStepExecute = true
+	stepRequestResponsePayload := make(map[string]interface{})
+
 	if step.When != "" {
-		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, requestBody.Payload, prefix)
+		for s, stepRequestResponse := range contextPayload {
+			stepRequestResponsePayload[strings.ReplaceAll(s," ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response":stepRequestResponse.Response}
+		}
+		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, stepRequestResponsePayload, prefix)
 	}
 
 	return err
@@ -50,13 +56,13 @@ func (step *Step) stepExecution(requestBody StepRequest, prefix string) (interfa
 	panic("Invalid mode specified")
 }
 
-func (step *Step) DoExecute(requestBody StepRequest, prefix string) (_ interface{}, _ error) {
-	err := step.preStepExecution(requestBody, prefix)
+func (step *Step) DoExecute(requestBody StepRequest, prefix string, requestContext RequestContext) (_ interface{}, _ error) {
+	err := step.preStepExecution(requestContext.Payload, prefix)
 	if err != nil {
 		return nil, err
 	}
 	if !step.canStepExecute {
-		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestBody.Payload)
+		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.Payload)
 		return requestBody, nil
 	}
 	res, err := step.stepExecution(requestBody, prefix)

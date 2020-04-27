@@ -41,7 +41,7 @@ func executeStep(workerId int, asyncStepExecutorChannel <-chan models.AsyncStepR
 	for asyncStepReq := range asyncStepExecutorChannel {
 		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, asyncStepReq.ServiceRequestId)
 		log.Printf("%s : Received async step to execute %v\n", prefix, asyncStepReq)
-		asyncStepResponse, err := ExecuteWorkflowStep(asyncStepReq.Payload, asyncStepReq.ServiceRequestId, asyncStepReq.WorkflowName, asyncStepReq.Step, prefix)
+		asyncStepResponse, err := ExecuteWorkflowStep(asyncStepReq.Payload, asyncStepReq.ServiceRequestId, asyncStepReq.WorkflowName, asyncStepReq.Step, prefix, models.RequestContext{})
 		if !err.IsNil() || asyncStepResponse != nil {
 			asyncStepRes := models.AsyncStepResponse{
 				ServiceRequestId: asyncStepReq.ServiceRequestId,

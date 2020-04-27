@@ -1,6 +1,14 @@
 package hooks
 
-import "testing"
+import (
+	"testing"
+)
+
+func setupStepRequest() map[string]interface{} {
+	stepRequestResponsePayload := make(map[string]interface{})
+	stepRequestResponsePayload["dummyStep"] = map[string]interface{}{"request": map[string]interface{}{"user_type": "admin"}, "response":map[string]interface{}{"user_type": "admin"}}
+	return stepRequestResponsePayload
+}
 
 func TestExprHook_ShouldStepExecute(t *testing.T) {
 	type args struct {
@@ -17,17 +25,17 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 		{
 			name: "shouldReturnTrueIfConditionSatisfies",
 			args: args{
-				whenCondition: "request.user_type == 'admin'",
-				stepRequest:   map[string]interface{}{"user_type": "admin"},
-				prefix:        "",
+				whenCondition: "context.dummyStep.request.user_type == 'admin'",
+				stepRequest: setupStepRequest(),
+				prefix:      "",
 			},
 			wantCanStepExecute: true,
 			wantErr:            false,
 		}, {
 			name: "shouldReturnFalseIfConditionNotSatisfied",
 			args: args{
-				whenCondition: "request.user_type == 'user'",
-				stepRequest:   map[string]interface{}{"user_type": "admin"},
+				whenCondition: "context.dummyStep.request.user_type == 'user'",
+				stepRequest:  setupStepRequest(),
 				prefix:        "",
 			},
 			wantCanStepExecute: false,
@@ -36,7 +44,7 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 			name: "shouldReturnErrorIfConditionIsNotInProperFormat",
 			args: args{
 				whenCondition: "user_type == 'user'",
-				stepRequest:   map[string]interface{}{"user_type": "admin"},
+				stepRequest:   setupStepRequest(),
 				prefix:        "",
 			},
 			wantCanStepExecute: false,
@@ -45,7 +53,7 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 			name: "shouldReturnErrorIfConditionIsInvalid",
 			args: args{
 				whenCondition: "1+2",
-				stepRequest:   map[string]interface{}{"user_type": "admin"},
+				stepRequest:   setupStepRequest(),
 				prefix:        "",
 			},
 			wantCanStepExecute: false,
