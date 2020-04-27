@@ -1,16 +1,21 @@
 package hooks
 
-type hookInterface interface {
-	preStepExecution(string, map[string]interface{}, string) (bool, error)
+type Hook interface {
+	ShouldStepExecute(string, map[string]interface{}, string) (bool, error)
+	TransformRequest(map[string]interface{}, string) (map[string]interface{}, error)
 }
 
-var hook hookInterface
+type defaultHook struct {
+}
 
-//TODO: need to refactor to support multiple hooks
-func PreStepHookExecutor(whenCondition string, stepRequest map[string]interface{}, prefix string) (bool, error) {
-	if whenCondition != "" {
-		hook = &ExprHook{}
-		return hook.preStepExecution(whenCondition, stepRequest, prefix)
-	}
-	panic("no implementation")
+func (d defaultHook) TransformRequest(m map[string]interface{}, s string) (map[string]interface{}, error) {
+	return m, nil
+}
+
+func (d defaultHook) ShouldStepExecute(s string, m map[string]interface{}, s2 string) (bool, error) {
+	return true, nil
+}
+
+func GetDefaultHook() Hook {
+	return defaultHook{}
 }

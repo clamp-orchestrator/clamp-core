@@ -9,7 +9,11 @@ import (
 type ExprHook struct {
 }
 
-func (e *ExprHook) preStepExecution(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
+func (e *ExprHook) TransformRequest(m map[string]interface{}, s string) (map[string]interface{}, error) {
+	return m, nil
+}
+
+func (e *ExprHook) ShouldStepExecute(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
 	log.Printf("%s Pre-step execution for step is in progress", prefix)
 	env := map[string]interface{}{
 		"request": stepRequest,
@@ -31,4 +35,8 @@ func (e *ExprHook) preStepExecution(whenCondition string, stepRequest map[string
 	} else {
 		return false, fmt.Errorf("invalid boolean expression : %s", whenCondition)
 	}
+}
+
+func GetExprHook() Hook {
+	return &ExprHook{}
 }

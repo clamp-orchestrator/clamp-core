@@ -21,37 +21,47 @@ type Step struct {
 	Enabled        bool   `json:"enabled"`
 	When           string `json:"when"`
 	canStepExecute bool
+	//shouldStepExecute func(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error)
+	//transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
 }
 
-func (step *Step) CanStepExecute(canStepExecute bool) {
-	step.canStepExecute = canStepExecute
+func (step *Step) DidStepExecute() bool {
+	return step.canStepExecute
 }
 
-func (step *Step) preStepExecution(requestBody StepRequest, prefix string) error {
-	canStepExecute, err := hooks.PreStepHookExecutor(step.When, requestBody.Payload, prefix)
-	step.canStepExecute = canStepExecute
+func (step *Step) preStepExecution(requestBody StepRequest, prefix string) (err error) {
+	step.canStepExecute = true
+	if step.When != "" {
+		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, requestBody.Payload, prefix)
+	}
+
 	return err
 }
 
-func (step *Step) DoExecute(requestBody StepRequest, prefix string) (skipStepExecution bool, _ interface{}, _ error) {
+func (step *Step) stepExecution(requestBody StepRequest, prefix string) (interface{}, error) {
+	switch step.Mode {
+	case "HTTP":
+		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
+		return res, err
+	case "AMQP":
+		res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
+		return res, err
+	}
+	panic("Invalid mode specified")
+}
+
+func (step *Step) DoExecute(requestBody StepRequest, prefix string) (_ interface{}, _ error) {
 	err := step.preStepExecution(requestBody, prefix)
 	if err != nil {
-		return skipStepExecution, nil, err
+		return nil, err
 	}
-	if skipStepExecution = !step.canStepExecute; !skipStepExecution {
-		switch step.Mode {
-		case "HTTP":
-			res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
-			return skipStepExecution, res, err
-		case "AMQP":
-			res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
-			return skipStepExecution, res, err
-		}
-		panic("Invalid mode specified")
-	} else {
+	if !step.canStepExecute {
 		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestBody.Payload)
-		return skipStepExecution, requestBody, nil
+		return requestBody, nil
 	}
+	res, err := step.stepExecution(requestBody, prefix)
+	//post Step execution
+	return res, err
 }
 
 func (step *Step) UnmarshalJSON(data []byte) error {
@@ -60,7 +70,21 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	mode := v["mode"]
-	switch mode {
+	err := step.setMode(mode)
+	if err != nil {
+		return err
+	}
+	type stepStruct Step
+	err = json.Unmarshal(data, (*stepStruct)(step))
+	return err
+}
+
+func (step *Step) setMode(mode interface{}) error {
+	m, ok := mode.(string)
+	if !ok {
+		return fmt.Errorf("%s is an invalid Mode", mode)
+	}
+	switch m {
 	case "HTTP":
 		step.Val = &executors.HttpVal{}
 	case "AMQP":
@@ -68,9 +92,7 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 	default:
 		return fmt.Errorf("%s is an invalid Mode", mode)
 	}
-	type stepStruct Step
-	err := json.Unmarshal(data, (*stepStruct)(step))
-	return err
+	return nil
 }
 
 func (step Step) getHttpVal() executors.HttpVal {
