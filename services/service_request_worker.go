@@ -82,19 +82,19 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 	var requestContext models.RequestContext
 	requestContext.ServiceRequestId = serviceRequest.ID
 	requestContext.WorkflowName = serviceRequest.WorkflowName
-	requestResponsePayload := make(map[string]models.RequestResponse)
+	stepsRequestResponsePayload := make(map[string]models.RequestResponse)
 	serviceRequest.RequestContext = requestContext
 	for _, step := range workflow.Steps[executeStepsFromIndex:] {
 		if step.StepType == "SYNC" {
 			stepResponsePayload, _ := ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix)
-			UpdateStepRequestResponseInRequestContext(step, serviceRequest, stepResponsePayload, requestResponsePayload, requestContext)
+			UpdateStepRequestResponseInRequestContext(step, serviceRequest, stepResponsePayload, stepsRequestResponsePayload, requestContext)
 		} else {
 			asyncStepExecutionRequest := prepareAsyncStepExecutionRequest(step, stepRequestPayload, serviceRequest)
-			UpdateStepRequestResponseInRequestContext(step, serviceRequest, nil, requestResponsePayload, requestContext)
+			UpdateStepRequestResponseInRequestContext(step, serviceRequest, nil, stepsRequestResponsePayload, requestContext)
 			AddAsyncStepToExecutorChannel(asyncStepExecutionRequest)
 			return
 		}
-		requestContext.Payload = requestResponsePayload
+		requestContext.Payload = stepsRequestResponsePayload
 		log.Println(" ----========= Request Context Object Payload ----=========", requestContext.Payload)
 		serviceRequest.RequestContext = requestContext
 	}
