@@ -83,14 +83,26 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 	requestContext.ServiceRequestId = serviceRequest.ID
 	requestContext.WorkflowName = serviceRequest.WorkflowName
 	stepsRequestResponsePayload := make(map[string]models.RequestResponse)
+	//prepare request context for async steps
+	if executeStepsFromIndex > 0 {
+		stepsStatuses, err := FindStepStatusByServiceRequestId(serviceRequest.ID)
+		if err == nil {
+			for _, stepsStatus := range stepsStatuses {
+				if stepsStatus.Status == models.STATUS_COMPLETED {
+					UpdateStepRequestResponseInRequestContext(stepsStatus.StepName, stepsStatus.Payload.Request,stepsStatus.Payload.Response, stepsRequestResponsePayload, requestContext)
+					requestContext.Payload = stepsRequestResponsePayload
+				}
+			}
+		}
+	}
 	serviceRequest.RequestContext = requestContext
 	for _, step := range workflow.Steps[executeStepsFromIndex:] {
 		if step.StepType == "SYNC" {
 			stepResponsePayload, _ := ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix)
-			UpdateStepRequestResponseInRequestContext(step, serviceRequest, stepResponsePayload, stepsRequestResponsePayload, requestContext)
+			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
 		} else {
 			asyncStepExecutionRequest := prepareAsyncStepExecutionRequest(step, stepRequestPayload, serviceRequest)
-			UpdateStepRequestResponseInRequestContext(step, serviceRequest, nil, stepsRequestResponsePayload, requestContext)
+			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, nil, stepsRequestResponsePayload, requestContext)
 			AddAsyncStepToExecutorChannel(asyncStepExecutionRequest)
 			return
 		}
@@ -100,12 +112,12 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 	}
 }
 
-func UpdateStepRequestResponseInRequestContext(step models.Step, serviceRequest models.ServiceRequest, stepResponsePayload map[string]interface{}, requestResponsePayload map[string]models.RequestResponse, requestContext models.RequestContext) {
-	stepRequestResponse := map[string]models.RequestResponse{step.Name: {
-		Request:  serviceRequest.Payload,
+func UpdateStepRequestResponseInRequestContext(stepName string, stepRequestPayload map[string]interface{}, stepResponsePayload map[string]interface{}, requestResponsePayload map[string]models.RequestResponse, requestContext models.RequestContext) {
+	stepRequestResponse := map[string]models.RequestResponse{stepName: {
+		Request:  stepRequestPayload,
 		Response: stepResponsePayload,
 	}}
-	requestResponsePayload[step.Name] = stepRequestResponse[step.Name]
+	requestResponsePayload[stepName] = stepRequestResponse[stepName]
 }
 
 func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map[string]interface{}, serviceReq models.ServiceRequest) models.AsyncStepRequest {
