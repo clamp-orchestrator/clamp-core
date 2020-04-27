@@ -54,7 +54,7 @@ func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, ste
 	stepsStatusRes := make([]models.StepStatusResponse, len(stepsStatusArr))
 	stepsCount := len(workflow.Steps)
 	if len(stepsStatusArr) > 0 {
-		var startedStepsCount, completedStepsCount, failedStepsCount, pausedStepsCount int
+		var startedStepsCount, completedStepsCount, failedStepsCount, pausedStepsCount, skippedStepsCount int
 		for i, stepsStatus := range stepsStatusArr {
 			stepsStatusRes[i] = models.StepStatusResponse{
 				Id:        stepsStatus.StepId,
@@ -72,10 +72,12 @@ func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, ste
 				failedStepsCount++
 			case models.STATUS_PAUSED:
 				pausedStepsCount++
+			case models.STATUS_SKIPPED:
+				skippedStepsCount++
 			}
 		}
 
-		if completedStepsCount == stepsCount {
+		if startedStepsCount == stepsCount && skippedStepsCount+completedStepsCount == stepsCount {
 			srvReqStatusRes.Status = models.STATUS_COMPLETED
 		} else if failedStepsCount > 0 {
 			srvReqStatusRes.Status = models.STATUS_FAILED

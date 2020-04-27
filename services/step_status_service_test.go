@@ -300,3 +300,50 @@ func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
 	_, err = FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
 	assert.NotNil(t, err)
 }
+
+func TestShouldReturnStatusCompletedIfOneStepSkipped(t *testing.T) {
+	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
+
+		statuses = make([]models.StepsStatus, 4)
+		statuses[0].WorkflowName = "testWF"
+		statuses[0].ID = "1"
+		statuses[0].Status = models.STATUS_STARTED
+		statuses[0].StepName = "step1"
+		statuses[0].TotalTimeInMs = 10
+		statuses[0].CreatedAt = step1Time
+		statuses[1].WorkflowName = "testWF"
+		statuses[1].ID = "2"
+		statuses[1].Status = models.STATUS_SKIPPED
+		statuses[1].StepName = "step1"
+		statuses[1].TotalTimeInMs = 20
+		statuses[1].CreatedAt = step1Time.Add(time.Second * 10)
+
+		statuses[2].WorkflowName = "testWF"
+		statuses[2].ID = "3"
+		statuses[2].Status = models.STATUS_STARTED
+		statuses[2].StepName = "step2"
+		statuses[2].TotalTimeInMs = 10
+		statuses[2].CreatedAt = step1Time.Add(time.Second * 20)
+		statuses[3].WorkflowName = "testWF"
+		statuses[3].ID = "4"
+		statuses[3].Status = models.STATUS_COMPLETED
+		statuses[3].StepName = "step2"
+		statuses[3].TotalTimeInMs = 20
+		statuses[3].CreatedAt = step1Time.Add(time.Second * 30)
+		return statuses, err
+	}
+	serviceReqID := uuid.New()
+	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	workflow := models.Workflow{
+		Name:        workflowName,
+		Description: "",
+		Enabled:     false,
+		CreatedAt:   time.Time{},
+		UpdatedAt:   time.Time{},
+		Steps:       make([]models.Step, 2),
+	}
+	resp := PrepareStepStatusResponse(serviceReqID, workflow, stepsStatus)
+	assert.Nil(t, err)
+	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
+}
