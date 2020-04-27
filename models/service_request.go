@@ -17,18 +17,6 @@ type ServiceRequest struct {
 	RequestContext RequestContext
 }
 
-type Status string
-
-const (
-	STATUS_NEW        Status = "NEW"
-	STATUS_STARTED    Status = "STARTED"
-	STATUS_RESUMED    Status = "RESUMED"
-	STATUS_PAUSED     Status = "PAUSED"
-	STATUS_COMPLETED  Status = "COMPLETED"
-	STATUS_FAILED     Status = "FAILED"
-	STATUS_INPROGRESS Status = "IN_PROGRESS"
-)
-
 func NewServiceRequest(workflowName string, payload map[string]interface{}) ServiceRequest {
 	currentTime := time.Now()
 	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt: currentTime, Payload: payload}

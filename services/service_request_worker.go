@@ -150,8 +150,8 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 		StepId:           step.Id,
 		Payload:          stepStatus.Payload.Request,
 	}
-	stepExecutionSkipped, resp, err := step.DoExecute(request, prefix)
-	if !stepExecutionSkipped {
+	resp, err := step.DoExecute(request, prefix)
+	if step.DidStepExecute() {
 		if err != nil {
 			clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 			recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
