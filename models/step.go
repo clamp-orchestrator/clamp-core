@@ -3,6 +3,7 @@ package models
 import (
 	"clamp-core/executors"
 	"clamp-core/hooks"
+	"clamp-core/transform"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,15 +13,20 @@ import (
 type Val interface {
 }
 
+type RequestTransform interface {
+}
+
 type Step struct {
-	Id             int    `json:"id"`
-	Name           string `json:"name" binding:"required"`
-	StepType       string `json:"type" binding:"required,oneof=SYNC ASYNC"`
-	Mode           string `json:"mode" binding:"required,oneof=HTTP AMQP"`
-	Val            Val    `json:"val" binding:"required"`
-	Transform      bool   `json:"transform"`
-	Enabled        bool   `json:"enabled"`
-	When           string `json:"when"`
+	Id               int              `json:"id"`
+	Name             string           `json:"name" binding:"required"`
+	StepType         string           `json:"type" binding:"required,oneof=SYNC ASYNC"`
+	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP"`
+	Val              Val              `json:"val" binding:"required"`
+	Transform        bool             `json:"transform"`
+	Enabled          bool             `json:"enabled"`
+	When             string           `json:"when"`
+	TransformFormat  string           `json:"transformFormat"`
+	RequestTransform RequestTransform `json:"requestTransform"`
 	canStepExecute bool
 	//shouldStepExecute func(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error)
 	//transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
@@ -42,6 +48,21 @@ func (step *Step) preStepExecution(contextPayload map[string]RequestResponse, pr
 	}
 
 	return err
+}
+
+func (step *Step) TransformRequest(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
+	if step.Transform {
+		switch step.TransformFormat {
+		case "HTTP":
+			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
+			return res, err
+		case "XML":
+			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
+			return res, err
+		}
+		panic("Invalid mode specified")
+	}
+	return requestBody, nil
 }
 
 func (step *Step) stepExecution(requestBody StepRequest, prefix string) (interface{}, error) {
@@ -68,6 +89,16 @@ func (step *Step) DoExecute(requestBody StepRequest, prefix string, requestConte
 	res, err := step.stepExecution(requestBody, prefix)
 	//post Step execution
 	return res, err
+}
+
+func (step *Step) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
+	transformedRequest, err := step.TransformRequest(requestBody, prefix)
+	
+	if err != nil {
+		return nil,err
+	}
+	//post Step execution
+	return transformedRequest,err
 }
 
 func (step *Step) UnmarshalJSON(data []byte) error {
