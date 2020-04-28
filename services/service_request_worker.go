@@ -111,7 +111,6 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 			return
 		}
 		requestContext.Payload = stepsRequestResponsePayload
-		log.Println(" ----========= Request Context Object Payload ----=========", requestContext.Payload)
 	}
 }
 
@@ -146,6 +145,14 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 			Response: nil,
 		},
 		StepId: step.Id,
+	}
+	//TODO Condition should be checked on transformed request or original request ? Based on that this section needs to be altered
+	if step.Transform {
+		transform, transformErrors := step.DoTransform(stepRequestPayload, prefix)
+		if transformErrors != nil {
+			log.Println("Error while transforming request payload")
+		}
+		stepStatus.Payload.Request = transform
 	}
 	recordStepStartedStatus(stepStatus, stepStartTime)
 	request := models.StepRequest{

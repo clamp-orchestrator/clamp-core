@@ -53,11 +53,11 @@ func (step *Step) preStepExecution(contextPayload map[string]RequestResponse, pr
 func (step *Step) TransformRequest(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
 	if step.Transform {
 		switch step.TransformFormat {
-		case "HTTP":
-			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
-			return res, err
 		case "XML":
 			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
+			return res, err
+		default:
+			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(requestBody, prefix)
 			return res, err
 		}
 		panic("Invalid mode specified")
@@ -93,11 +93,9 @@ func (step *Step) DoExecute(requestBody StepRequest, prefix string, requestConte
 
 func (step *Step) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
 	transformedRequest, err := step.TransformRequest(requestBody, prefix)
-	
 	if err != nil {
 		return nil,err
 	}
-	//post Step execution
 	return transformedRequest,err
 }
 
@@ -107,6 +105,15 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	mode := v["mode"]
+	//TODO I guess this is initialization section otherwise transform.JsonTransform was not getting called.
+	requestTransform := v["transformFormat"]
+
+	if requestTransform != nil {
+		transformErr := step.setRequestTransform(requestTransform)
+		if transformErr != nil {
+			return transformErr
+		}
+	}
 	err := step.setMode(mode)
 	if err != nil {
 		return err
@@ -114,6 +121,20 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 	type stepStruct Step
 	err = json.Unmarshal(data, (*stepStruct)(step))
 	return err
+}
+
+func (step *Step) setRequestTransform(requestTransform interface{}) error {
+	m, ok := requestTransform.(string)
+	if !ok {
+		return fmt.Errorf("%s is an invalid Mode", requestTransform)
+	}
+	switch m {
+	case "XML":
+		step.RequestTransform = &transform.XMLTransform{}
+	default:
+		step.RequestTransform = &transform.JsonTransform{}
+	}
+	return nil
 }
 
 func (step *Step) setMode(mode interface{}) error {

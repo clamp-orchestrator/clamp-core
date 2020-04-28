@@ -31,7 +31,7 @@ func (httpVal HttpVal) DoExecute(requestBody interface{}, prefix string) (interf
 	if err != nil {
 		return nil, err
 	}
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != 200 && resp.StatusCode != 201 {
 		data, _ := ioutil.ReadAll(resp.Body)
 		err := errors.New(string(data))
 		log.Println("Unable to execute \t", httpVal.Url, " with error message", err)

@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/services"
+	"clamp-core/transform"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -28,6 +29,9 @@ func setUp() {
 			Method:  "POST",
 			Url:     "http://34.222.238.234:3333/api/v1/login",
 			Headers: "",
+		},
+		RequestTransform: &transform.JsonTransform{
+			Keys: map[string]interface{}{"a":"b"},
 		},
 	}
 
