@@ -33,8 +33,18 @@ func createServiceRequestHandler() gin.HandlerFunc {
 			return
 		}
 		services.AddServiceRequestToChannel(serviceReq)
-		c.JSON(http.StatusOK, serviceReq)
+		response := prepareServiceRequestResponse(serviceReq)
+		c.JSON(http.StatusOK, response)
 	}
+}
+
+func prepareServiceRequestResponse(serviceReq ServiceRequest) ServiceRequestResponse {
+	response := ServiceRequestResponse{
+		URL:    "/serviceRequest/" + serviceReq.ID.String(),
+		Status: serviceReq.Status,
+		ID:     serviceReq.ID,
+	}
+	return response
 }
 
 func readRequestPayload(c *gin.Context) map[string]interface{} {
