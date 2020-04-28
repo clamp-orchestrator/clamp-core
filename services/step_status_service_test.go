@@ -49,19 +49,31 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 		step2Time := time.Date(2020, time.April, 07, 16, 32, 00, 20000000, time.UTC)
 
-		statuses = make([]models.StepsStatus, 2)
+		statuses = make([]models.StepsStatus, 4)
 		statuses[0].WorkflowName = stepsStatusReq.WorkflowName
 		statuses[0].ID = stepsStatusReq.ID
-		statuses[0].Status = stepsStatusReq.Status
+		statuses[0].Status = models.STATUS_STARTED
 		statuses[0].StepName = stepsStatusReq.StepName
 		statuses[0].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
 		statuses[0].CreatedAt = step1Time
 		statuses[1].WorkflowName = stepsStatusReq.WorkflowName
-		statuses[1].ID = "2"
+		statuses[1].ID = stepsStatusReq.ID
 		statuses[1].Status = stepsStatusReq.Status
-		statuses[1].StepName = "step2"
+		statuses[1].StepName = stepsStatusReq.StepName
 		statuses[1].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
-		statuses[1].CreatedAt = step2Time
+		statuses[1].CreatedAt = step1Time
+		statuses[2].WorkflowName = stepsStatusReq.WorkflowName
+		statuses[2].ID = "2"
+		statuses[2].Status = models.STATUS_STARTED
+		statuses[2].StepName = "step2"
+		statuses[2].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
+		statuses[2].CreatedAt = step2Time
+		statuses[3].WorkflowName = stepsStatusReq.WorkflowName
+		statuses[3].ID = "2"
+		statuses[3].Status = stepsStatusReq.Status
+		statuses[3].StepName = "step2"
+		statuses[3].TotalTimeInMs = stepsStatusReq.TotalTimeInMs
+		statuses[3].CreatedAt = step2Time
 		return statuses, err
 	}
 
@@ -77,17 +89,17 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	resp := PrepareStepStatusResponse(stepsStatusReq.ServiceRequestId, workflow, stepsStatus)
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, resp.WorkflowName)
-	assert.Equal(t, stepsStatusReq.Status, resp.Status)
+	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
 	//assert.Equal(t, stepsStatusReq.ServiceRequestId, resp.ServiceRequestId)
 	assert.Equal(t, int64(20), resp.TotalTimeInMs)
 	assert.NotNil(t, resp.ServiceRequestId)
 	assert.NotNil(t, resp.Steps)
-	assert.Equal(t, stepsStatusReq.Status, resp.Steps[0].Status)
+	assert.Equal(t, models.STATUS_COMPLETED, resp.Steps[1].Status)
 	assert.Equal(t, stepsStatusReq.StepName, resp.Steps[0].Name)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[0].TimeTaken)
-	assert.Equal(t, stepsStatusReq.Status, resp.Steps[1].Status)
-	assert.Equal(t, "step2", resp.Steps[1].Name)
-	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[1].TimeTaken)
+	assert.Equal(t, models.STATUS_COMPLETED, resp.Steps[3].Status)
+	assert.Equal(t, "step2", resp.Steps[2].Name)
+	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[2].TimeTaken)
 
 	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		return statuses, errors.New("select query failed")
