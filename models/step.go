@@ -50,21 +50,6 @@ func (step *Step) preStepExecution(contextPayload map[string]RequestResponse, pr
 	return err
 }
 
-func (step *Step) TransformRequest(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
-	if step.Transform {
-		switch step.TransformFormat {
-		case "XML":
-			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
-			return res, err
-		default:
-			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(requestBody, prefix)
-			return res, err
-		}
-		panic("Invalid mode specified")
-	}
-	return requestBody, nil
-}
-
 func (step *Step) stepExecution(requestBody StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
@@ -92,11 +77,18 @@ func (step *Step) DoExecute(requestBody StepRequest, prefix string, requestConte
 }
 
 func (step *Step) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
-	transformedRequest, err := step.TransformRequest(requestBody, prefix)
-	if err != nil {
-		return nil,err
+	if step.Transform {
+		switch step.TransformFormat {
+		case "XML":
+			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
+			return res, err
+		default:
+			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(requestBody, prefix)
+			return res, err
+		}
+		panic("Invalid mode specified")
 	}
-	return transformedRequest,err
+	return requestBody, nil
 }
 
 func (step *Step) UnmarshalJSON(data []byte) error {

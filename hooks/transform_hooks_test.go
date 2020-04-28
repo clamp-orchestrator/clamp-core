@@ -1,27 +1,29 @@
 package hooks
 
 import (
+	"reflect"
 	"testing"
 )
 
+
 func TestExprHook_TransformRequest(t *testing.T) {
 	type args struct {
-		key string
+		key map[string]interface{}
 		stepRequest   map[string]interface{}
 	}
 	tests := []struct {
-		name             string
-		args             args
-		transformedValue string
-		wantErr          bool
+		name                   string
+		args                   args
+		expectedTransformation map[string]interface{}
+		wantErr                bool
 	}{
 		{
 			name: "shouldReturnTransformedValueIfKeysMatchesWithRequestPayload",
 			args: args{
-				key: "dummyStep.request.user_type",
+				key: map[string]interface{}{"userType":"dummyStep.request.user_type"} ,
 				stepRequest: setupStepRequest(),
 			},
-			transformedValue: "admin",
+			expectedTransformation : map[string]interface{}{"userType":"admin"},
 			wantErr:            false,
 		},
 	}
@@ -29,13 +31,14 @@ func TestExprHook_TransformRequest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			e := &TransformHook{}
 			transformedRequest, err := e.TransformRequest( tt.args.stepRequest, tt.args.key)
-			transformedRequestValue := transformedRequest[tt.args.key].(string)
+
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TransformRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if transformedRequestValue != tt.transformedValue {
-				t.Errorf("TransformRequest() transformedRequestValue = %v, want %v", transformedRequestValue, tt.transformedValue)
+			eq := reflect.DeepEqual(transformedRequest, tt.expectedTransformation)
+			if !eq {
+				t.Errorf("TransformRequest() transformedRequest = %v, want %v", transformedRequest, tt.expectedTransformation)
 			}
 		})
 	}

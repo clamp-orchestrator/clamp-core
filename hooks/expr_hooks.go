@@ -9,7 +9,7 @@ import (
 type ExprHook struct {
 }
 
-func (e *ExprHook) TransformRequest(m map[string]interface{}, s string) (map[string]interface{}, error) {
+func (e *ExprHook) TransformRequest(m map[string]interface{}, s map[string]interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 

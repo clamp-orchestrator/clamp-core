@@ -1,7 +1,8 @@
 package hooks
 
 import (
-	"github.com/antonmedv/expr"
+	"encoding/json"
+	"github.com/qntfy/kazaam"
 	"log"
 )
 
@@ -12,13 +13,40 @@ func (e *TransformHook) ShouldStepExecute(string, map[string]interface{}, string
 	panic("implement me")
 }
 
-func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{}, key string) (map[string]interface{}, error) {
+func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{}, transformedStructure map[string]interface{}) (map[string]interface{}, error) {
 	var transformedRequestBody map[string]interface{}
-	eval, err := expr.Eval(key, stepRequestBody)
-	log.Println("Evaluted value ", eval)
-	log.Println("Evaluted error ", err)
-	transformedRequestBody = map[string]interface{}{key:eval}
+
+	marshal, err := json.Marshal(stepRequestBody)
+
+	specString := prepareSpecStringAsPerKazaamContract(transformedStructure, err)
+
+	//Main kazaam transformation object
+	transform, kazaamErr := kazaam.NewKazaam(string(specString))
+	if kazaamErr != nil {
+		log.Println("Something went wrong")
+	}
+	//Actual transformation happens here
+	bytes, err := transform.Transform(marshal)
+
+	err = json.Unmarshal(bytes, &transformedRequestBody)
+	log.Println("Evaluted value ", transformedRequestBody)
+	if err != nil {
+		log.Println("Evaluted error ", err)
+		return nil, err
+	}
 	return transformedRequestBody, nil
+}
+
+func prepareSpecStringAsPerKazaamContract(transformedStructure map[string]interface{}, err error) []byte {
+	//Operation is set to Shift mode of Kazaam
+	spec := make([]map[string]interface{}, 1)
+	specInterface := map[string]interface{}{
+		"operation": "shift",
+		"spec":      transformedStructure,
+	}
+	spec[0] = specInterface
+	specString, err := json.Marshal(spec)
+	return specString
 }
 
 func GetTransformHook() Hook {

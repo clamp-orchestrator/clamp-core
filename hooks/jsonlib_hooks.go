@@ -4,7 +4,7 @@ package hooks
 type jsonLib struct {
 }
 
-func (d jsonLib) TransformRequest(m map[string]interface{}, s string) (map[string]interface{}, error) {
+func (d jsonLib) TransformRequest(m map[string]interface{}, s map[string]interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 

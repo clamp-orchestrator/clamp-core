@@ -146,7 +146,7 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 		},
 		StepId: step.Id,
 	}
-	//TODO Condition should be checked on transformed request or original request ? Based on that this section needs to be altered
+	//TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
 	if step.Transform {
 		transform, transformErrors := step.DoTransform(stepRequestPayload, prefix)
 		if transformErrors != nil {
