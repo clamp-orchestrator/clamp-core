@@ -171,7 +171,7 @@ func TestStep_DoTransform(t *testing.T) {
 				Mode:     "HTTP",
 				StepType: "SYNC",
 				RequestTransform: &transform.JsonTransform{
-					Spec:map[string]interface{}{"name":"user_name"},
+					Spec:map[string]interface{}{"userdetails.name":"user_name"},
 				},
 				Val: &executors.HttpVal{
 					Method:  "POST",
@@ -185,7 +185,7 @@ func TestStep_DoTransform(t *testing.T) {
 				requestBody: map[string]interface{}{"user_type": "admin","user_name":"superadmin"},
 				prefix: "",
 			},
-			expectedTransformation : map[string]interface{}{"name":"superadmin"},
+			expectedTransformation : map[string]interface{}{"userdetails":map[string]interface{}{"name":"superadmin"}},
 			wantErr: false,
 		},
 		{

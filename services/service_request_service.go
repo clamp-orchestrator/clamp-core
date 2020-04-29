@@ -22,8 +22,6 @@ func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest
 	serviceRequest, err := repository.GetDB().SaveServiceRequest(serviceReq)
 	if err != nil {
 		log.Printf("Failed saving service request %v, error: %s", serviceRequest, err.Error())
-	} else {
-		log.Printf("Successfully created new service request %v", serviceRequest)
 	}
 	return serviceRequest, err
 }

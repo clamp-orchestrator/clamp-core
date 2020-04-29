@@ -23,17 +23,15 @@ func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{},
 	//Main kazaam transformation object
 	transform, kazaamErr := kazaam.NewKazaam(string(specString))
 	if kazaamErr != nil {
+		//TODO If transformation fails what to do, Need to handle that scenario
 		log.Println("Something went wrong")
+		return nil, kazaamErr
 	}
 	//Actual transformation happens here
 	bytes, err := transform.Transform(marshal)
 
-	err = json.Unmarshal(bytes, &transformedRequestBody)
+	_ = json.Unmarshal(bytes, &transformedRequestBody)
 	log.Println("Evaluted value ", transformedRequestBody)
-	if err != nil {
-		log.Println("Evaluted error ", err)
-		return nil, err
-	}
 	return transformedRequestBody, nil
 }
 

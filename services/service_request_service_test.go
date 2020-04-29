@@ -32,6 +32,23 @@ func TestSaveServiceRequest(t *testing.T) {
 	assert.Equal(t, "insertion failed", err.Error())
 }
 
+func TestShouldFailToSaveServiceRequestAndThrowError(t *testing.T) {
+	serviceReq := models.ServiceRequest{
+		ID:           uuid.UUID{},
+		WorkflowName: "TESTING",
+		Status:       models.STATUS_NEW,
+	}
+
+	saveServiceRequestMock = func(serReq models.ServiceRequest) (request models.ServiceRequest, err error) {
+		return models.ServiceRequest{}, errors.New("insertion failed")
+	}
+	serviceReq.WorkflowName = ""
+	request, err := SaveServiceRequest(serviceReq)
+	assert.Equal(t, models.ServiceRequest{},request)
+	assert.NotNil(t, err)
+	assert.Equal(t, "insertion failed", err.Error())
+}
+
 func TestFindByID(t *testing.T) {
 	repository.SetDb(&mockDB{})
 	serviceReq := models.ServiceRequest{

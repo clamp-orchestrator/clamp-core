@@ -16,6 +16,7 @@ func TestExprHook_TransformRequest(t *testing.T) {
 		args                   args
 		expectedTransformation map[string]interface{}
 		wantErr                bool
+		errMessage                string
 	}{
 		{
 			name: "shouldReturnTransformedValueIfKeysMatchesWithRequestPayload",
@@ -25,6 +26,15 @@ func TestExprHook_TransformRequest(t *testing.T) {
 			},
 			expectedTransformation : map[string]interface{}{"userType":"admin"},
 			wantErr:            false,
+		},
+		{
+			name: "shouldReturnTransformationFailedWhenSpecIsEmpty",
+			args: args{
+				key: map[string]interface{}{} ,
+				stepRequest: setupStepRequest(),
+			},
+			wantErr:            true,
+			errMessage: "SpecError - Spec must contain at least one element",
 		},
 	}
 	for _, tt := range tests {
@@ -36,9 +46,11 @@ func TestExprHook_TransformRequest(t *testing.T) {
 				t.Errorf("TransformRequest() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			eq := reflect.DeepEqual(transformedRequest, tt.expectedTransformation)
-			if !eq {
-				t.Errorf("TransformRequest() transformedRequest = %v, want %v", transformedRequest, tt.expectedTransformation)
+			if !tt.wantErr {
+				eq := reflect.DeepEqual(transformedRequest, tt.expectedTransformation)
+				if !eq {
+					t.Errorf("TransformRequest() transformedRequest = %v, want %v", transformedRequest, tt.expectedTransformation)
+				}
 			}
 		})
 	}

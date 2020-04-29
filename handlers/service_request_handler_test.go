@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/services"
@@ -19,7 +20,90 @@ import (
 const workflowName string = "testWorkflow"
 const transformationWorkflowName string = "transformWorkflow"
 
-func setUp() {
+func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+
+	w, bodyStr := callCreateServiceRequest(workflowName)
+	var jsonResp models.ServiceRequest
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
+	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
+	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+}
+
+func TestShouldNotCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) {
+	createWorkflowWithTransformationEnabledInOneStep()
+
+	w, bodyStr := callCreateServiceRequest(transformationWorkflowName)
+	var jsonResp models.ServiceRequest
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
+	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
+	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+}
+//TODO
+func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidData(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+
+	w, bodyStr := callCreateServiceRequest(workflowName)
+	var jsonResp models.ServiceRequest
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
+	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
+	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+}
+
+func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+	_, bodyStr := callCreateServiceRequest("InvalidWF")
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
+	assert.Equal(t, "No record found with given workflow name : InvalidWF", jsonResp.Message)
+}
+
+func TestShouldGetServiceRequestStatus(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+	_, bodyStr := callCreateServiceRequest(workflowName)
+	var serviceReq models.ServiceRequestResponse
+	json.Unmarshal([]byte(bodyStr), &serviceReq)
+	time.Sleep(time.Second * 5)
+	status, body := callGetServiceRequestStatus(serviceReq.ID)
+	var response models.ServiceRequestStatusResponse
+	json.Unmarshal([]byte(body), &response)
+	assert.Equal(t, 200, status.Code)
+	assert.Equal(t, models.STATUS_COMPLETED, response.Status)
+	assert.Equal(t, 2, len(response.Steps))
+}
+
+func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	marshal, _ := json.Marshal(prepareServiceRequestPayload())
+	req, _ := http.NewRequest("POST", "/serviceRequest/"+wfName, bytes.NewReader(marshal))
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	return w, bodyStr
+}
+
+func callGetServiceRequestStatus(serviceRequestId uuid.UUID) (*httptest.ResponseRecorder, string) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestId.String(), nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	return w, bodyStr
+}
+
+func CreateWorkflowIfItsAlreadyDoesNotExists() {
 	step := models.Step{
 		Name:      "1",
 		StepType:  "SYNC",
@@ -42,6 +126,12 @@ func setUp() {
 	if err != nil {
 		services.SaveWorkflow(workflow)
 	}
+}
+
+func prepareServiceRequestPayload() map[string]interface{} {
+	serviceRequestPayload := make(map[string]interface{})
+	serviceRequestPayload["userDetails"] = map[string]interface{}{"name": "testing","address":"unit test", "mobile":"990099009900"}
+	return serviceRequestPayload
 }
 
 func createWorkflowWithTransformationEnabledInOneStep() {
@@ -72,71 +162,3 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 	}
 }
 
-func TestCreateNewServiceRequestRoute(t *testing.T) {
-	setUp()
-
-	w, bodyStr := callCreateServiceRequest(workflowName)
-	var jsonResp models.ServiceRequest
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
-
-	assert.Equal(t, 200, w.Code)
-//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
-	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
-	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
-}
-
-func TestCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) {
-	createWorkflowWithTransformationEnabledInOneStep()
-
-	w, bodyStr := callCreateServiceRequest(transformationWorkflowName)
-	var jsonResp models.ServiceRequest
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
-
-	assert.Equal(t, 200, w.Code)
-	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
-	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
-	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
-}
-
-func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string) {
-	router := setupRouter()
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("POST", "/serviceRequest/"+wfName, nil)
-	router.ServeHTTP(w, req)
-
-	bodyStr := w.Body.String()
-	return w, bodyStr
-}
-
-func callGetServiceRequestStatus(serviceRequestId uuid.UUID) (*httptest.ResponseRecorder, string) {
-	router := setupRouter()
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestId.String(), nil)
-	router.ServeHTTP(w, req)
-
-	bodyStr := w.Body.String()
-	return w, bodyStr
-}
-
-func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
-	setUp()
-	_, bodyStr := callCreateServiceRequest("InvalidWF")
-	var jsonResp models.ClampErrorResponse
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
-	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
-	assert.Equal(t, "No record found with given workflow name : InvalidWF", jsonResp.Message)
-}
-
-func TestShouldGetServiceRequestStatus(t *testing.T) {
-	setUp()
-	_, bodyStr := callCreateServiceRequest(workflowName)
-	var serviceReq models.ServiceRequestResponse
-	json.Unmarshal([]byte(bodyStr), &serviceReq)
-	time.Sleep(time.Second * 5)
-	status, body := callGetServiceRequestStatus(serviceReq.ID)
-	var response models.ServiceRequestStatusResponse
-	json.Unmarshal([]byte(body), &response)
-	assert.Equal(t, 200, status.Code)
-	assert.Equal(t, models.STATUS_COMPLETED, response.Status)
-	assert.Equal(t, 2, len(response.Steps))
-}
