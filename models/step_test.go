@@ -9,8 +9,8 @@ import (
 	"testing"
 )
 
-func prepareStepRequestResponse() map[string]RequestResponse {
-	stepRequestResponse := map[string]RequestResponse{"dummyStep": {
+func prepareStepRequestResponse() map[string]*StepContext {
+	stepRequestResponse := map[string]*StepContext{"dummyStep": {
 		Request:  map[string]interface{}{"user_type": "admin"},
 		Response: nil,
 	}}
@@ -21,7 +21,7 @@ func prepareRequestContextForTests() RequestContext {
 	reqCtx := RequestContext{
 		ServiceRequestId: uuid.UUID{},
 		WorkflowName:     "",
-		Payload:          prepareStepRequestResponse(),
+		StepsContext:     prepareStepRequestResponse(),
 	}
 	return reqCtx
 }
@@ -39,8 +39,8 @@ func TestStep_DoExecute(t *testing.T) {
 		canStepExecute bool
 	}
 	type args struct {
-		requestBody StepRequest
-		prefix      string
+		requestBody    StepRequest
+		prefix         string
 		requestContext RequestContext
 	}
 	tests := []struct {
@@ -100,10 +100,10 @@ func TestStep_DoExecute(t *testing.T) {
 					Payload:          map[string]interface{}{"user_type": "admin"},
 				},
 				prefix: "",
-				requestContext : RequestContext{
+				requestContext: RequestContext{
 					ServiceRequestId: uuid.UUID{},
 					WorkflowName:     "",
-					Payload:          prepareStepRequestResponse(),
+					StepsContext:     prepareStepRequestResponse(),
 				},
 			},
 			want: func(step Step) {
@@ -127,7 +127,7 @@ func TestStep_DoExecute(t *testing.T) {
 			}
 
 			reqCtx := prepareRequestContextForTests()
-			_, err := step.DoExecute(tt.args.requestBody, tt.args.prefix, reqCtx)
+			_, err := step.DoExecute(reqCtx, tt.args.prefix)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DoExecute() error = %v, wantErr %v", err, tt.wantErr)
 				return

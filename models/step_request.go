@@ -7,3 +7,7 @@ type StepRequest struct {
 	StepId           int                    `json:"step_id"`
 	Payload          map[string]interface{} `json:"payload"`
 }
+
+func NewStepRequest(serviceRequestId uuid.UUID, stepId int, payload map[string]interface{}) *StepRequest {
+	return &StepRequest{ServiceRequestId: serviceRequestId, StepId: stepId, Payload: payload}
+}

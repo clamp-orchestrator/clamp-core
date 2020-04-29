@@ -55,7 +55,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	if err == nil {
 		lastStep := workflow.Steps[len(workflow.Steps)-1]
 		if serviceReq.CurrentStepId == 0 || serviceReq.CurrentStepId != lastStep.Id {
-			executeWorkflowStepsInSync(workflow, prefix, serviceReq)
+			executeWorkflowSteps(workflow, prefix, serviceReq)
 		} else {
 			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
 		}
@@ -71,7 +71,7 @@ func catchErrors(prefix string, requestId uuid.UUID) {
 	}
 }
 
-func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) {
+func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) {
 	stepRequestPayload := serviceRequest.Payload
 	lastStepExecuted := serviceRequest.CurrentStepId
 	executeStepsFromIndex := 0
@@ -79,47 +79,24 @@ func executeWorkflowStepsInSync(workflow models.Workflow, prefix string, service
 		executeStepsFromIndex = lastStepExecuted
 		log.Printf("%s Skipping steps till  step id %d\n", prefix, executeStepsFromIndex)
 	}
-	var requestContext models.RequestContext
-	requestContext.ServiceRequestId = serviceRequest.ID
-	requestContext.WorkflowName = serviceRequest.WorkflowName
-	stepsRequestResponsePayload := make(map[string]models.RequestResponse)
+	requestContext := CreateRequestContext(workflow, serviceRequest)
 	//prepare request context for async steps
 	if executeStepsFromIndex > 0 {
-		stepsStatuses, err := FindStepStatusByServiceRequestId(serviceRequest.ID)
-		if err == nil {
-			for _, stepsStatus := range stepsStatuses {
-				if stepsStatus.Status == models.STATUS_COMPLETED {
-					UpdateStepRequestResponseInRequestContext(stepsStatus.StepName, stepsStatus.Payload.Request,stepsStatus.Payload.Response, stepsRequestResponsePayload, requestContext)
-					requestContext.Payload = stepsRequestResponsePayload
-				}
-			}
-		}
+		EnhanceRequestContextWithExecutedSteps(&requestContext)
+
 	}
-	var stepResponsePayload map[string]interface{}
 	for _, step := range workflow.Steps[executeStepsFromIndex:] {
 		if step.StepType == "SYNC" {
-			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
-			requestContext.Payload = stepsRequestResponsePayload
-			stepResponsePayload, _ := ExecuteWorkflowStep(stepRequestPayload, serviceRequest.ID, serviceRequest.WorkflowName, step, prefix,requestContext)
-			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
+			err := ExecuteWorkflowStep(step, requestContext, prefix)
+			if !err.IsNil() {
+				return
+			}
 		} else {
-			//TODO Need to put request in one more channel
 			asyncStepExecutionRequest := prepareAsyncStepExecutionRequest(step, stepRequestPayload, serviceRequest)
-			UpdateStepRequestResponseInRequestContext(step.Name, stepRequestPayload, stepResponsePayload, stepsRequestResponsePayload, requestContext)
-			requestContext.Payload = stepsRequestResponsePayload
 			AddAsyncStepToExecutorChannel(asyncStepExecutionRequest)
 			return
 		}
-		requestContext.Payload = stepsRequestResponsePayload
 	}
-}
-
-func UpdateStepRequestResponseInRequestContext(stepName string, stepRequestPayload map[string]interface{}, stepResponsePayload map[string]interface{}, requestResponsePayload map[string]models.RequestResponse, requestContext models.RequestContext) {
-	stepRequestResponse := map[string]models.RequestResponse{stepName: {
-		Request:  stepRequestPayload,
-		Response: stepResponsePayload,
-	}}
-	requestResponsePayload[stepName] = stepRequestResponse[stepName]
 }
 
 func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map[string]interface{}, serviceReq models.ServiceRequest) models.AsyncStepRequest {
@@ -133,41 +110,46 @@ func prepareAsyncStepExecutionRequest(step models.Step, previousStepResponse map
 }
 
 //TODO: replace prefix with other standard way like MDC
-func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceRequestId uuid.UUID, workflowName string, step models.Step, prefix string, requestContext models.RequestContext) (map[string]interface{}, models.ClampErrorResponse) {
+func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
+	serviceRequestId := requestContext.ServiceRequestId
+	workflowName := requestContext.WorkflowName
+	stepRequest := requestContext.StepsContext[step.Name].Request
+
 	defer catchErrors(prefix, serviceRequestId)
+
+	requestContext.SetStepRequestToContext(step.Name, stepRequest)
+
 	stepStartTime := time.Now()
 	stepStatus := models.StepsStatus{
 		ServiceRequestId: serviceRequestId,
 		WorkflowName:     workflowName,
 		StepName:         step.Name,
 		Payload: models.Payload{
-			Request:  stepRequestPayload,
+			Request:  stepRequest,
 			Response: nil,
 		},
 		StepId: step.Id,
 	}
+
+	recordStepStartedStatus(stepStatus, stepStartTime)
+
 	//TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
 	if step.Transform {
-		transform, transformErrors := step.DoTransform(stepRequestPayload, prefix)
+		transform, transformErrors := step.DoTransform(stepRequest, prefix)
 		if transformErrors != nil {
 			log.Println("Error while transforming request payload")
 		}
-		stepStatus.Payload.Request = transform
+		requestContext.SetStepRequestToContext(step.Name, transform)
 	}
-	recordStepStartedStatus(stepStatus, stepStartTime)
-	request := models.StepRequest{
-		ServiceRequestId: stepStatus.ServiceRequestId,
-		StepId:           step.Id,
-		Payload:          stepStatus.Payload.Request,
-	}
-	resp, err := step.DoExecute(request, prefix, requestContext)
+
+	resp, err := step.DoExecute(requestContext, prefix)
 	if step.DidStepExecute() {
 		if err != nil {
 			clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 			recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 			errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
 			panic(errFmt)
-			return nil, *clampErrorResponse
+			return *clampErrorResponse
 		}
 		if resp != nil {
 			log.Printf("%s Step response received: %s", prefix, resp.(string))
@@ -175,14 +157,15 @@ func ExecuteWorkflowStep(stepRequestPayload map[string]interface{}, serviceReque
 			json.Unmarshal([]byte(resp.(string)), &responsePayload)
 			stepStatus.Payload.Response = responsePayload
 			recordStepCompletionStatus(stepStatus, stepStartTime)
-			return responsePayload, models.EmptyErrorResponse()
+			requestContext.SetStepResponseToContext(step.Name, responsePayload)
+			return models.EmptyErrorResponse()
 		}
 	} else {
 		//record step skipped
-		recordStepSkippedStatus(stepStatus,stepStartTime)
-		return stepRequestPayload, models.EmptyErrorResponse()
+		recordStepSkippedStatus(stepStatus, stepStartTime)
+		return models.EmptyErrorResponse()
 	}
-	return nil, models.EmptyErrorResponse()
+	return models.EmptyErrorResponse()
 }
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {

@@ -27,7 +27,7 @@ type Step struct {
 	When             string           `json:"when"`
 	TransformFormat  string           `json:"transformFormat"`
 	RequestTransform RequestTransform `json:"requestTransform"`
-	canStepExecute bool
+	canStepExecute   bool
 	//shouldStepExecute func(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error)
 	//transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
 }
@@ -36,13 +36,13 @@ func (step *Step) DidStepExecute() bool {
 	return step.canStepExecute
 }
 
-func (step *Step) preStepExecution(contextPayload map[string]RequestResponse, prefix string) (err error) {
+func (step *Step) preStepExecution(contextPayload map[string]*StepContext, prefix string) (err error) {
 	step.canStepExecute = true
 	stepRequestResponsePayload := make(map[string]interface{})
 
 	if step.When != "" {
 		for s, stepRequestResponse := range contextPayload {
-			stepRequestResponsePayload[strings.ReplaceAll(s," ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response":stepRequestResponse.Response}
+			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
 		}
 		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, stepRequestResponsePayload, prefix)
 	}
@@ -50,7 +50,7 @@ func (step *Step) preStepExecution(contextPayload map[string]RequestResponse, pr
 	return err
 }
 
-func (step *Step) stepExecution(requestBody StepRequest, prefix string) (interface{}, error) {
+func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
 		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
@@ -62,16 +62,17 @@ func (step *Step) stepExecution(requestBody StepRequest, prefix string) (interfa
 	panic("Invalid mode specified")
 }
 
-func (step *Step) DoExecute(requestBody StepRequest, prefix string, requestContext RequestContext) (_ interface{}, _ error) {
-	err := step.preStepExecution(requestContext.Payload, prefix)
+func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ interface{}, _ error) {
+	err := step.preStepExecution(requestContext.StepsContext, prefix)
+	request := requestContext.GetStepRequestFromContext(step.Name)
 	if err != nil {
 		return nil, err
 	}
 	if !step.canStepExecute {
-		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.Payload)
-		return requestBody, nil
+		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
+		return request, nil
 	}
-	res, err := step.stepExecution(requestBody, prefix)
+	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestId, step.Id, request), prefix)
 	//post Step execution
 	return res, err
 }
