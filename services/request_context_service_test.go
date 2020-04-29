@@ -60,7 +60,7 @@ func TestShouldEnhanceRequestContext(t *testing.T) {
 	}, models.ServiceRequest{
 		ID: uuid.New(),
 	})
-	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
+	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
 		stepsStatus := make([]models.StepsStatus, 2)
 		stepsStatus[0].StepName = "step1"
 		stepsStatus[0].Payload.Request = map[string]interface{}{"k": "v"}
