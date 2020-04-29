@@ -1,23 +1,19 @@
 package migrations
 
 import (
-	"log"
-	"os"
-
+	"clamp-core/repository"
 	"github.com/go-pg/pg/v9"
 	migrations "github.com/robinjoseph08/go-pg-migrations/v2"
+	"log"
+	"os"
 )
 
 const directory = "migrations"
 
 //Migrate executes all the database migrations on the database
 func Migrate() {
-	db := pg.Connect(&pg.Options{
-		Addr:     "localhost:5432",
-		User:     "clamp",
-		Database: "clampdev",
-		Password: "clamppass",
-	})
+	options := repository.GetPostgresOptions()
+	db := pg.Connect(options)
 
 	err := migrations.Run(db, directory, os.Args)
 

@@ -81,11 +81,13 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 	}
 	requestContext := CreateRequestContext(workflow, serviceRequest)
 	//prepare request context for async steps
+
 	if executeStepsFromIndex > 0 {
 		EnhanceRequestContextWithExecutedSteps(&requestContext)
-
 	}
-	for _, step := range workflow.Steps[executeStepsFromIndex:] {
+
+	for i, step := range workflow.Steps[executeStepsFromIndex:] {
+		ComputeRequestToCurrentStepInContext(workflow, step, &requestContext, executeStepsFromIndex+i, stepRequestPayload)
 		if step.StepType == "SYNC" {
 			err := ExecuteWorkflowStep(step, requestContext, prefix)
 			if !err.IsNil() {
@@ -163,7 +165,11 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	} else {
 		//record step skipped
 		recordStepSkippedStatus(stepStatus, stepStartTime)
-		return models.EmptyErrorResponse()
+		clampErrorResponse := models.EmptyErrorResponse()
+		if err != nil {
+			clampErrorResponse = *models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+		}
+		return clampErrorResponse
 	}
 	return models.EmptyErrorResponse()
 }

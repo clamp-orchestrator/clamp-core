@@ -64,10 +64,10 @@ func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interf
 
 func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ interface{}, _ error) {
 	err := step.preStepExecution(requestContext.StepsContext, prefix)
-	request := requestContext.GetStepRequestFromContext(step.Name)
 	if err != nil {
 		return nil, err
 	}
+	request := requestContext.GetStepRequestFromContext(step.Name)
 	if !step.canStepExecute {
 		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil

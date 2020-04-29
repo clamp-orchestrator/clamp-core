@@ -1,11 +1,13 @@
 package repository
 
 import (
+	"clamp-core/config"
 	"clamp-core/models"
 	"context"
 	"github.com/go-pg/pg/v9"
 	"github.com/google/uuid"
 	"log"
+	"strings"
 	"sync"
 )
 
@@ -26,15 +28,36 @@ func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
 }
 
 func connectDB() (db *pg.DB) {
-	db = pg.Connect(&pg.Options{
-		User:     "clamp",
-		Password: "clamppass",
-		Database: "clampdev",
-	})
+	db = pg.Connect(GetPostgresOptions())
 	if LogSQLQueries {
 		db.AddQueryHook(dbLogger{})
 	}
 	return db
+}
+
+func GetPostgresOptions() *pg.Options {
+	connStr := config.ENV.DBConnectionStr
+	connArr := strings.Split(connStr, " ")
+	var host, user, password, dbName string
+	for _, conn := range connArr {
+		connMap := strings.Split(conn, "=")
+		switch connMap[0] {
+		case "host":
+			host = connMap[1]
+		case "user":
+			user = connMap[1]
+		case "password":
+			password = connMap[1]
+		case "dbname":
+			dbName = connMap[1]
+		}
+	}
+	return &pg.Options{
+		Addr:     host,
+		User:     user,
+		Password: password,
+		Database: dbName,
+	}
 }
 
 type postgres struct {

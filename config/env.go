@@ -13,7 +13,7 @@ var ENV = struct {
 
 	*/
 	DBDriver        string `env:"CLAMP_DB_DRIVER" envDefault:"postgres"`
-	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=myhost user=root dbname=clamp password=mypassword"`
+	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=34.222.238.234:5432 user=clamp dbname=clampdev password=clamppass"`
 	/**
 	Examples:
 

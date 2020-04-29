@@ -84,3 +84,75 @@ func TestShouldEnhanceRequestContext(t *testing.T) {
 	}
 
 }
+
+func TestComputeRequestToCurrentStepInContext(t *testing.T) {
+	workflow := models.Workflow{
+		Name: "TEST_WF",
+		Steps: []models.Step{{
+			Name: "step1",
+		}, {
+			Name: "step2",
+		}, {
+			Name: "step3",
+		}},
+	}
+	context := CreateRequestContext(workflow, models.ServiceRequest{
+		ID: uuid.New(),
+	})
+
+	type args struct {
+		workflow             models.Workflow
+		currentStepExecuting models.Step
+		requestContext       *models.RequestContext
+		stepIndex            int
+		stepRequestPayload   map[string]interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "ShouldComputeContextForFirstStep",
+			args: args{
+				workflow: workflow,
+				currentStepExecuting: models.Step{
+					Name: "step1",
+				},
+				requestContext:     &context,
+				stepIndex:          0,
+				stepRequestPayload: map[string]interface{}{"k": "v"},
+			},
+		},
+		{
+			name: "ShouldComputeContextForIntermediateStep2",
+			args: args{
+				workflow: workflow,
+				currentStepExecuting: models.Step{
+					Name: "step2",
+				},
+				requestContext:     &context,
+				stepIndex:          1,
+				stepRequestPayload: map[string]interface{}{"request": "value"},
+			},
+		},
+		{
+			name: "ShouldComputeContextForIntermediateStep3",
+			args: args{
+				workflow: workflow,
+				currentStepExecuting: models.Step{
+					Name: "step3",
+				},
+				requestContext:     &context,
+				stepIndex:          1,
+				stepRequestPayload: map[string]interface{}{"request": "value"},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ComputeRequestToCurrentStepInContext(tt.args.workflow, tt.args.currentStepExecuting, tt.args.requestContext, tt.args.stepIndex, tt.args.stepRequestPayload)
+			tt.args.requestContext.SetStepResponseToContext(tt.args.currentStepExecuting.Name, map[string]interface{}{"response": "value"})
+			assert.NotNil(t, tt.args.requestContext.GetStepRequestFromContext(tt.args.currentStepExecuting.Name))
+		})
+	}
+}
