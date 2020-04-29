@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -40,7 +41,7 @@ func setUpWorkflowRequest() models.Workflow {
 	}
 	steps[0] = models.Step{
 		Name:      "firstStep",
-		StepType:  "SYNC",
+		Type:      "SYNC",
 		Mode:      "HTTP",
 		Val:       httpVal,
 		Transform: false,
@@ -179,6 +180,8 @@ func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *t
 	bodyStr := w.Body.String()
 	var errorJsonResp models.ClampErrorResponse
 	json.Unmarshal([]byte(bodyStr), &errorJsonResp)
+	log.Println("++++++++=errorJsonResp.Code+++++++++++", errorJsonResp.Code)
+	log.Println("++++++++=errorJsonResp.Message+++++++++++", errorJsonResp.Message)
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, errorJsonResp.Code)
 	assert.NotNil(t, errorJsonResp.Message)

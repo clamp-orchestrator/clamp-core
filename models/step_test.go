@@ -117,7 +117,7 @@ func TestStep_DoExecute(t *testing.T) {
 			step := &Step{
 				Id:             tt.fields.Id,
 				Name:           tt.fields.Name,
-				StepType:       tt.fields.StepType,
+				Type:           tt.fields.StepType,
 				Mode:           tt.fields.Mode,
 				Val:            tt.fields.Val,
 				Transform:      tt.fields.Transform,
@@ -137,18 +137,17 @@ func TestStep_DoExecute(t *testing.T) {
 	}
 }
 
-
 func TestStep_DoTransform(t *testing.T) {
 	type fields struct {
-		Id             int
-		Name           string
-		StepType       string
-		Mode           string
-		Val            Val
-		Transform      bool
-		Enabled        bool
-		When           string
-		canStepExecute bool
+		Id               int
+		Name             string
+		StepType         string
+		Mode             string
+		Val              Val
+		Transform        bool
+		Enabled          bool
+		When             string
+		canStepExecute   bool
 		TransformFormat  string
 		RequestTransform RequestTransform
 	}
@@ -157,11 +156,11 @@ func TestStep_DoTransform(t *testing.T) {
 		prefix      string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
+		name                   string
+		fields                 fields
+		args                   args
 		expectedTransformation map[string]interface{}
-		wantErr bool
+		wantErr                bool
 	}{
 		{
 			name: "ShouldTransformRequestWhenTransformIsEnabledAndJsonTransformation",
@@ -171,7 +170,7 @@ func TestStep_DoTransform(t *testing.T) {
 				Mode:     "HTTP",
 				StepType: "SYNC",
 				RequestTransform: &transform.JsonTransform{
-					Spec:map[string]interface{}{"userdetails.name":"user_name"},
+					Spec: map[string]interface{}{"userdetails.name": "user_name"},
 				},
 				Val: &executors.HttpVal{
 					Method:  "POST",
@@ -182,11 +181,11 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
-				requestBody: map[string]interface{}{"user_type": "admin","user_name":"superadmin"},
-				prefix: "",
+				requestBody: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+				prefix:      "",
 			},
-			expectedTransformation : map[string]interface{}{"userdetails":map[string]interface{}{"name":"superadmin"}},
-			wantErr: false,
+			expectedTransformation: map[string]interface{}{"userdetails": map[string]interface{}{"name": "superadmin"}},
+			wantErr:                false,
 		},
 		{
 			name: "ShouldTransformRequestWhenTransformIsEnabledAndXmlTransformation",
@@ -243,17 +242,17 @@ func TestStep_DoTransform(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			step := &Step{
-				Id:             tt.fields.Id,
-				Name:           tt.fields.Name,
-				StepType:       tt.fields.StepType,
-				Mode:           tt.fields.Mode,
-				Val:            tt.fields.Val,
-				Transform:      tt.fields.Transform,
-				TransformFormat: tt.fields.TransformFormat,
-				RequestTransform:tt.fields.RequestTransform,
-				Enabled:        tt.fields.Enabled,
-				When:           tt.fields.When,
-				canStepExecute: tt.fields.canStepExecute,
+				Id:               tt.fields.Id,
+				Name:             tt.fields.Name,
+				Type:             tt.fields.StepType,
+				Mode:             tt.fields.Mode,
+				Val:              tt.fields.Val,
+				Transform:        tt.fields.Transform,
+				TransformFormat:  tt.fields.TransformFormat,
+				RequestTransform: tt.fields.RequestTransform,
+				Enabled:          tt.fields.Enabled,
+				When:             tt.fields.When,
+				canStepExecute:   tt.fields.canStepExecute,
 			}
 
 			transformedRequest, err := step.DoTransform(tt.args.requestBody, tt.args.prefix)

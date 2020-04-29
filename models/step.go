@@ -19,7 +19,7 @@ type RequestTransform interface {
 type Step struct {
 	Id               int              `json:"id"`
 	Name             string           `json:"name" binding:"required"`
-	StepType         string           `json:"type" binding:"required,oneof=SYNC ASYNC"`
+	Type             string           `json:"type" binding:"required,oneof=SYNC ASYNC"`
 	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP"`
 	Val              Val              `json:"val" binding:"required"`
 	Transform        bool             `json:"transform"`
@@ -121,10 +121,10 @@ func (step *Step) setRequestTransform(requestTransform interface{}) error {
 		return fmt.Errorf("%s is an invalid Mode", requestTransform)
 	}
 	switch m {
-		case "XML":
-			step.RequestTransform = &transform.XMLTransform{}
-		default:
-			step.RequestTransform = &transform.JsonTransform{}
+	case "XML":
+		step.RequestTransform = &transform.XMLTransform{}
+	default:
+		step.RequestTransform = &transform.JsonTransform{}
 	}
 	return nil
 }

@@ -18,7 +18,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		workflow.Id = "TEST_WF"
 		step := models.Step{
 			Name:      "1",
-			StepType:  "SYNC",
+			Type:      "SYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
@@ -71,12 +71,12 @@ func AddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflowT
 		workflow.Id = "TEST_WF"
 		step := models.Step{
 			Name:      "1",
-			StepType:  "SYNC",
+			Type:      "SYNC",
 			Mode:      "HTTP",
 			Transform: true,
 			Enabled:   false,
 			RequestTransform: &transform.JsonTransform{
-				Spec:map[string]interface{}{"name":"test"},
+				Spec: map[string]interface{}{"name": "test"},
 			},
 			Val: &executors.HttpVal{
 				Method:  "POST",
@@ -120,6 +120,3 @@ func AddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflowT
 		})
 	}
 }
-
-
-

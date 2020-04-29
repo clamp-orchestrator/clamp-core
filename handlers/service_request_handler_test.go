@@ -28,7 +28,7 @@ func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
-//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
+	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
 	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
 	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
@@ -45,6 +45,7 @@ func TestShouldNotCreateNewServiceRequestRouteWithTransformationStep(t *testing.
 	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
 	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
+
 //TODO
 func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidData(t *testing.T) {
 	CreateWorkflowIfItsAlreadyDoesNotExists()
@@ -106,7 +107,7 @@ func callGetServiceRequestStatus(serviceRequestId uuid.UUID) (*httptest.Response
 func CreateWorkflowIfItsAlreadyDoesNotExists() {
 	step := models.Step{
 		Name:      "1",
-		StepType:  "SYNC",
+		Type:      "SYNC",
 		Mode:      "HTTP",
 		Transform: false,
 		Enabled:   false,
@@ -130,19 +131,19 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 
 func prepareServiceRequestPayload() map[string]interface{} {
 	serviceRequestPayload := make(map[string]interface{})
-	serviceRequestPayload["userDetails"] = map[string]interface{}{"name": "testing","address":"unit test", "mobile":"990099009900"}
+	serviceRequestPayload["userDetails"] = map[string]interface{}{"name": "testing", "address": "unit test", "mobile": "990099009900"}
 	return serviceRequestPayload
 }
 
 func createWorkflowWithTransformationEnabledInOneStep() {
 	step := models.Step{
 		Name:      "1",
-		StepType:  "SYNC",
+		Type:      "SYNC",
 		Mode:      "HTTP",
 		Transform: true,
 		Enabled:   false,
 		RequestTransform: &transform.JsonTransform{
-			Spec:map[string]interface{}{"name":"test"},
+			Spec: map[string]interface{}{"name": "test"},
 		},
 		Val: &executors.HttpVal{
 			Method:  "POST",
@@ -161,4 +162,3 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 		services.SaveWorkflow(workflow)
 	}
 }
-

@@ -32,9 +32,9 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
 		workflow.Id = "TEST_WF"
 		step := models.Step{
-			Id : 1,
+			Id:        1,
 			Name:      "1",
-			StepType:  "ASYNC",
+			Type:      "ASYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
@@ -66,8 +66,8 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 				asyncStepResponseReq: models.AsyncStepResponse{
 					ServiceRequestId: serviceRequestId,
 					StepId:           1,
-					Response:          prepareResponsePayload(),
-					Error:           models.ClampErrorResponse{},
+					Response:         prepareResponsePayload(),
+					Error:            models.ClampErrorResponse{},
 				},
 			},
 		},
@@ -97,15 +97,15 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			TotalTimeInMs:    1000,
 			StepName:         "1",
 			Reason:           "",
-			Payload:          models.Payload{
+			Payload: models.Payload{
 				Request:  prepareRequestPayload(),
 				Response: nil,
 			},
-			StepId:           1,
+			StepId: 1,
 		}
 		statuses[0] = stepStatus
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")
-		return statuses,err
+		return statuses, err
 	}
 
 	for _, tt := range tests {
@@ -123,9 +123,9 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
 		workflow.Id = "TEST_WF"
 		step := models.Step{
-			Id : 1,
+			Id:        1,
 			Name:      "1",
-			StepType:  "ASYNC",
+			Type:      "ASYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
@@ -157,8 +157,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 				asyncStepResponseReq: models.AsyncStepResponse{
 					ServiceRequestId: serviceRequestId,
 					StepId:           1,
-					Response:          prepareResponsePayload(),
-					Error:           models.ClampErrorResponse{
+					Response:         prepareResponsePayload(),
+					Error: models.ClampErrorResponse{
 						Code:    400,
 						Message: "Failed to process due to internal failure",
 					},
@@ -178,15 +178,15 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			TotalTimeInMs:    1000,
 			StepName:         "1",
 			Reason:           "",
-			Payload:          models.Payload{
+			Payload: models.Payload{
 				Request:  prepareRequestPayload(),
 				Response: nil,
 			},
-			StepId:           1,
+			StepId: 1,
 		}
 		statuses[0] = stepStatus
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")
-		return statuses,err
+		return statuses, err
 	}
 
 	for _, tt := range tests {
