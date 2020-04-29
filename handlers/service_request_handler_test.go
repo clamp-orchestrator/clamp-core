@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/services"
+	"clamp-core/transform"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -16,6 +17,7 @@ import (
 )
 
 const workflowName string = "testWorkflow"
+const transformationWorkflowName string = "transformWorkflow"
 
 func setUp() {
 	step := models.Step{
@@ -42,6 +44,34 @@ func setUp() {
 	}
 }
 
+func createWorkflowWithTransformationEnabledInOneStep() {
+	step := models.Step{
+		Name:      "1",
+		StepType:  "SYNC",
+		Mode:      "HTTP",
+		Transform: true,
+		Enabled:   false,
+		RequestTransform: &transform.JsonTransform{
+			Spec:map[string]interface{}{"name":"test"},
+		},
+		Val: &executors.HttpVal{
+			Method:  "POST",
+			Url:     "https://reqres.in/api/users",
+			Headers: "",
+		},
+	}
+
+	workflow := models.Workflow{
+		Name:  transformationWorkflowName,
+		Steps: []models.Step{step},
+	}
+	resp, err := services.FindWorkflowByName(transformationWorkflowName)
+	log.Println(resp)
+	if err != nil {
+		services.SaveWorkflow(workflow)
+	}
+}
+
 func TestCreateNewServiceRequestRoute(t *testing.T) {
 	setUp()
 
@@ -51,6 +81,19 @@ func TestCreateNewServiceRequestRoute(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 //	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
+	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
+	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+}
+
+func TestCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) {
+	createWorkflowWithTransformationEnabledInOneStep()
+
+	w, bodyStr := callCreateServiceRequest(transformationWorkflowName)
+	var jsonResp models.ServiceRequest
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
 	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
 	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }

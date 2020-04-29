@@ -86,7 +86,6 @@ func (step *Step) DoTransform(requestBody map[string]interface{}, prefix string)
 			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(requestBody, prefix)
 			return res, err
 		}
-		panic("Invalid mode specified")
 	}
 	return requestBody, nil
 }
@@ -121,10 +120,10 @@ func (step *Step) setRequestTransform(requestTransform interface{}) error {
 		return fmt.Errorf("%s is an invalid Mode", requestTransform)
 	}
 	switch m {
-	case "XML":
-		step.RequestTransform = &transform.XMLTransform{}
-	default:
-		step.RequestTransform = &transform.JsonTransform{}
+		case "XML":
+			step.RequestTransform = &transform.XMLTransform{}
+		default:
+			step.RequestTransform = &transform.JsonTransform{}
 	}
 	return nil
 }
