@@ -248,7 +248,7 @@ func TestShouldReturnStatusInprogress(t *testing.T) {
 
 func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testing.T) {
 	stepsStatusReq := prepareStepsStatus()
-	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 1)
@@ -261,7 +261,7 @@ func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testin
 		return statuses, err
 	}
 
-	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
 	stepsStatus := stepsStatuses[0]
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
@@ -272,16 +272,16 @@ func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testin
 	assert.Equal(t, "step1", stepsStatus.StepName)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
 
-	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		return statuses, errors.New("select query failed")
 	}
-	_, err = FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	_, err = FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
 	assert.NotNil(t, err)
 }
 
 func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
 	stepsStatusReq := prepareStepsStatus()
-	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 1)
@@ -295,7 +295,7 @@ func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
 		return statuses, err
 	}
 
-	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
 	stepsStatus := stepsStatuses[0]
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
@@ -306,10 +306,10 @@ func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
 	assert.Equal(t, "step1", stepsStatus.StepName)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
 
-	findStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDescMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		return statuses, errors.New("select query failed")
 	}
-	_, err = FindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	_, err = FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
 	assert.NotNil(t, err)
 }
 
