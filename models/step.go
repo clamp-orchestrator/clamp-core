@@ -53,7 +53,7 @@ func (step *Step) preStepExecution(contextPayload map[string]*StepContext, prefi
 func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
-		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody, prefix)
+		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody.Payload, prefix)
 		return res, err
 	case "AMQP":
 		res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)

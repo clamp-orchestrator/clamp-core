@@ -34,6 +34,20 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			wantErrMsg: "",
 		},
 		{
+			name: "TestShouldExecuteHTTPStepWithHeaders",
+			fields: HttpVal{
+				Method:  "GET",
+				Url:     "http://34.222.238.234:3333/api/v1/user",
+				Headers: "Content-Type:application/json;token:abc",
+			},
+			args: args{
+				requestBody: map[string]interface{}{"k": "v"},
+			},
+			want:       map[string]interface{}{"id": "1234", "name": "ABC", "email": "abc@sahaj.com", "org": "sahaj"},
+			wantErr:    false,
+			wantErrMsg: "",
+		},
+		{
 			name: "TestShouldThrowErrorWhileExecutingStep",
 			fields: HttpVal{
 				Method:  "GET",

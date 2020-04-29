@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -22,8 +23,8 @@ func (httpVal HttpVal) DoExecute(requestBody interface{}, prefix string) (interf
 		Timeout: time.Second * 10,
 	}
 	requestJsonBytes, _ := json.Marshal(requestBody)
-	requestReader := bytes.NewReader(requestJsonBytes)
-	request, err := http.NewRequest(httpVal.Method, httpVal.Url, requestReader)
+	request, err := http.NewRequest(httpVal.Method, httpVal.Url, bytes.NewBuffer(requestJsonBytes))
+	fetchAndLoadRequestWithHeadersIfDefined(httpVal, request)
 	if err != nil {
 		return nil, err
 	}
@@ -40,4 +41,14 @@ func (httpVal HttpVal) DoExecute(requestBody interface{}, prefix string) (interf
 	data, _ := ioutil.ReadAll(resp.Body)
 	log.Printf("%sHTTP Executor: Successfully called http %s:%s", prefix, httpVal.Method, httpVal.Url)
 	return string(data), err
+}
+
+func fetchAndLoadRequestWithHeadersIfDefined(httpVal HttpVal, request *http.Request) {
+	if httpVal.Headers != "" {
+		httpHeaders := strings.Split(httpVal.Headers, ";")
+		for _, header := range httpHeaders {
+			httpHeader := strings.Split(header, ":")
+			request.Header.Add(httpHeader[0], httpHeader[1])
+		}
+	}
 }
