@@ -145,31 +145,26 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	}
 
 	resp, err := step.DoExecute(requestContext, prefix)
-	if step.DidStepExecute() {
-		if err != nil {
-			clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-			recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
-			errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-			panic(errFmt)
-			return *clampErrorResponse
-		}
-		if resp != nil {
-			log.Printf("%s Step response received: %s", prefix, resp.(string))
-			var responsePayload map[string]interface{}
-			json.Unmarshal([]byte(resp.(string)), &responsePayload)
-			stepStatus.Payload.Response = responsePayload
-			recordStepCompletionStatus(stepStatus, stepStartTime)
-			requestContext.SetStepResponseToContext(step.Name, responsePayload)
-			return models.EmptyErrorResponse()
-		}
+	if err != nil {
+		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
+		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
+		panic(errFmt)
+		return *clampErrorResponse
+	} else if step.DidStepExecute() && resp != nil {
+		log.Printf("%s Step response received: %s", prefix, resp.(string))
+		var responsePayload map[string]interface{}
+		json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		stepStatus.Payload.Response = responsePayload
+		recordStepCompletionStatus(stepStatus, stepStartTime)
+		requestContext.SetStepResponseToContext(step.Name, responsePayload)
+		return models.EmptyErrorResponse()
 	} else {
 		//record step skipped
+		//setting response of skipped step with same as request for future validations use
+		requestContext.SetStepResponseToContext(step.Name, requestContext.GetStepRequestFromContext(step.Name))
 		recordStepSkippedStatus(stepStatus, stepStartTime)
-		clampErrorResponse := models.EmptyErrorResponse()
-		if err != nil {
-			clampErrorResponse = *models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-		}
-		return clampErrorResponse
+		return models.EmptyErrorResponse()
 	}
 	return models.EmptyErrorResponse()
 }
