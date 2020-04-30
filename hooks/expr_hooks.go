@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const ContextPrefix = "context."
+
 type ExprHook struct {
 }
 
@@ -16,8 +18,9 @@ func (e *ExprHook) TransformRequest(m map[string]interface{}, s map[string]inter
 
 func (e *ExprHook) ShouldStepExecute(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
 	log.Printf("%s Pre-step execution for step is in progress", prefix)
-	if !strings.HasPrefix(whenCondition, "context.") {
-		whenCondition = "content." + whenCondition
+
+	if !strings.HasPrefix(whenCondition, ContextPrefix) {
+		whenCondition = ContextPrefix + whenCondition
 	}
 	env := map[string]interface{}{
 		"context": stepRequest,
