@@ -6,15 +6,32 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
+)
+
+var (
+	serviceRequestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "create_service_request_handler_counter",
+		Help: "The total number of service requests created",
+	}, []string{"workflow_name"})
+	serviceRequestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "create_service_request_handler_histogram",
+		Help: "The total number of service requests created",
+	})
 )
 
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		startTime := time.Now()
 		log.Println("Create service request handler")
 		workflowName := c.Param("workflowName")
+		serviceRequestCounter.WithLabelValues(workflowName).Inc()
 		_, err := services.FindWorkflowByName(workflowName)
 
 		requestPayload := readRequestPayload(c)
@@ -34,6 +51,7 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		}
 		services.AddServiceRequestToChannel(serviceReq)
 		response := prepareServiceRequestResponse(serviceReq)
+		serviceRequestHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, response)
 	}
 }
