@@ -6,6 +6,7 @@ import (
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
+	r.GET("/metrics", prometheusHandler())
 	r.POST("/serviceRequest/:workflowName", createServiceRequestHandler())
 	r.GET("/serviceRequest/:serviceRequestId", getServiceRequestStatusHandler())
 	r.POST("/workflow", createWorkflowHandler())
