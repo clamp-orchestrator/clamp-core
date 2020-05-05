@@ -238,6 +238,31 @@ func TestStep_DoTransform(t *testing.T) {
 			expectedTransformation: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 			wantErr:                false,
 		},
+		{
+			name: "ShouldNotTransformRequestWhenTransformationFailsDueToSomeError",
+			fields: fields{
+				Id:       1,
+				Name:     "dummyStep",
+				Mode:     "HTTP",
+				StepType: "SYNC",
+				RequestTransform: &transform.JsonTransform{
+					Spec: map[string]interface{}{},
+				},
+				Val: &executors.HttpVal{
+					Method:  "POST",
+					Url:     "https://reqres.in/api/users",
+					Headers: "",
+				},
+				Transform: true,
+				Enabled:   true,
+			},
+			args: args{
+				requestBody: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+				prefix:      "",
+			},
+			expectedTransformation: nil,
+			wantErr:                true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

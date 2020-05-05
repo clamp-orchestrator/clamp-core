@@ -130,6 +130,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		transform, transformErrors := step.DoTransform(stepRequest, prefix)
 		if transformErrors != nil {
 			log.Println("Error while transforming request payload")
+			panic(transformErrors)
 		}
 		requestContext.SetStepRequestToContext(step.Name, transform)
 		stepStatus.Payload.Request = transform
