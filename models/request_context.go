@@ -5,6 +5,7 @@ import "github.com/google/uuid"
 type StepContext struct {
 	Request  map[string]interface{}
 	Response map[string]interface{}
+	StepSkipped bool
 }
 
 type RequestContext struct {

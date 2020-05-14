@@ -5,8 +5,8 @@ import (
 )
 
 type AsyncStepResponse struct {
-	ServiceRequestId   uuid.UUID              `json:"service_request_id"`
-	StepId             int                    `json:"step_id"`
+	ServiceRequestId   uuid.UUID              `json:"serviceRequestId"`
+	StepId             int                    `json:"stepId"`
 	Response           map[string]interface{} `json:"response"`
 	Error              ClampErrorResponse     `json:"error"`
 	stepStatusRecorded bool
