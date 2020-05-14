@@ -139,6 +139,11 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 
 	resp, err := step.DoExecute(requestContext, prefix)
 	if err != nil {
+		if step.OnFailure !=nil{
+			for _, stepOnFailure := range step.OnFailure {
+				ExecuteWorkflowStep(stepOnFailure, requestContext, prefix)
+			}
+		}
 		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
@@ -146,6 +151,11 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		return *clampErrorResponse
 	} else if step.DidStepExecute() && resp != nil && step.Type == "SYNC" {
 		log.Printf("%s Step response received: %s", prefix, resp.(string))
+		if step.OnSuccess !=nil{
+			for _, stepOnFailure := range step.OnSuccess {
+				ExecuteWorkflowStep(stepOnFailure, requestContext, prefix)
+			}
+		}
 		var responsePayload map[string]interface{}
 		json.Unmarshal([]byte(resp.(string)), &responsePayload)
 		stepStatus.Payload.Response = responsePayload
