@@ -80,18 +80,22 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	return res, err
 }
 
-func (step *Step) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
+func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map[string]interface{}, error) {
+	stepRequestResponsePayload := make(map[string]interface{})
+	for s, stepRequestResponse := range requestContext.StepsContext {
+		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+	}
 	if step.Transform {
 		switch step.TransformFormat {
 		case "XML":
-			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(requestBody, prefix)
+			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(stepRequestResponsePayload, prefix)
 			return res, err
 		default:
-			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(requestBody, prefix)
+			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(stepRequestResponsePayload, prefix)
 			return res, err
 		}
 	}
-	return requestBody, nil
+	return stepRequestResponsePayload, nil
 }
 
 func (step *Step) UnmarshalJSON(data []byte) error {

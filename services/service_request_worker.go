@@ -127,7 +127,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 
 	//TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
 	if step.Transform {
-		transform, transformErrors := step.DoTransform(stepRequest, prefix)
+		transform, transformErrors := step.DoTransform(requestContext, prefix)
 		if transformErrors != nil {
 			log.Println("Error while transforming request payload")
 			panic(transformErrors)
