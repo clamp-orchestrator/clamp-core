@@ -10,7 +10,18 @@ import (
 	"log"
 	"net/http"
 )
-
+// Create Service Request godoc
+// @Summary Create a service request
+// @Description Create a service request and get service request id
+// @Accept json
+// @Produce json
+// @Param workflowname path string true "Workflow Name"
+// @Param serviceRequestPayload body string true "Service Request Payload"
+// @Success 200 {object} models.ServiceRequestResponse
+// @Failure 400 {object} models.ClampErrorResponse
+// @Failure 404 {object} models.ClampErrorResponse
+// @Failure 500 {object} models.ClampErrorResponse
+// @Router /serviceRequest/{workflowname} [post]
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		log.Println("Create service request handler")
@@ -58,7 +69,17 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 		return nil
 	}
 }
-
+// Get Service Request By Id godoc
+// @Summary Get service request details by service request id
+// @Description Get service request by service request id
+// @Accept json
+// @Produce json
+// @Param serviceRequestId path string true "Service Request Id"
+// @Success 200 {object} models.ServiceRequestStatusResponse
+// @Failure 400 {object} models.ClampErrorResponse
+// @Failure 404 {object} models.ClampErrorResponse
+// @Failure 500 {object} models.ClampErrorResponse
+// @Router /serviceRequest/{serviceRequestId} [get]
 func getServiceRequestStatusHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		serviceRequestId := c.Param("serviceRequestId")
