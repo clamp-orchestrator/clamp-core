@@ -4,8 +4,22 @@ import (
 	"clamp-core/models"
 	"clamp-core/services"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
 	"net/http"
+	"time"
+)
+
+var (
+	resumeAsyncServiceRequestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "resume_async_service_request_handler_counter",
+		Help: "The total number of async service requests resumed",
+	}, []string{"resume"})
+	resumeAsyncServiceRequestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "resume_async_service_request_handler_histogram",
+		Help: "The total number of async service requests resumed",
+	})
 )
 // Http Resume Service Request API for Async Step godoc
 // @Summary Http Resume Service Request API for Async Step
@@ -20,7 +34,9 @@ import (
 // @Router /stepResponse [post]
 func createStepResponseHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		startTime := time.Now()
 		var res models.AsyncStepResponse
+		resumeAsyncServiceRequestCounter.WithLabelValues("resume").Inc()
 		err := c.ShouldBindJSON(&res)
 		if err != nil {
 			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
@@ -31,6 +47,7 @@ func createStepResponseHandler() gin.HandlerFunc {
 		log.Printf("[HTTP Consumer] : Received step completed response: %v", res)
 		log.Printf("[HTTP Consumer] : Pushing step completed response to channel")
 		services.AddStepResponseToResumeChannel(res)
+		resumeAsyncServiceRequestHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, models.CreateSuccessResponse(http.StatusOK, "success"))
 	}
 }

@@ -4,8 +4,30 @@ import (
 	"clamp-core/models"
 	"clamp-core/services"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
 	"net/http"
+	"time"
+)
+
+var (
+	workflowRequestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "create_workflow_request_handler_counter",
+		Help: "The total number of workflow created",
+	}, []string{"workflow"})
+	workflowRequestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "create_workflow_request_handler_histogram",
+		Help: "The total number of service requests created",
+	})
+	workflowByWokflowNameCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "get_workflow_handler_by_workflow_name_counter",
+		Help: "The total number of workflow fetched based on workflow name",
+	}, []string{"workflow_name"})
+	workflowByWokflowNameHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "get_workflow_handler_by_workflow_name_histogram",
+		Help: "The total number of workflow fetched based on workflow name",
+	})
 )
 // Create a Workflow godoc
 // @Summary Create workflow for execution
@@ -20,8 +42,10 @@ import (
 // @Router /workflow [post]
 func createWorkflowHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		startTime := time.Now()
 		// Create new Service Workflow
 		var workflowReq models.Workflow
+		workflowRequestCounter.WithLabelValues("workflow").Inc()
 		err := c.ShouldBindJSON(&workflowReq)
 		if err != nil {
 			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
@@ -32,6 +56,7 @@ func createWorkflowHandler() gin.HandlerFunc {
 		log.Printf("Create workflow request : %v \n", workflowReq)
 		serviceFlowRes := models.CreateWorkflow(workflowReq)
 		serviceFlowRes, err = services.SaveWorkflow(serviceFlowRes)
+		workflowRequestHistogram.Observe(time.Since(startTime).Seconds())
 		if err != nil {
 			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 			c.JSON(http.StatusBadRequest, errorResponse)
@@ -53,9 +78,12 @@ func createWorkflowHandler() gin.HandlerFunc {
 // @Router /workflow/{workflowname} [get]
 func fetchWorkflowBasedOnWorkflowName() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		startTime := time.Now()
 		workflowName := c.Param("workflow")
+		workflowByWokflowNameCounter.WithLabelValues(workflowName).Inc()
 		result, _ := services.FindWorkflowByName(workflowName)
 		//TODO - handle error scenario. Currently it is always 200 ok
+		workflowByWokflowNameHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, result)
 	}
 }

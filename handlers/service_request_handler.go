@@ -23,6 +23,14 @@ var (
 		Name: "create_service_request_handler_histogram",
 		Help: "The total number of service requests created",
 	})
+	serviceRequestByIdCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "get_service_request_handler_by_id_counter",
+		Help: "The total number of service requests enquired",
+	}, []string{"service_request_id"})
+	serviceRequestByIdHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "get_service_request_handler_by_id_histogram",
+		Help: "The total number of service requests enquired",
+	})
 )
 // Create Service Request godoc
 // @Summary Create a service request
@@ -100,6 +108,7 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 // @Router /serviceRequest/{serviceRequestId} [get]
 func getServiceRequestStatusHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		startTime := time.Now()
 		serviceRequestId := c.Param("serviceRequestId")
 
 		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestId))
@@ -107,10 +116,12 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, CreateErrorResponse(http.StatusBadRequest, err.Error()))
 			return
 		}
+		serviceRequestByIdCounter.WithLabelValues(serviceRequestId).Inc()
 		workflow, _ := services.FindWorkflowByName(serviceRequest.WorkflowName)
 		stepsStatues, _ := services.FindStepStatusByServiceRequestId(uuid.MustParse(serviceRequestId))
 		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestId), workflow, stepsStatues)
 		//TODO - handle error scenario. Currently it is always 200 ok
+		serviceRequestByIdHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, stepsStatusResponse)
 	}
 }
