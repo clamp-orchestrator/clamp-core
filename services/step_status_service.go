@@ -76,8 +76,8 @@ func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, ste
 				skippedStepsCount++
 			}
 		}
-
-		if startedStepsCount == stepsCount && skippedStepsCount+completedStepsCount == stepsCount {
+		//TODO Need to  change this  logic
+		if startedStepsCount >= stepsCount && skippedStepsCount+completedStepsCount >= stepsCount {
 			srvReqStatusRes.Status = models.STATUS_COMPLETED
 		} else if failedStepsCount > 0 {
 			srvReqStatusRes.Status = models.STATUS_FAILED

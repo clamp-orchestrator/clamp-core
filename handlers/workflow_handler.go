@@ -7,7 +7,17 @@ import (
 	"log"
 	"net/http"
 )
-
+// Create a Workflow godoc
+// @Summary Create workflow for execution
+// @Description Create workflow for sequential execution
+// @Accept json
+// @Consume json
+// @Param workflowPayload body models.Workflow true "Workflow Definition Payload"
+// @Success 200 {object} models.Workflow
+// @Failure 400 {object} models.ClampErrorResponse
+// @Failure 404 {object} models.ClampErrorResponse
+// @Failure 500 {object} models.ClampErrorResponse
+// @Router /workflow [post]
 func createWorkflowHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Create new Service Workflow
@@ -30,7 +40,17 @@ func createWorkflowHandler() gin.HandlerFunc {
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}
 }
-
+// Fetch workflow details By Workflow Name godoc
+// @Summary Fetch workflow details By Workflow Name
+// @Description Fetch workflow details By Workflow Name
+// @Accept json
+// @Produce json
+// @Param workflowname path string true "workflow name"
+// @Success 200 {object} models.Workflow
+// @Failure 400 {object} models.Workflow
+// @Failure 404 {object} models.Workflow
+// @Failure 500 {object} models.Workflow
+// @Router /workflow/{workflowname} [get]
 func fetchWorkflowBasedOnWorkflowName() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		workflowName := c.Param("workflow")

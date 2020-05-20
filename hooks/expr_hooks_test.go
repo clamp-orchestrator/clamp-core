@@ -25,7 +25,7 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 		{
 			name: "shouldReturnTrueIfConditionSatisfies",
 			args: args{
-				whenCondition: "context.dummyStep.request.user_type == 'admin'",
+				whenCondition: "dummyStep.request.user_type == 'admin'",
 				stepRequest: setupStepRequest(),
 				prefix:      "",
 			},
@@ -34,7 +34,7 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 		}, {
 			name: "shouldReturnFalseIfConditionNotSatisfied",
 			args: args{
-				whenCondition: "context.dummyStep.request.user_type == 'user'",
+				whenCondition: "dummyStep.request.user_type == 'user'",
 				stepRequest:  setupStepRequest(),
 				prefix:        "",
 			},
@@ -43,7 +43,7 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 		}, {
 			name: "shouldReturnErrorIfConditionIsNotInProperFormat",
 			args: args{
-				whenCondition: "user_type == 'user'",
+				whenCondition: "user_type",
 				stepRequest:   setupStepRequest(),
 				prefix:        "",
 			},

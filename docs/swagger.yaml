@@ -1,0 +1,317 @@
+basePath: /
+definitions:
+  models.AsyncStepResponse:
+    properties:
+      error:
+        $ref: '#/definitions/models.ClampErrorResponse'
+        type: object
+      response:
+        additionalProperties: true
+        type: object
+      serviceRequestId:
+        type: string
+      stepId:
+        type: integer
+      stepStatusRecorded:
+        type: boolean
+    type: object
+  models.ClampErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models.ClampSuccessResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models.Payload:
+    properties:
+      request:
+        additionalProperties: true
+        type: object
+      response:
+        additionalProperties: true
+        type: object
+    type: object
+  models.RequestTransform:
+    type: object
+  models.ServiceRequestResponse:
+    properties:
+      pollUrl:
+        type: string
+      serviceRequestId:
+        type: string
+      status:
+        type: string
+    type: object
+  models.ServiceRequestStatusResponse:
+    properties:
+      reason:
+        type: string
+      service_request_id:
+        type: string
+      status:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/models.StepStatusResponse'
+        type: array
+      total_time_in_ms:
+        type: integer
+      workflow_name:
+        type: string
+    type: object
+  models.Step:
+    properties:
+      canStepExecute:
+        type: boolean
+      enabled:
+        type: boolean
+      id:
+        type: integer
+      mode:
+        type: string
+      name:
+        type: string
+      onFailure:
+        items:
+          $ref: '#/definitions/models.Step'
+        type: array
+      onSuccess:
+        items:
+          $ref: '#/definitions/models.Step'
+        type: array
+      requestTransform:
+        $ref: '#/definitions/models.RequestTransform'
+        type: object
+      transform:
+        type: boolean
+      transformFormat:
+        type: string
+      type:
+        type: string
+      val:
+        $ref: '#/definitions/models.Val'
+        type: object
+      when:
+        type: string
+    required:
+    - mode
+    - name
+    - type
+    - val
+    type: object
+  models.StepStatusResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      payload:
+        $ref: '#/definitions/models.Payload'
+        type: object
+      status:
+        type: string
+      time_taken:
+        type: integer
+    type: object
+  models.Val:
+    type: object
+  models.Workflow:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      enabled:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+      steps:
+        items:
+          $ref: '#/definitions/models.Step'
+        type: array
+      updated_at:
+        type: string
+    required:
+    - name
+    - steps
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server Petstore server.
+  license: {}
+  termsOfService: http://swagger.io/terms/
+  title: Clamp Swagger API
+  version: "1.0"
+paths:
+  /serviceRequest/{serviceRequestId}:
+    get:
+      consumes:
+      - application/json
+      description: Get service request by service request id
+      parameters:
+      - description: Service Request Id
+        in: path
+        name: serviceRequestId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ServiceRequestStatusResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+      summary: Get service request details by service request id
+  /serviceRequest/{workflowname}:
+    post:
+      consumes:
+      - application/json
+      description: Create a service request and get service request id
+      parameters:
+      - description: Workflow Name
+        in: path
+        name: workflowname
+        required: true
+        type: string
+      - description: Service Request Payload
+        in: body
+        name: serviceRequestPayload
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ServiceRequestResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+      summary: Create a service request
+  /stepResponse:
+    post:
+      consumes:
+      - application/json
+      description: Http Resume Service Request API for Async Step
+      parameters:
+      - description: Resume Service Request Payload
+        in: body
+        name: ResumeServiceRequestPayload
+        required: true
+        schema:
+          $ref: '#/definitions/models.AsyncStepResponse'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ClampSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+      summary: Http Resume Service Request API for Async Step
+  /workflow:
+    post:
+      consumes:
+      - application/json
+      description: Create workflow for sequential execution
+      parameters:
+      - description: Workflow Definition Payload
+        in: body
+        name: workflowPayload
+        required: true
+        schema:
+          $ref: '#/definitions/models.Workflow'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Workflow'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ClampErrorResponse'
+      summary: Create workflow for execution
+  /workflow/{workflowname}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch workflow details By Workflow Name
+      parameters:
+      - description: workflow name
+        in: path
+        name: workflowname
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Workflow'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Workflow'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Workflow'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Workflow'
+      summary: Fetch workflow details By Workflow Name
+swagger: "2.0"

@@ -17,10 +17,38 @@ type Workflow struct {
 
 //Create a new work flow for a given service flow and return service flow details
 func CreateWorkflow(workflowRequest Workflow) Workflow {
+	stepCounter :=0
 	for i := 0; i < len(workflowRequest.Steps); i++ {
-		workflowRequest.Steps[i].Id = i + 1
+		stepCounter++
+		workflowRequest.Steps[i].Id = stepCounter
+		UpdateStepCounterForEachOfSubSteps(workflowRequest, i, stepCounter)
 	}
 	return newServiceFlow(workflowRequest)
+}
+
+func UpdateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCounter int) {
+	if workflowRequest.Steps[i].OnSuccess != nil {
+		isSuccessSubStep := true
+		stepCounter = UpdateSubStepsIds(workflowRequest, i, stepCounter, isSuccessSubStep)
+	}
+	if workflowRequest.Steps[i].OnFailure != nil {
+		isSuccessSubStep := false
+		stepCounter = UpdateSubStepsIds(workflowRequest, i, stepCounter, isSuccessSubStep)
+	}
+}
+
+func UpdateSubStepsIds(workflowRequest Workflow, i int, stepCounter int, isSuccessSubStep bool ) int {
+	var subSteps []Step
+	if isSuccessSubStep {
+		subSteps = workflowRequest.Steps[i].OnSuccess
+	}else{
+		subSteps = workflowRequest.Steps[i].OnFailure
+	}
+	for subStepId, _ := range subSteps {
+		stepCounter++
+		subSteps[subStepId].Id = stepCounter
+	}
+	return stepCounter
 }
 
 func newServiceFlow(workflow Workflow) Workflow {

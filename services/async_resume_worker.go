@@ -91,7 +91,7 @@ func getResumeStepResponseChannel() chan models.AsyncStepResponse {
 }
 
 func AddStepResponseToResumeChannel(response models.AsyncStepResponse) {
-	if response.ServiceRequestId == uuid.Nil || response.StepId == 0 || response.Response == nil {
+	if response.ServiceRequestId == uuid.Nil || response.StepId == 0 || (response.Response == nil && response.Error.Code == 0) {
 		log.Printf("Invalid step resume request received %v", response)
 		return
 	}

@@ -13,6 +13,7 @@ func prepareStepRequestResponse() map[string]*StepContext {
 	stepRequestResponse := map[string]*StepContext{"dummyStep": {
 		Request:  map[string]interface{}{"user_type": "admin"},
 		Response: nil,
+		StepSkipped:false,
 	}}
 	return stepRequestResponse
 }
@@ -152,6 +153,7 @@ func TestStep_DoTransform(t *testing.T) {
 		RequestTransform RequestTransform
 	}
 	type args struct {
+		reqCtx RequestContext
 		requestBody map[string]interface{}
 		prefix      string
 	}
@@ -170,7 +172,7 @@ func TestStep_DoTransform(t *testing.T) {
 				Mode:     "HTTP",
 				StepType: "SYNC",
 				RequestTransform: &transform.JsonTransform{
-					Spec: map[string]interface{}{"userdetails.name": "user_name"},
+					Spec: map[string]interface{}{"userdetails.name": "dummyStep.request.user_name"},
 				},
 				Val: &executors.HttpVal{
 					Method:  "POST",
@@ -181,6 +183,14 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
+				reqCtx : RequestContext{
+					ServiceRequestId: uuid.UUID{},
+					WorkflowName:     "",
+					StepsContext:     map[string]*StepContext{"dummyStep": {
+						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+						Response: nil,
+					}},
+				},
 				requestBody: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 				prefix:      "",
 			},
@@ -195,7 +205,7 @@ func TestStep_DoTransform(t *testing.T) {
 				Mode:     "HTTP",
 				StepType: "SYNC",
 				RequestTransform: &transform.XMLTransform{
-					Keys: map[string]interface{}{"name": "user_name"},
+					Keys: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
 				TransformFormat: "XML",
 				Val: &executors.HttpVal{
@@ -207,10 +217,23 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
+				reqCtx : RequestContext{
+					ServiceRequestId: uuid.UUID{},
+					WorkflowName:     "",
+					StepsContext:     map[string]*StepContext{"dummyStep": {
+						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+						Response: map[string]interface{}{},
+					}},
+				},
 				requestBody: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 				prefix:      "",
 			},
-			expectedTransformation: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+			expectedTransformation: map[string]interface{}{
+				"dummyStep": map[string]interface{}{
+					"request":map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+					"response":map[string]interface{}{},
+				},
+			},
 			wantErr:                false,
 		},
 		{
@@ -221,7 +244,7 @@ func TestStep_DoTransform(t *testing.T) {
 				Mode:     "HTTP",
 				StepType: "SYNC",
 				RequestTransform: &transform.JsonTransform{
-					Spec: map[string]interface{}{"name": "user_name"},
+					Spec: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
 				Val: &executors.HttpVal{
 					Method:  "POST",
@@ -232,11 +255,56 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
+				reqCtx : RequestContext{
+					ServiceRequestId: uuid.UUID{},
+					WorkflowName:     "",
+					StepsContext:     map[string]*StepContext{"dummyStep": {
+						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+						Response: map[string]interface{}{},
+					}},
+				},
+				prefix:      "",
+			},
+			expectedTransformation: map[string]interface{}{
+				"dummyStep": map[string]interface{}{
+					"request":map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+					"response":map[string]interface{}{},
+				},
+			},
+			wantErr:                false,
+		},
+		{
+			name: "ShouldNotTransformRequestWhenTransformationFailsDueToSomeError",
+			fields: fields{
+				Id:       1,
+				Name:     "dummyStep",
+				Mode:     "HTTP",
+				StepType: "SYNC",
+				RequestTransform: &transform.JsonTransform{
+					Spec: map[string]interface{}{},
+				},
+				Val: &executors.HttpVal{
+					Method:  "POST",
+					Url:     "https://reqres.in/api/users",
+					Headers: "",
+				},
+				Transform: true,
+				Enabled:   true,
+			},
+			args: args{
+				reqCtx : RequestContext{
+					ServiceRequestId: uuid.UUID{},
+					WorkflowName:     "",
+					StepsContext:     map[string]*StepContext{"dummyStep": {
+						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+						Response: map[string]interface{}{},
+					}},
+				},
 				requestBody: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 				prefix:      "",
 			},
-			expectedTransformation: map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
-			wantErr:                false,
+			expectedTransformation: nil,
+			wantErr:                true,
 		},
 	}
 	for _, tt := range tests {
@@ -254,8 +322,7 @@ func TestStep_DoTransform(t *testing.T) {
 				When:             tt.fields.When,
 				canStepExecute:   tt.fields.canStepExecute,
 			}
-
-			transformedRequest, err := step.DoTransform(tt.args.requestBody, tt.args.prefix)
+			transformedRequest, err := step.DoTransform(tt.args.reqCtx, tt.args.prefix)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DoTransform() error = %v, wantErr %v", err, tt.wantErr)
 				return
