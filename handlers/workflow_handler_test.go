@@ -165,6 +165,24 @@ func TestShouldReturnCreatedWorkflowSuccessfullyByWorkflowNameRoute(t *testing.T
 	assert.NotNil(t, jsonResp.Steps)
 }
 
+
+func TestShouldFailToReturnWorkflowIfInvalidWorkflowNameIsProvidedInTheRoute(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflow/"+"dummy", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, 400, jsonResp.Code)
+	assert.Equal(t, "No record exists with workflow name : "+"dummy", jsonResp.Message)
+}
+
 func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *testing.T) {
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Name = workflowName

@@ -27,23 +27,14 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 }
 
 func UpdateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCounter int) {
-	if workflowRequest.Steps[i].OnSuccess != nil {
-		isSuccessSubStep := true
-		stepCounter = UpdateSubStepsIds(workflowRequest, i, stepCounter, isSuccessSubStep)
-	}
 	if workflowRequest.Steps[i].OnFailure != nil {
-		isSuccessSubStep := false
-		stepCounter = UpdateSubStepsIds(workflowRequest, i, stepCounter, isSuccessSubStep)
+		stepCounter = UpdateSubStepsIds(workflowRequest, i, stepCounter)
 	}
 }
 
-func UpdateSubStepsIds(workflowRequest Workflow, i int, stepCounter int, isSuccessSubStep bool ) int {
+func UpdateSubStepsIds(workflowRequest Workflow, i int, stepCounter int) int {
 	var subSteps []Step
-	if isSuccessSubStep {
-		subSteps = workflowRequest.Steps[i].OnSuccess
-	}else{
-		subSteps = workflowRequest.Steps[i].OnFailure
-	}
+	subSteps = workflowRequest.Steps[i].OnFailure
 	for subStepId, _ := range subSteps {
 		stepCounter++
 		subSteps[subStepId].Id = stepCounter

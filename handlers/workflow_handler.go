@@ -3,6 +3,8 @@ package handlers
 import (
 	"clamp-core/models"
 	"clamp-core/services"
+	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -29,6 +31,22 @@ var (
 		Help: "The total number of workflow fetched based on workflow name",
 	})
 )
+
+type CustomError struct {
+	StatusCode int
+	Err error
+}
+
+func (r *CustomError) Error() string {
+	return fmt.Sprintf("status %d: err %v", r.StatusCode, r.Err)
+}
+
+func ErrorRequest() error {
+	return &CustomError{
+		StatusCode: 503,
+		Err:        errors.New("unavailable"),
+	}
+}
 // Create a Workflow godoc
 // @Summary Create workflow for execution
 // @Description Create workflow for sequential execution
@@ -58,12 +76,16 @@ func createWorkflowHandler() gin.HandlerFunc {
 		serviceFlowRes, err = services.SaveWorkflow(serviceFlowRes)
 		workflowRequestHistogram.Observe(time.Since(startTime).Seconds())
 		if err != nil {
-			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-			c.JSON(http.StatusBadRequest, errorResponse)
+			prepareErrorResponse(err, c)
 			return
 		}
 		c.JSON(http.StatusOK, serviceFlowRes)
 	}
+}
+
+func prepareErrorResponse(err error, c *gin.Context) {
+		errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, errorResponse)
 }
 // Fetch workflow details By Workflow Name godoc
 // @Summary Fetch workflow details By Workflow Name
@@ -81,9 +103,14 @@ func fetchWorkflowBasedOnWorkflowName() gin.HandlerFunc {
 		startTime := time.Now()
 		workflowName := c.Param("workflow")
 		workflowByWokflowNameCounter.WithLabelValues(workflowName).Inc()
-		result, _ := services.FindWorkflowByName(workflowName)
+		result, err := services.FindWorkflowByName(workflowName)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		workflowByWokflowNameHistogram.Observe(time.Since(startTime).Seconds())
+		if err != nil {
+			err := errors.New("No record exists with workflow name : " +workflowName)
+			prepareErrorResponse(err, c)
+			return
+		}
 		c.JSON(http.StatusOK, result)
 	}
 }
