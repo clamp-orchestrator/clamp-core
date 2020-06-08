@@ -68,6 +68,15 @@ func createServiceRequestHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
+		var serviceRequestHeaders string
+		for key, value := range c.Request.Header {
+			log.Println("Header Key : ", key, " Header Value : ", value)
+			serviceRequestHeaders += key + ":" + value[0] + ";"
+		}
+		//Setting Request Headers if it exists
+		if serviceRequestHeaders != "" {
+			serviceReq.RequestHeaders = serviceRequestHeaders
+		}
 		services.AddServiceRequestToChannel(serviceReq)
 		response := prepareServiceRequestResponse(serviceReq)
 		serviceRequestHistogram.Observe(time.Since(startTime).Seconds())

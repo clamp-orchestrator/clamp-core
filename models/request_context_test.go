@@ -23,7 +23,7 @@ func TestShouldSetStepRequestToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestId: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
 	context.SetStepRequestToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Request)
@@ -35,7 +35,7 @@ func TestShouldGetStepRequestFromContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestId: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
 	context.SetStepRequestToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Request)
@@ -47,7 +47,7 @@ func TestShouldSetStepResponseToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestId: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
 	context.SetStepResponseToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Response)
@@ -59,7 +59,7 @@ func TestShouldGetStepResponseFromContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestId: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
 	context.SetStepResponseToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Response)

@@ -13,7 +13,7 @@ var ENV = struct {
 
 	*/
 	DBDriver        string `env:"CLAMP_DB_DRIVER" envDefault:"postgres"`
-	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=34.222.238.234:5432 user=clamp dbname=clampdev password=clamppass"`
+	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=18.236.212.57:5432 user=clamp dbname=clampdev password=clamppass"`
 	/**
 	Examples:
 
@@ -23,7 +23,7 @@ var ENV = struct {
 
 	*/
 	QueueDriver        string `env:"CLAMP_QUEUE_DRIVER" envDefault:"amqp"`
-	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@34.222.238.234:5672/"`
+	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@localhost:5672/"`
 	QueueName          string `env:"CLAMP_QUEUE_NAME" envDefault:"clamp_steps_response"`
 }{}
 

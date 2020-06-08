@@ -54,6 +54,15 @@ func (step *Step) preStepExecution(contextPayload map[string]*StepContext, prefi
 func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
+		headers := step.Val.(*executors.HttpVal).Headers
+		requestHeaders := requestBody.Headers
+		if requestHeaders != "" && headers != ""{
+			headers = requestHeaders + headers
+		}else if requestHeaders != "" && headers == ""{
+			headers = requestHeaders
+		}
+
+		step.Val.(*executors.HttpVal).Headers = headers
 		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody.Payload, prefix)
 		return res, err
 	case "AMQP":
@@ -74,7 +83,7 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}
-	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestId, step.Id, request), prefix)
+	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestId, step.Id, request,  requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
 	//post Step execution
 	return res, err
 }

@@ -24,7 +24,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://34.222.238.234:3333/api/v1/login",
+				Url:     "http://18.236.212.57:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -80,7 +80,7 @@ func AddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflowT
 			},
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://34.222.238.234:3333/api/v1/login",
+				Url:     "http://18.236.212.57:3333/api/v1/login",
 				Headers: "",
 			},
 		}

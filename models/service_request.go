@@ -15,6 +15,7 @@ type ServiceRequest struct {
 	//TODO: rename to last step id executed
 	CurrentStepId int `json:"current_step_id",binding:"omitempty"`
 	RequestContext RequestContext
+	RequestHeaders string
 }
 
 func NewServiceRequest(workflowName string, payload map[string]interface{}) ServiceRequest {

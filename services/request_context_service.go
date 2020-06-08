@@ -12,6 +12,8 @@ func CreateRequestContext(workflow models.Workflow, request models.ServiceReques
 		context.StepsContext[step.Name] = &models.StepContext{
 			Request:  nil,
 			Response: nil,
+			RequestHeaders: request.RequestHeaders,
+			ResponseHeaders:"",
 		}
 	}
 	return

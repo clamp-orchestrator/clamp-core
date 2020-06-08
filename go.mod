@@ -3,6 +3,7 @@ module clamp-core
 go 1.13
 
 require (
+	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/antonmedv/expr v1.8.3
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/gin-gonic/gin v1.5.0
@@ -17,4 +18,7 @@ require (
 	github.com/robinjoseph08/go-pg-migrations/v2 v2.0.1
 	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	github.com/stretchr/testify v1.5.1
+	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
+	github.com/swaggo/gin-swagger v1.2.0
+	github.com/swaggo/swag v1.6.7
 )

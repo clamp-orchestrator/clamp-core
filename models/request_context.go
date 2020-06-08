@@ -4,6 +4,8 @@ import "github.com/google/uuid"
 
 type StepContext struct {
 	Request  map[string]interface{}
+	RequestHeaders  string
+	ResponseHeaders  string
 	Response map[string]interface{}
 	StepSkipped bool
 }
@@ -18,10 +20,32 @@ func (ctx *RequestContext) SetStepRequestToContext(stepName string, requestPaylo
 	stepContext := ctx.StepsContext[stepName]
 	stepContext.Request = requestPayload
 }
+
 func (ctx *RequestContext) SetStepResponseToContext(stepName string, responsePayload map[string]interface{}) {
 	stepContext := ctx.StepsContext[stepName]
 	stepContext.Response = responsePayload
 }
+
+func (ctx *RequestContext) SetStepRequestHeadersToContext(stepName string, requestHeaders string) {
+	stepContext := ctx.StepsContext[stepName]
+	stepContext.RequestHeaders = requestHeaders
+}
+
+func (ctx *RequestContext) SetStepResponseHeadersToContext(stepName string, responseHeaders string) {
+	stepContext := ctx.StepsContext[stepName]
+	stepContext.ResponseHeaders = responseHeaders
+}
+
+func (ctx RequestContext) GetStepRequestHeadersFromContext(stepName string) string {
+	stepContext := ctx.StepsContext[stepName]
+	return stepContext.RequestHeaders
+}
+
+func (ctx RequestContext) GetStepResponseHeadersFromContext(stepName string) string {
+	stepContext := ctx.StepsContext[stepName]
+	return stepContext.ResponseHeaders
+}
+
 
 func (ctx RequestContext) GetStepRequestFromContext(stepName string) map[string]interface{} {
 	stepContext := ctx.StepsContext[stepName]
