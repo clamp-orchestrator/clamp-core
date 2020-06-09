@@ -13,6 +13,7 @@ type AMQPVal struct {
 	ExchangeName  string `json:"exchange_name"`
 	RoutingKey    string `json:"routing_key"`
 	ContentType   string `json:"content_type"`
+	ReplyTo       string `json:"reply_to"`
 }
 
 func (val AMQPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {

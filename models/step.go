@@ -166,3 +166,7 @@ func (step *Step) setMode(mode interface{}) error {
 func (step Step) getHttpVal() executors.HttpVal {
 	return step.Val.(executors.HttpVal)
 }
+
+func (step Step) getAMQPVal() *executors.AMQPVal {
+	return step.Val.(*executors.AMQPVal)
+}

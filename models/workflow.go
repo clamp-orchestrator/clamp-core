@@ -1,6 +1,8 @@
 package models
 
 import (
+	"clamp-core/config"
+	"clamp-core/executors"
 	"time"
 )
 
@@ -21,6 +23,14 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 	for i := 0; i < len(workflowRequest.Steps); i++ {
 		stepCounter++
 		workflowRequest.Steps[i].Id = stepCounter
+		switch workflowRequest.Steps[i].Mode {
+		case "AMQP":
+			{
+				if workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo == "" {
+					workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
+				}
+			}
+		}
 		UpdateStepCounterForEachOfSubSteps(workflowRequest, i, stepCounter)
 	}
 	return newServiceFlow(workflowRequest)
