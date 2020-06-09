@@ -76,6 +76,7 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 			} else {
 				serviceRequest.Payload = stepResponse.Response
 				serviceRequest.CurrentStepId = stepResponse.StepId
+				serviceRequest.RequestHeaders = stepResponse.RequestHeaders
 				AddServiceRequestToChannel(serviceRequest)
 			}
 		}

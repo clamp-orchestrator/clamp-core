@@ -63,25 +63,32 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		// Create new service request
 		serviceReq := NewServiceRequest(workflowName, requestPayload)
 		serviceReq, err = services.SaveServiceRequest(serviceReq)
+		requestHeaders := readRequestHeadersAndSetInServiceRequest(c)
+		serviceReq.RequestHeaders = requestHeaders
 		if err != nil {
 			errorResponse := CreateErrorResponse(http.StatusBadRequest, err.Error())
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
-		}
-		var serviceRequestHeaders string
-		for key, value := range c.Request.Header {
-			log.Println("Header Key : ", key, " Header Value : ", value)
-			serviceRequestHeaders += key + ":" + value[0] + ";"
-		}
-		//Setting Request Headers if it exists
-		if serviceRequestHeaders != "" {
-			serviceReq.RequestHeaders = serviceRequestHeaders
 		}
 		services.AddServiceRequestToChannel(serviceReq)
 		response := prepareServiceRequestResponse(serviceReq)
 		serviceRequestHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, response)
 	}
+}
+
+func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string{
+	var serviceRequestHeaders string
+	for key, value := range c.Request.Header {
+		log.Println("Header Key : ", key, " Header Value : ", value)
+		serviceRequestHeaders += key + ":" + value[0] + ";"
+	}
+	//Setting Request Headers if it exists
+	if serviceRequestHeaders != "" {
+		return serviceRequestHeaders
+		log.Println("Service Request Headers ====>" + serviceRequestHeaders)
+	}
+	return serviceRequestHeaders
 }
 
 func prepareServiceRequestResponse(serviceReq ServiceRequest) ServiceRequestResponse {

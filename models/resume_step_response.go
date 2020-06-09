@@ -10,6 +10,7 @@ type AsyncStepResponse struct {
 	Response           map[string]interface{} `json:"response"`
 	Error              ClampErrorResponse     `json:"error"`
 	stepStatusRecorded bool
+	RequestHeaders string
 }
 
 func (res *AsyncStepResponse) SetStepStatusRecorded(stepStatusRecorded bool) {

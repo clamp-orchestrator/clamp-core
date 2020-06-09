@@ -54,15 +54,7 @@ func (step *Step) preStepExecution(contextPayload map[string]*StepContext, prefi
 func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
 	case "HTTP":
-		headers := step.Val.(*executors.HttpVal).Headers
-		requestHeaders := requestBody.Headers
-		if requestHeaders != "" && headers != ""{
-			headers = requestHeaders + headers
-		}else if requestHeaders != "" && headers == ""{
-			headers = requestHeaders
-		}
-
-		step.Val.(*executors.HttpVal).Headers = headers
+		step.UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody)
 		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody.Payload, prefix)
 		return res, err
 	case "AMQP":
@@ -70,6 +62,17 @@ func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interf
 		return res, err
 	}
 	panic("Invalid mode specified")
+}
+
+func (step *Step) UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody *StepRequest) {
+	headers := step.Val.(*executors.HttpVal).Headers
+	requestHeaders := requestBody.Headers
+	if requestHeaders != "" && headers != "" {
+		headers = requestHeaders + headers
+	} else if requestHeaders != "" && headers == "" {
+		headers = requestHeaders
+	}
+	step.Val.(*executors.HttpVal).Headers = headers
 }
 
 func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ interface{}, _ error) {

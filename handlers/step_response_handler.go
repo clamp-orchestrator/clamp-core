@@ -44,6 +44,8 @@ func createStepResponseHandler() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
+		resumeServiceRequestHeaders := readRequestHeadersAndSetInServiceRequest(c)
+		res.RequestHeaders = resumeServiceRequestHeaders
 		log.Printf("[HTTP Consumer] : Received step completed response: %v", res)
 		log.Printf("[HTTP Consumer] : Pushing step completed response to channel")
 		services.AddStepResponseToResumeChannel(res)
