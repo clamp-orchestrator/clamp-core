@@ -1,6 +1,7 @@
 package services
 
 import (
+	"clamp-core/config"
 	"clamp-core/models"
 	"encoding/json"
 	"errors"
@@ -95,7 +96,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		if !err.IsNil() {
 			return models.STATUS_FAILED
 		}
-		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == "ASYNC" {
+		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == config.ENV.AsyncStepType {
 			log.Printf("%s : Pushed to sleep mode until response for step - %s is recieved", prefix, step.Name)
 			return models.STATUS_PAUSED
 		}
