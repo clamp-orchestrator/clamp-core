@@ -26,9 +26,12 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 		switch workflowRequest.Steps[i].Mode {
 		case "AMQP":
 			{
-				if workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo == "" {
-					workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
-				}
+				workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
+				workflowRequest.Steps[i].Type = config.ENV.AsyncStepType
+			}
+			case "HTTP":
+			{
+				workflowRequest.Steps[i].Type = config.ENV.SyncStepType
 			}
 		}
 		UpdateStepCounterForEachOfSubSteps(workflowRequest, i, stepCounter)

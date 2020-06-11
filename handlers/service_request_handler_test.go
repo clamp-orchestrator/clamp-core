@@ -88,6 +88,8 @@ func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string
 	w := httptest.NewRecorder()
 	marshal, _ := json.Marshal(prepareServiceRequestPayload())
 	req, _ := http.NewRequest("POST", "/serviceRequest/"+wfName, bytes.NewReader(marshal))
+	req.Header.Add("Content-Type","application/json")
+	req.Header.Add("token","abc")
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()

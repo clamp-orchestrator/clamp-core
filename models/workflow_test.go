@@ -202,3 +202,52 @@ func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefault
 	assert.Equal(t, config.ENV.QueueName, workflowResponse.Steps[0].getAMQPVal().ReplyTo)
 	assert.Equal(t, "topic-a", workflowResponse.Steps[0].getAMQPVal().QueueName)
 }
+
+func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
+	http := executors.HttpVal{
+		Method:  "GET",
+		Url:     "http://18.236.212.57:3333/api/v1/user",
+		Headers: "",
+	}
+	steps := []Step{{}}
+	failureSteps := []Step{{}}
+	failureSteps[0] = Step{
+		Name:    "onFailureStep",
+		Mode:    "HTTP",
+		Val:     http,
+		Enabled: true,
+	}
+	steps[0] = Step{
+		Name:    "firstStep",
+		Mode:    "HTTP",
+		Val:     http,
+		Enabled: true,
+		OnFailure: failureSteps,
+	}
+	workflow := Workflow{
+		Id:          "1",
+		Name:        "Test",
+		Description: "Test",
+		Enabled:     false,
+		Steps:       steps,
+	}
+
+	serviceFlowRequest := workflow
+	err := binding.Validator.ValidateStruct(workflow)
+	if err != nil {
+		log.Println(err)
+	}
+	assert.Nil(t, err)
+	workflowResponse := CreateWorkflow(serviceFlowRequest)
+
+	assert.NotEmpty(t, workflowResponse.Id)
+	assert.NotNil(t, workflowResponse.CreatedAt)
+	assert.Equal(t, serviceFlowRequest.Description, workflowResponse.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.Description, workflowResponse.Description))
+	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
+	assert.Equal(t, serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name))
+	assert.Equal(t, "http://18.236.212.57:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
+	assert.NotNil(t,  workflowResponse.Steps[0].OnFailure)
+	assert.Equal(t, "onFailureStep", workflowResponse.Steps[0].OnFailure[0].Name)
+	assert.Equal(t, "HTTP", workflowResponse.Steps[0].OnFailure[0].Mode)
+	assert.Equal(t, "http://18.236.212.57:3333/api/v1/user", workflowResponse.Steps[0].OnFailure[0].getHttpVal().Url)
+}

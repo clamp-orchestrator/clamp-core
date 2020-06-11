@@ -23,8 +23,13 @@ var ENV = struct {
 
 	*/
 	QueueDriver        string `env:"CLAMP_QUEUE_DRIVER" envDefault:"amqp"`
-	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@localhost:5672/"`
+	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@18.236.212.57:5672/"`
 	QueueName          string `env:"CLAMP_QUEUE_NAME" envDefault:"clamp_steps_response"`
+	/**
+	System Defaults
+	 */
+	AsyncStepType          string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
+	SyncStepType          string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
 }{}
 
 func init() {

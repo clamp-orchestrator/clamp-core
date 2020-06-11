@@ -19,7 +19,7 @@ type RequestTransform interface {
 type Step struct {
 	Id               int              `json:"id"`
 	Name             string           `json:"name" binding:"required"`
-	Type             string           `json:"type" binding:"required,oneof=SYNC ASYNC"`
+	Type             string           `json:"type"`
 	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP"`
 	Val              Val              `json:"val" binding:"required"`
 	Transform        bool             `json:"transform"`

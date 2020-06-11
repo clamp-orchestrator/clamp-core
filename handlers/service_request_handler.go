@@ -80,13 +80,12 @@ func createServiceRequestHandler() gin.HandlerFunc {
 func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string{
 	var serviceRequestHeaders string
 	for key, value := range c.Request.Header {
-		log.Println("Header Key : ", key, " Header Value : ", value)
 		serviceRequestHeaders += key + ":" + value[0] + ";"
 	}
 	//Setting Request Headers if it exists
 	if serviceRequestHeaders != "" {
-		return serviceRequestHeaders
 		log.Println("Service Request Headers ====>" + serviceRequestHeaders)
+		return serviceRequestHeaders
 	}
 	return serviceRequestHeaders
 }
