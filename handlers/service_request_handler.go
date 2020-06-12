@@ -53,23 +53,23 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		serviceRequestCounter.WithLabelValues(workflowName).Inc()
 		_, err := services.FindWorkflowByName(workflowName)
 
-		requestPayload := readRequestPayload(c)
-
 		if err != nil {
 			errorResponse := CreateErrorResponse(http.StatusBadRequest, "No record found with given workflow name : "+workflowName)
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
+
+		requestPayload := readRequestPayload(c)
 		// Create new service request
 		serviceReq := NewServiceRequest(workflowName, requestPayload)
 		serviceReq, err = services.SaveServiceRequest(serviceReq)
-		requestHeaders := readRequestHeadersAndSetInServiceRequest(c)
-		serviceReq.RequestHeaders = requestHeaders
 		if err != nil {
 			errorResponse := CreateErrorResponse(http.StatusBadRequest, err.Error())
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
+		requestHeaders := readRequestHeadersAndSetInServiceRequest(c)
+		serviceReq.RequestHeaders = requestHeaders
 		services.AddServiceRequestToChannel(serviceReq)
 		response := prepareServiceRequestResponse(serviceReq)
 		serviceRequestHistogram.Observe(time.Since(startTime).Seconds())
@@ -105,10 +105,8 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 		data, _ := ioutil.ReadAll(c.Request.Body)
 		json.Unmarshal(data, &payload)
 		log.Println("Request Body", payload)
-		return payload
-	} else {
-		return nil
 	}
+	return payload
 }
 // Get Service Request By Id godoc
 // @Summary Get service request details by service request id
