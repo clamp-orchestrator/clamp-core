@@ -48,7 +48,9 @@ func fetchAndLoadRequestWithHeadersIfDefined(httpVal HttpVal, request *http.Requ
 		httpHeaders := strings.Split(httpVal.Headers, ";")
 		for _, header := range httpHeaders[:len(httpHeaders)-1] {
 			httpHeader := strings.Split(header, ":")
-			request.Header.Add(httpHeader[0], httpHeader[1])
+			if httpHeader != nil && len(httpHeader) >1 {
+				request.Header.Add(httpHeader[0], httpHeader[1])
+			}
 		}
 	}
 }

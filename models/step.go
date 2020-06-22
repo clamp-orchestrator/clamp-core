@@ -37,7 +37,7 @@ func (step *Step) DidStepExecute() bool {
 	return step.canStepExecute
 }
 
-func (step *Step) preStepExecution(contextPayload map[string]*StepContext, prefix string) (err error) {
+func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefix string) (err error) {
 	step.canStepExecute = true
 	stepRequestResponsePayload := make(map[string]interface{})
 
@@ -76,7 +76,7 @@ func (step *Step) UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(reques
 }
 
 func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ interface{}, _ error) {
-	err := step.preStepExecution(requestContext.StepsContext, prefix)
+	err := step.PreStepExecution(requestContext.StepsContext, prefix)
 	if err != nil {
 		return nil, err
 	}
