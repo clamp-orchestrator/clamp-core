@@ -60,6 +60,8 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 		if !duplicateStepResponse {
 			if !stepResponse.IsStepStatusRecorded() {
 				currentStepStatus.ID = ""
+				resumeStepStartTime := currentStepStatus.CreatedAt
+				currentStepStatus.CreatedAt = time.Time{}
 				//TODO Setting Id empty and also errors validations
 				//TODO subtracting -5.30 since time is stored in GMT in PSql
 				if !stepResponse.Error.IsNil() {
@@ -67,7 +69,7 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 					continue
 				} else {
 					currentStepStatus.Payload.Response = stepResponse.Response
-					recordStepCompletionStatus(currentStepStatus, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
+					recordStepCompletionStatus(currentStepStatus, resumeStepStartTime)
 				}
 			}
 			serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestId)

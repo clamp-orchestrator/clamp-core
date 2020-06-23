@@ -87,7 +87,7 @@ func (p *postgres) FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceReq
 func (p *postgres) FindStepStatusByServiceRequestIdAndStatus(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	var stepStatuses []models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestId, status).Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestId, status).Order("created_at ASC").Select()
 	if err != nil {
 		return stepStatuses, err
 	}
@@ -99,7 +99,7 @@ func (p *postgres) FindStepStatusByServiceRequestIdAndStatus(serviceRequestId uu
 
 func (p *postgres) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestId).Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestId).Order("created_at ASC").Select()
 	var stepStatuses []models.StepsStatus
 	for _, status := range pgStepStatus {
 		stepStatuses = append(stepStatuses, status.ToStepStatus())

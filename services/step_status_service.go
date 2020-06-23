@@ -4,15 +4,31 @@ import (
 	"clamp-core/models"
 	"clamp-core/repository"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
+	"strconv"
 	"time"
 )
 
+var (
+	stepRequestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "create_step_request_handler_counter",
+		Help: "The total number of step requests created",
+	}, []string{"step_name", "time_in_ms","service_request_id"})
+	stepRequestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "create_step_request_handler_histogram",
+		Help: "The total number of step requests created",
+	})
+)
 func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error) {
 	log.Printf("Saving step status : %v", stepStatusReq)
 	stepStatusReq, err := repository.GetDB().SaveStepStatus(stepStatusReq)
 	if err != nil {
 		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
+	}
+	if stepStatusReq.Status == models.STATUS_COMPLETED{
+		stepRequestCounter.WithLabelValues(stepStatusReq.StepName,strconv.FormatInt(stepStatusReq.TotalTimeInMs, 10),stepStatusReq.ServiceRequestId.String()).Inc()
 	}
 	return stepStatusReq, err
 }
