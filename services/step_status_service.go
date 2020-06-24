@@ -7,18 +7,21 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
-	"strconv"
 	"time"
 )
 
 var (
-	stepRequestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "create_step_request_handler_counter",
-		Help: "The total number of step requests created",
-	}, []string{"step_name", "time_in_ms","service_request_id"})
-	stepRequestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
-		Name: "create_step_request_handler_histogram",
-		Help: "The total number of step requests created",
+	serviceRequestStepNameTimeExecutorCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "service_request_with_step_name_time_counter",
+		Help: "The total time taken by a step to execute",
+	}, []string{"service_request_id", "step_name", "step_status"})
+	serviceRequestStepNameCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Name: "service_request_with_step_name_counter",
+		Help: "Steps counter ",
+	}, []string{"service_request_id", "step_name", "step_status"})
+	serviceRequestStepNameTimeExecutorHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "service_request_with_step_name_histogram",
+		Help: "total time taken histogram",
 	})
 )
 func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error) {
@@ -27,9 +30,9 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 	if err != nil {
 		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
-	if stepStatusReq.Status == models.STATUS_COMPLETED{
-		stepRequestCounter.WithLabelValues(stepStatusReq.StepName,strconv.FormatInt(stepStatusReq.TotalTimeInMs, 10),stepStatusReq.ServiceRequestId.String()).Inc()
-	}
+	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestId.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
+	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestId.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Inc()
+	serviceRequestStepNameTimeExecutorHistogram.Observe(float64(stepStatusReq.TotalTimeInMs))
 	return stepStatusReq, err
 }
 
