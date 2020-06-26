@@ -1,0 +1,850 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 15,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 13,
+      "panels": [],
+      "title": "Service Response time",
+      "type": "row"
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 2,
+      "fillGradient": 2,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "hiddenSeries": false,
+      "id": 17,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "max": true,
+        "min": true,
+        "rightSide": true,
+        "show": true,
+        "sort": "avg",
+        "sortDesc": true,
+        "total": false,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "7.0.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "avg by (step_name) (service_request_with_step_name_time_counter{step_status=\"COMPLETED\", step_name!~\"submit motor claim|submit medical claim\"})",
+          "format": "time_series",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{step_name}}",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Average response time by business step",
+      "tooltip": {
+        "shared": false,
+        "sort": 2,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "min": null,
+        "mode": "series",
+        "name": null,
+        "show": false,
+        "values": [
+          "avg"
+        ]
+      },
+      "yaxes": [
+        {
+          "decimals": null,
+          "format": "ms",
+          "label": "Time taken",
+          "logBase": 2,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "s",
+          "label": "Time",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 25,
+      "options": {
+        "displayMode": "basic",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "7.0.0",
+      "targets": [
+        {
+          "expr": "clamp_max(sum by (service_request_id) (service_request_with_step_name_time_counter{step_name!~\"submit motor claim|submit medical claim\"}), 100000)",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "{{service_request_id}}",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Claim lifecycle completion time - Excluding manual review",
+      "transformations": [],
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "datasource": "Prometheus",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "dark-green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 200
+              },
+              {
+                "color": "dark-orange",
+                "value": 700
+              },
+              {
+                "color": "dark-red",
+                "value": 1000
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 9,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.0",
+      "targets": [
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"user authentication\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"user authentication\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "hide": false,
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 3,
+          "legendFormat": "User Authentication",
+          "refId": "B"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"user authorization\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"user authorization\", step_status=\"COMPLETED\"}))",
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "User Authorization",
+          "refId": "C"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"get user details\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"get user details\", step_status=\"COMPLETED\"}))",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Get User Info",
+          "refId": "D"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"create claim\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"create claim\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Create Claim",
+          "refId": "A"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"submit motor claim\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"submit motor claim\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Submit Motor Claim",
+          "refId": "E"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"update approved claim\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"update approved claim\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Approved Claims",
+          "refId": "F"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"process disbursement\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"process disbursement\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Process Disbursement",
+          "refId": "G"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"notify approval status\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"notify approval status\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Approval Notification",
+          "refId": "H"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"notify rejection status\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"notify rejection status\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Rejection Notification",
+          "refId": "I"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"update reject claim\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"update reject claim\", step_status=\"COMPLETED\"}))",
+          "format": "heatmap",
+          "interval": "",
+          "intervalFactor": 10,
+          "legendFormat": "Rejected Claim",
+          "refId": "J"
+        },
+        {
+          "expr": "avg(sum(service_request_with_step_name_time_counter{step_name=\"submit medical claim\", step_status=\"COMPLETED\"})/count(service_request_with_step_name_counter{step_name=\"submit medical claim\", step_status=\"COMPLETED\"}))",
+          "interval": "",
+          "legendFormat": "Submit Medical Claim",
+          "refId": "K"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Average Step Response times",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 11,
+      "panels": [],
+      "title": "Service statistics",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 28
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.0",
+      "targets": [
+        {
+          "expr": "count (count by (service_request_id) (service_request_with_step_name_time_counter))",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Claims Created",
+      "type": "stat"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 28
+      },
+      "id": 19,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.0",
+      "targets": [
+        {
+          "expr": "(count(service_request_with_step_name_counter{step_name=\"submit motor claim\", step_status=\"STARTED\"}))-(count(service_request_with_step_name_counter{step_name=\"update approved claim\", step_status=\"COMPLETED\"})+(count(service_request_with_step_name_counter{step_name=\"update reject claim\", step_status=\"COMPLETED\"})))",
+          "format": "table",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Claims pending review",
+      "type": "stat"
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "fill": 0,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 34
+      },
+      "hiddenSeries": false,
+      "id": 15,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 2,
+      "nullPointMode": "null as zero",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pluginVersion": "7.0.0",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": true,
+      "targets": [
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"submit motor claim\", step_status=\"STARTED\"})",
+          "interval": "",
+          "legendFormat": "Motor Claim - Started",
+          "refId": "E"
+        },
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"submit motor claim\", step_status=\"COMPLETED\"})",
+          "interval": "",
+          "legendFormat": "Motor Claim - Completed",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"submit motor claim\", step_status=\"FAILED\"})",
+          "interval": "",
+          "legendFormat": "Motor Claim - Failed",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"submit medical claim\", step_status=\"STARTED\"})",
+          "interval": "",
+          "legendFormat": "Medical Claim - Started",
+          "refId": "F"
+        },
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"submit medical claim\", step_status=\"COMPLETED\"})",
+          "interval": "",
+          "legendFormat": "Medical Claim - Complete",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"submit medical claim\", step_status=\"FAILED\"})",
+          "interval": "",
+          "legendFormat": "Medical Claim - Failed",
+          "refId": "D"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Claim Type Distribution",
+      "tooltip": {
+        "shared": false,
+        "sort": 1,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "series",
+        "name": null,
+        "show": false,
+        "values": [
+          "max"
+        ]
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": "No of Claim Requests",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": null
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Rejected Claim"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "semi-dark-yellow",
+                      "value": null
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Approved Claim"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "percentage",
+                  "steps": [
+                    {
+                      "color": "semi-dark-green",
+                      "value": null
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 34
+      },
+      "id": 23,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.0",
+      "targets": [
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"update approved claim\",step_status=\"COMPLETED\"})",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Approved Claim",
+          "refId": "E"
+        },
+        {
+          "expr": "sum(service_request_with_step_name_counter{step_name=\"update reject claim\",step_status=\"COMPLETED\"})",
+          "instant": true,
+          "interval": "",
+          "legendFormat": "Rejected Claim",
+          "refId": "B"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Approved & Rejected Claims",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "datasource": null,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "id": 21,
+      "panels": [],
+      "title": "Workflow statistics",
+      "type": "row"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {},
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 41
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "values": false
+        }
+      },
+      "pluginVersion": "7.0.0",
+      "targets": [
+        {
+          "expr": "create_workflow_request_handler_counter",
+          "format": "heatmap",
+          "interval": "",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Total workflows created",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 25,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Clamp-Metrics",
+  "uid": "ihhU4aZMz",
+  "version": 85
+}
