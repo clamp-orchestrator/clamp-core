@@ -18,7 +18,8 @@ func (val KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface
 	syncProducer, err := sarama.NewSyncProducer([]string{val.ConnectionURL}, nil)
 	//asyncProducer, err := sarama.NewAsyncProducer([]string{val.ConnectionURL}, nil)
 	if err != nil {
-		panic(err)
+		log.Printf("%s Kafka Error: %s", prefix, err.Error())
+		return nil, err
 	}
 
 	requestJsonBytes, _ := json.Marshal(requestBody)
