@@ -13,7 +13,7 @@ var ENV = struct {
 
 	*/
 	DBDriver        string `env:"CLAMP_DB_DRIVER" envDefault:"postgres"`
-	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=18.236.212.57:5432 user=clamp dbname=clampdev password=clamppass"`
+	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=54.70.48.149:5432 user=clamp dbname=clampdev password=clamppass"`
 	/**
 	Examples:
 
@@ -23,8 +23,19 @@ var ENV = struct {
 
 	*/
 	QueueDriver        string `env:"CLAMP_QUEUE_DRIVER" envDefault:"amqp"`
-	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@18.236.212.57:5672/"`
+	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@54.70.48.149:5672/"`
 	QueueName          string `env:"CLAMP_QUEUE_NAME" envDefault:"clamp_steps_response"`
+	/**
+	Examples:
+
+	CLAMP_QUEUE_DRIVER     CLAMP_QUEUE_CONNECTION_STR
+	=================     ===============================================================
+	"kafka"            "amqp://guest:guest@localhost:5672/"
+
+	*/
+	KafkaConnectionStr string `env:"CLAMP_KAFKA_CONNECTION_STR" envDefault:"localhost:9092"`
+	KafkaTopicName     string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_topic"`
+	KafkaConsumerTopicName     string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_consumer_topic"`
 	/**
 	System Defaults
 	 */

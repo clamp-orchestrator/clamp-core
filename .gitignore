@@ -1,5 +1,7 @@
+main
 clamp-core
 .idea/
 main
 cp.out
 go.mod
+go.sum

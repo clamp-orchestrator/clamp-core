@@ -12,5 +12,7 @@ func init() {
 	switch config.ENV.QueueDriver {
 	case "amqp":
 		StepResponseListener = &amqpListener{}
+	case "kafka":
+		StepResponseListener = &Consumer{}
 	}
 }

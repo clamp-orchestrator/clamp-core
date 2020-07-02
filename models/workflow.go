@@ -24,15 +24,20 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 		stepCounter++
 		workflowRequest.Steps[i].Id = stepCounter
 		switch workflowRequest.Steps[i].Mode {
-		case "AMQP":
-			{
-				workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
-				workflowRequest.Steps[i].Type = config.ENV.AsyncStepType
-			}
+			case "AMQP":
+				{
+					workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
+					workflowRequest.Steps[i].Type = config.ENV.AsyncStepType
+				}
 			case "HTTP":
-			{
-				workflowRequest.Steps[i].Type = config.ENV.SyncStepType
-			}
+				{
+					workflowRequest.Steps[i].Type = config.ENV.SyncStepType
+				}
+			case "KAFKA":
+				{
+					workflowRequest.Steps[i].Val.(*executors.KafkaVal).ReplyTo = config.ENV.KafkaConsumerTopicName
+					workflowRequest.Steps[i].Type = config.ENV.AsyncStepType
+				}
 		}
 		UpdateStepCounterForEachOfSubSteps(workflowRequest, i, stepCounter)
 	}
