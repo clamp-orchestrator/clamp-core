@@ -20,7 +20,7 @@ type Step struct {
 	Id               int              `json:"id"`
 	Name             string           `json:"name" binding:"required"`
 	Type             string           `json:"type"`
-	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP"`
+	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP KAFKA"`
 	Val              Val              `json:"val" binding:"required"`
 	Transform        bool             `json:"transform"`
 	Enabled          bool             `json:"enabled"`
@@ -59,6 +59,9 @@ func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interf
 		return res, err
 	case "AMQP":
 		res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
+		return res, err
+	case "KAFKA":
+		res, err := step.Val.(*executors.KafkaVal).DoExecute(requestBody, prefix)
 		return res, err
 	}
 	panic("Invalid mode specified")
@@ -157,6 +160,8 @@ func (step *Step) setMode(mode interface{}) error {
 		step.Val = &executors.HttpVal{}
 	case "AMQP":
 		step.Val = &executors.AMQPVal{}
+	case "KAFKA":
+		step.Val = &executors.KafkaVal{}
 	default:
 		return fmt.Errorf("%s is an invalid Mode", mode)
 	}
