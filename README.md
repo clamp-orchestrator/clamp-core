@@ -50,11 +50,11 @@ You can change it to any other port via `-p ANYOTHERPORT:8080`
 Grafana Credentials: admin/admin
 ``
 
-- [Prometheus Dashboard](http://54.190.89.41:9090/graph)
+- [Prometheus Dashboard](http://34.222.166.218:9090/graph)
 
-- [Grafana Clamp Dashboard](http://54.190.89.41:3000/d/Ai6xpCgGz/clamp-dashboard?orgId=1)
+- [Grafana Clamp Dashboard](http://34.222.166.218:3000/d/ihhU4aZMz/clamp-metrics?orgId=1&refresh=5s)
 
-- [Grafana System Dashboard](http://54.190.89.41:3000/d/rYdddlPWk/node-exporter-full?orgId=1&from=now-3h&to=now)
+- [Grafana System Dashboard](http://34.222.166.218:3000/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=5s)
 
 ## Backlogs & Issues
 
