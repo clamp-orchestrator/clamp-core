@@ -42,12 +42,12 @@ You can change it to any other port via `-p ANYOTHERPORT:8080`
 
 ## Documentation
 
-- [Clamp Swagger Documentation](http://54.190.89.41:8080/swagger/index.html)
+- [Clamp Swagger Documentation](http://34.222.166.218:8080/swagger/index.html)
 
 ## Monitoring & Metrics
 
 ``
-Grafana Credentials: admin/admin
+Grafana Credentials: admin/Metrics@2468
 ``
 
 - [Prometheus Dashboard](http://34.222.166.218:9090/graph)
