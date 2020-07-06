@@ -14,6 +14,18 @@ stages:
   - test
   - build
   - integration-test
+  - deploy
+
+pages:
+  stage: deploy
+  script:
+  - mkdir public
+  - cp -r docs/. public
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
 
 test:
   extends: .go-cache
