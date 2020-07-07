@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a sample server Petstore server.",
+        "description": "An opinionated approach to microservices architecture and orchestration",
         "title": "Clamp Swagger API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {},
@@ -265,6 +265,9 @@
                     "type": "object",
                     "$ref": "#/definitions/models.ClampErrorResponse"
                 },
+                "requestHeaders": {
+                    "type": "string"
+                },
                 "response": {
                     "type": "object",
                     "additionalProperties": true
@@ -363,7 +366,6 @@
             "required": [
                 "mode",
                 "name",
-                "type",
                 "val"
             ],
             "properties": {
@@ -383,12 +385,6 @@
                     "type": "string"
                 },
                 "onFailure": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.Step"
-                    }
-                },
-                "onSuccess": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.Step"
