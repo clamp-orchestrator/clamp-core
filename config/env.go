@@ -33,14 +33,15 @@ var ENV = struct {
 	"kafka"            "amqp://guest:guest@localhost:5672/"
 
 	*/
-	KafkaConnectionStr string `env:"CLAMP_KAFKA_CONNECTION_STR" envDefault:"54.70.48.149:9092"`
-	KafkaTopicName     string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_topic"`
-	KafkaConsumerTopicName     string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_consumer_topic"`
+	KafkaConnectionStr     string `env:"CLAMP_KAFKA_CONNECTION_STR" envDefault:"54.70.48.149:9092"`
+	KafkaTopicName         string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_topic"`
+	KafkaConsumerTopicName string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_consumer_topic"`
 	/**
 	System Defaults
-	 */
-	AsyncStepType          string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
-	SyncStepType          string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
+	*/
+	AsyncStepType string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
+	SyncStepType  string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
+	PORT          string `env:"APP_PORT" envDefault:"8080"`
 }{}
 
 func init() {
