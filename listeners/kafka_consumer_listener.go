@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 )
 
 type Consumer struct {
@@ -22,10 +23,10 @@ func (c *Consumer) Listen() {
 		saramConfig.ClientID = "go-kafka-consumer"
 		saramConfig.Consumer.Return.Errors = true
 
-		brokers := []string{config.ENV.KafkaConnectionStr}
+		brokers := config.ENV.KafkaConnectionStr
 
 		// Create new consumer
-		master, err := sarama.NewConsumer(brokers, saramConfig)
+		master, err := sarama.NewConsumer(strings.Split(brokers, ","), saramConfig)
 		if err != nil {
 			panic(err)
 		}
@@ -87,27 +88,28 @@ func consume(topic string, master sarama.Consumer) (chan *sarama.ConsumerMessage
 	errors := make(chan *sarama.ConsumerError)
 
 	partitions, _ := master.Partitions(topic)
-	// this only consumes partition no 1, you would probably want to consume all partitions
-	consumer, err := master.ConsumePartition(topic, partitions[0], sarama.OffsetNewest)
-	if nil != err {
-		fmt.Printf("Topic %v Partitions: %v", topic, partitions)
-		panic(err)
-	}
-	fmt.Println(" Start consuming topic ", topic)
-	go func(topic string, consumer sarama.PartitionConsumer) {
-		for {
-			select {
-			case consumerError := <-consumer.Errors():
-				errors <- consumerError
-				fmt.Println("consumerError: ", consumerError.Err)
-
-			case msg := <-consumer.Messages():
-				consumers <- msg
-				fmt.Println("" +
-					"Got message on topic ", topic, msg.Value)
-			}
+	for _, partition := range partitions {
+		consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetNewest)
+		if nil != err {
+			fmt.Printf("Topic %v Partitions: %v", topic, partition)
+			panic(err)
 		}
-	}(topic, consumer)
+		fmt.Println(" Start consuming topic ", topic)
+		go func(topic string, consumer sarama.PartitionConsumer) {
+			for {
+				select {
+				case consumerError := <-consumer.Errors():
+					errors <- consumerError
+					fmt.Println("consumerError: ", consumerError.Err)
+
+				case msg := <-consumer.Messages():
+					consumers <- msg
+					fmt.Println("" +
+						"Got message on topic ", topic, msg.Value)
+				}
+			}
+		}(topic, consumer)
+	}
 
 	return consumers, errors
 }
