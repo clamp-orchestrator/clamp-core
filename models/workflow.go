@@ -31,7 +31,9 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 				}
 			case "HTTP":
 				{
-					workflowRequest.Steps[i].Type = config.ENV.SyncStepType
+					if workflowRequest.Steps[i].Type == "" {
+						workflowRequest.Steps[i].Type = config.ENV.SyncStepType
+					}
 				}
 			case "KAFKA":
 				{
