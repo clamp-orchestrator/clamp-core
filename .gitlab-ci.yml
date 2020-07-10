@@ -51,7 +51,7 @@ build:
 build-docker:
   extends: .go-cache
   tags:
-    - clamp-demo
+    - shell-clamp
   stage: build-docker
   before_script:
     - docker info
@@ -65,7 +65,7 @@ build-docker:
 
 deploy:
   tags:
-    - clamp-demo
+    - shell-clamp
   stage: deploy
   dependencies:
     - build-docker
