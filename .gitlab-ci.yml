@@ -50,6 +50,8 @@ build:
 
 build-docker:
   extends: .go-cache
+  tags:
+    - clamp-runner
   stage: build-docker
   before_script:
     - docker info
