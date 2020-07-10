@@ -42,7 +42,7 @@ var ENV = struct {
 	*/
 	AsyncStepType string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
 	SyncStepType  string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
-	PORT          string `env:"APP_PORT" envDefault:"8080"`
+	PORT          string `env:"APP_PORT" envDefault:"8081"`
 }{}
 
 func init() {
