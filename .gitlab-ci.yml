@@ -71,7 +71,6 @@ deploy:
     - build-docker
   script:
     - rm -rf /home/ubuntu/clamp/*
-    - tar -xf pravesh-client-1.0.0.tar.gz -C /home/ubuntu/clamp/
     - docker login registry.gitlab.com -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
     - docker container stop clamp || docker container rm clamp || true
     - docker system prune -f -a
