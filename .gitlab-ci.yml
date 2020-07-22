@@ -75,8 +75,6 @@ deploy:
     - docker container stop clamp || docker container rm clamp || true
     - docker system prune -f -a
     - docker pull registry.gitlab.com/sahajsoft/clamp/clamp-core:$CI_COMMIT_SHA
-    #- sudo rm /home/ubuntu/nginx/nginx.conf || true
-    #- sudo cp nginx_demo_conf/nginx.conf /home/ubuntu/nginx/
     - docker run --name=clamp -d --restart always -p0.0.0.0:8642:8080 registry.gitlab.com/sahajsoft/clamp/clamp-core:$CI_COMMIT_SHA
     - docker tag registry.gitlab.com/sahajsoft/clamp/clamp-core:$CI_COMMIT_SHA registry.gitlab.com/sahajsoft/clamp/clamp-core:demo-$CI_COMMIT_SHA
     - docker push registry.gitlab.com/sahajsoft/clamp/clamp-core:demo-$CI_COMMIT_SHA
