@@ -35,6 +35,7 @@ test:
     - go test clamp-core/executors clamp-core/models clamp-core/services
   only:
     - merge_requests
+    - master
 
 build:
   extends: .go-cache
@@ -61,6 +62,7 @@ build-docker:
     - docker system prune -f -a
   only:
     - ci-cd
+    - master
 
 deploy:
   tags:
@@ -79,6 +81,7 @@ deploy:
     - docker push registry.gitlab.com/sahajsoft/clamp/clamp-core:demo-$CI_COMMIT_SHA
   only:
     - ci-cd
+    - master
 
 
 integration-test:
