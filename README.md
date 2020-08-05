@@ -11,7 +11,7 @@ The clamp core that can be deployed as a binary and does service orchestration
 5. `Postgres DB` and `RabbitMq` can be configured in `config/env.go` file
 6. Presently we are using common postgres 
    ```
-   hostname : 54.70.48.149:5432 
+   hostname : 34.216.32.148:5432 
    user : clamp 
    dbname : clampdev
    password : clamppass
