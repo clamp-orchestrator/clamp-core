@@ -35,7 +35,6 @@ test:
     - go test clamp-core/executors clamp-core/models clamp-core/services
   only:
     - merge_requests
-    - master
 
 build:
   extends: .go-cache
