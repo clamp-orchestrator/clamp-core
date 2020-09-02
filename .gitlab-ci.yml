@@ -29,7 +29,8 @@ pages:
   - master
 
 test:
-  extends: .go-cache
+  tags:
+    - shell-clamp
   stage: test
   script:
     - go test clamp-core/executors clamp-core/models clamp-core/services
@@ -38,7 +39,8 @@ test:
     - master
 
 build:
-  extends: .go-cache
+  tags:
+    - shell-clamp
   stage: build
   script:
     - go build
@@ -49,7 +51,6 @@ build:
     - master
 
 build-docker:
-  extends: .go-cache
   tags:
     - shell-clamp
   stage: build-docker
@@ -85,7 +86,8 @@ deploy:
 
 
 integration-test:
-  extends: .go-cache
+  tags:
+    - shell-clamp
   stage: integration-test
   script:
     - go test clamp-core/handlers
