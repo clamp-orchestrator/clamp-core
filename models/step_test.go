@@ -11,9 +11,9 @@ import (
 
 func prepareStepRequestResponse() map[string]*StepContext {
 	stepRequestResponse := map[string]*StepContext{"dummyStep": {
-		Request:  map[string]interface{}{"user_type": "admin"},
-		Response: nil,
-		StepSkipped:false,
+		Request:     map[string]interface{}{"user_type": "admin"},
+		Response:    nil,
+		StepSkipped: false,
 	}}
 	return stepRequestResponse
 }
@@ -60,7 +60,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: "SYNC",
 				Val: &executors.HttpVal{
 					Method: "POST",
-					Url:    "http://34.216.32.148:3333/api/v1/orders",
+					Url:    "http://172.31.0.152:3333/api/v1/orders",
 				},
 				Transform: false,
 				Enabled:   true,
@@ -88,7 +88,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: "SYNC",
 				Val: &executors.HttpVal{
 					Method: "POST",
-					Url:    "http://34.216.32.148:3333/api/v1/orders",
+					Url:    "http://172.31.0.152:3333/api/v1/orders",
 				},
 				Transform: false,
 				Enabled:   true,
@@ -153,7 +153,7 @@ func TestStep_DoTransform(t *testing.T) {
 		RequestTransform RequestTransform
 	}
 	type args struct {
-		reqCtx RequestContext
+		reqCtx      RequestContext
 		requestBody map[string]interface{}
 		prefix      string
 	}
@@ -183,10 +183,10 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
-				reqCtx : RequestContext{
+				reqCtx: RequestContext{
 					ServiceRequestId: uuid.UUID{},
 					WorkflowName:     "",
-					StepsContext:     map[string]*StepContext{"dummyStep": {
+					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 						Response: nil,
 					}},
@@ -217,10 +217,10 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
-				reqCtx : RequestContext{
+				reqCtx: RequestContext{
 					ServiceRequestId: uuid.UUID{},
 					WorkflowName:     "",
-					StepsContext:     map[string]*StepContext{"dummyStep": {
+					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 						Response: map[string]interface{}{},
 					}},
@@ -230,11 +230,11 @@ func TestStep_DoTransform(t *testing.T) {
 			},
 			expectedTransformation: map[string]interface{}{
 				"dummyStep": map[string]interface{}{
-					"request":map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
-					"response":map[string]interface{}{},
+					"request":  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+					"response": map[string]interface{}{},
 				},
 			},
-			wantErr:                false,
+			wantErr: false,
 		},
 		{
 			name: "ShouldNotTransformRequestWhenTransformIsDisabled",
@@ -255,23 +255,23 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
-				reqCtx : RequestContext{
+				reqCtx: RequestContext{
 					ServiceRequestId: uuid.UUID{},
 					WorkflowName:     "",
-					StepsContext:     map[string]*StepContext{"dummyStep": {
+					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 						Response: map[string]interface{}{},
 					}},
 				},
-				prefix:      "",
+				prefix: "",
 			},
 			expectedTransformation: map[string]interface{}{
 				"dummyStep": map[string]interface{}{
-					"request":map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
-					"response":map[string]interface{}{},
+					"request":  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
+					"response": map[string]interface{}{},
 				},
 			},
-			wantErr:                false,
+			wantErr: false,
 		},
 		{
 			name: "ShouldNotTransformRequestWhenTransformationFailsDueToSomeError",
@@ -292,10 +292,10 @@ func TestStep_DoTransform(t *testing.T) {
 				Enabled:   true,
 			},
 			args: args{
-				reqCtx : RequestContext{
+				reqCtx: RequestContext{
 					ServiceRequestId: uuid.UUID{},
 					WorkflowName:     "",
-					StepsContext:     map[string]*StepContext{"dummyStep": {
+					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
 						Response: map[string]interface{}{},
 					}},

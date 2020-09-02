@@ -88,8 +88,8 @@ func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string
 	w := httptest.NewRecorder()
 	marshal, _ := json.Marshal(prepareServiceRequestPayload())
 	req, _ := http.NewRequest("POST", "/serviceRequest/"+wfName, bytes.NewReader(marshal))
-	req.Header.Add("Content-Type","application/json")
-	req.Header.Add("token","abc")
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("token", "abc")
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -115,7 +115,7 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 		Enabled:   false,
 		Val: &executors.HttpVal{
 			Method:  "POST",
-			Url:     "http://34.216.32.148:3333/api/v1/login",
+			Url:     "http://172.31.0.152:3333/api/v1/login",
 			Headers: "",
 		},
 	}

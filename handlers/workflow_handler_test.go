@@ -35,7 +35,7 @@ func setUpWorkflowRequest() models.Workflow {
 	steps := make([]models.Step, 1)
 	httpVal := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http: //34.216.32.148:3333/api/v1/user",
+		Url:     "http: //172.31.0.152:3333/api/v1/user",
 		Headers: "",
 	}
 	steps[0] = models.Step{
@@ -164,7 +164,6 @@ func TestShouldReturnCreatedWorkflowSuccessfullyByWorkflowNameRoute(t *testing.T
 	assert.Equal(t, workflowName, jsonResp.Name, fmt.Sprintf("The expected name was %s but we got %s", workflowReg.Name, jsonResp.Name))
 	assert.NotNil(t, jsonResp.Steps)
 }
-
 
 func TestShouldFailToReturnWorkflowIfInvalidWorkflowNameIsProvidedInTheRoute(t *testing.T) {
 	router := setupRouter()

@@ -40,7 +40,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://34.216.32.148:3333/api/v1/login",
+				Url:     "http://172.31.0.152:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -131,7 +131,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://34.216.32.148:3333/api/v1/login",
+				Url:     "http://172.31.0.152:3333/api/v1/login",
 				Headers: "",
 			},
 		}
