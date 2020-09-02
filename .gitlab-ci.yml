@@ -6,10 +6,10 @@ image: golang:1.13.5
   variables:
     GOPATH: $CI_PROJECT_DIR/../.go
   before_script:
-    - mkdir -p .go
+    - mkdir -p ../.go
   cache:
     paths:
-      - .go/pkg/mod/
+      - ../.go/pkg/mod/
 
 
 stages:
