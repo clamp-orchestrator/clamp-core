@@ -4,7 +4,7 @@ image: golang:1.13.5
   tags:
     - shell-clamp
   variables:
-    GOPATH: $CI_PROJECT_DIR/.go
+    GOPATH: $CI_PROJECT_DIR/../.go
   before_script:
     - mkdir -p .go
   cache:
