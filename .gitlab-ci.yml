@@ -1,15 +1,13 @@
 image: golang:1.13.5
 
 .go-cache:
-  tags:
-    - shell-clamp
   variables:
-    GOPATH: $CI_PROJECT_DIR/../.go
+    GOPATH: $CI_PROJECT_DIR/.go
   before_script:
-    - mkdir -p ../.go
+    - mkdir -p .go
   cache:
     paths:
-      - ../.go/pkg/mod/
+      - .go/pkg/mod/
 
 
 stages:
@@ -32,8 +30,6 @@ pages:
 
 test:
   extends: .go-cache
-  tags:
-    - shell-clamp
   stage: test
   script:
     - go test clamp-core/executors clamp-core/models clamp-core/services
@@ -43,8 +39,6 @@ test:
 
 build:
   extends: .go-cache
-  tags:
-    - shell-clamp
   stage: build
   script:
     - go build
@@ -91,8 +85,6 @@ deploy:
 
 
 integration-test:
-  tags:
-    - shell-clamp
   extends: .go-cache
   stage: integration-test
   script:
