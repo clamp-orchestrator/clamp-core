@@ -30,6 +30,8 @@ pages:
 
 test:
   extends: .go-cache
+  tags:
+    - shell-clamp
   stage: test
   script:
     - go test clamp-core/executors clamp-core/models clamp-core/services
@@ -39,6 +41,8 @@ test:
 
 build:
   extends: .go-cache
+  tags:
+    - shell-clamp
   stage: build
   script:
     - go build
@@ -85,6 +89,8 @@ deploy:
 
 
 integration-test:
+  tags:
+    - shell-clamp
   extends: .go-cache
   stage: integration-test
   script:
