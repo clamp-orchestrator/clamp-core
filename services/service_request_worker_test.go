@@ -24,7 +24,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://172.31.0.152:3333/api/v1/login",
+				Url:     "http://18.237.132.65:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -80,7 +80,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 			},
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://172.31.0.152:3333/api/v1/login",
+				Url:     "http://18.237.132.65:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -134,7 +134,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 			When:      "skipStep.request.id1 == 'val3'",
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://172.31.0.152:3333/api/v1/login",
+				Url:     "http://18.237.132.65:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -189,7 +189,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://172.31.0.152:3333/api/v1/login",
+				Url:     "http://18.237.132.65:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -202,7 +202,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://172.31.0.152:3333/api/v1/login",
+				Url:     "http://18.237.132.65:3333/api/v1/login",
 				Headers: "",
 			},
 		}
