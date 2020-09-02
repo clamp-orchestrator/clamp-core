@@ -73,7 +73,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			},
 			want:       map[string]interface{}{"id": "1234", "name": "ABC", "email": "abc@sahaj.com", "org": "sahaj"},
 			wantErr:    true,
-			wantErrMsg: "Get \"http://localhost:3333/api/v1/user\": dial tcp 127.0.0.1:3333: connect: connection refused",
+			wantErrMsg: "Get http://localhost:3333/api/v1/user: dial tcp [::1]:3333: connect: connection refused",
 		},
 	}
 	for _, tt := range tests {
