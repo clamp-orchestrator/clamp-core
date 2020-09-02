@@ -4,6 +4,7 @@ import (
 	"clamp-core/config"
 	"testing"
 )
+
 func TestKafkaVal_DoExecute(t *testing.T) {
 	type fields struct {
 		ConnectionURL string
@@ -24,7 +25,7 @@ func TestKafkaVal_DoExecute(t *testing.T) {
 		{
 			name: "should return error if connection fails",
 			fields: fields{
-				ConnectionURL: "34.216.32.148:19092/",
+				ConnectionURL: "172.31.0.152:19092/",
 				TopicName:     "topic_test",
 				ContentType:   "text/plain",
 			},
