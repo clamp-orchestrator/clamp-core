@@ -23,7 +23,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			name: "TestShouldExecuteHTTPStep",
 			fields: HttpVal{
 				Method:  "GET",
-				Url:     "http://18.237.132.65:3333/api/v1/user",
+				Url:     "http://54.190.25.178:3333/api/v1/user",
 				Headers: "",
 			},
 			args: args{
@@ -37,7 +37,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			name: "TestShouldExecuteHTTPStepWithHeaders",
 			fields: HttpVal{
 				Method:  "GET",
-				Url:     "http://18.237.132.65:3333/api/v1/user",
+				Url:     "http://54.190.25.178:3333/api/v1/user",
 				Headers: "Content-Type:application/json;token:abc",
 			},
 			args: args{
@@ -51,7 +51,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			name: "TestShouldThrowErrorWhileExecutingStep",
 			fields: HttpVal{
 				Method:  "GET",
-				Url:     "http://18.237.132.65:3333/api/v1/asd",
+				Url:     "http://54.190.25.178:3333/api/v1/asd",
 				Headers: "",
 			},
 			args: args{

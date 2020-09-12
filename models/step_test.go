@@ -60,7 +60,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: "SYNC",
 				Val: &executors.HttpVal{
 					Method: "POST",
-					Url:    "http://18.237.132.65:3333/api/v1/orders",
+					Url:    "http://54.190.25.178:3333/api/v1/orders",
 				},
 				Transform: false,
 				Enabled:   true,
@@ -88,7 +88,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: "SYNC",
 				Val: &executors.HttpVal{
 					Method: "POST",
-					Url:    "http://18.237.132.65:3333/api/v1/orders",
+					Url:    "http://54.190.25.178:3333/api/v1/orders",
 				},
 				Transform: false,
 				Enabled:   true,
