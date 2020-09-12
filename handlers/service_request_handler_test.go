@@ -115,7 +115,7 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 		Enabled:   false,
 		Val: &executors.HttpVal{
 			Method:  "POST",
-			Url:     "http://18.237.132.65:3333/api/v1/login",
+			Url:     "http://54.190.25.178:3333/api/v1/login",
 			Headers: "",
 		},
 	}
