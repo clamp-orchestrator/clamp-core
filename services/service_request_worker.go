@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
 	"net/http"
 	"sync"
@@ -16,6 +18,16 @@ import (
 const ServiceRequestChannelSize = 1000
 const ServiceRequestWorkersSize = 100
 
+var (
+	completedServiceRequestCounter = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "completed_service_request_handler_counter",
+		Help: "The total number of service requests completed",
+	})
+	failedServiceRequestCounter = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "failed_service_request_handler_counter",
+		Help: "The total number of service requests failed",
+	})
+)
 var (
 	serviceRequestChannel chan models.ServiceRequest
 	singletonOnce         sync.Once
@@ -58,8 +70,11 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 		if serviceReq.CurrentStepId == 0 || serviceReq.CurrentStepId != lastStep.Id {
 			status := executeWorkflowSteps(workflow, prefix, serviceReq)
 			if status == models.STATUS_COMPLETED {
+				completedServiceRequestCounter.Inc()
 				elapsed := time.Since(start)
 				log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
+			} else if status == models.STATUS_FAILED {
+				failedServiceRequestCounter.Inc()
 			}
 		} else {
 			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
@@ -140,7 +155,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 
 	resp, err := step.DoExecute(requestContext, prefix)
 	if err != nil {
-		if step.OnFailure !=nil{
+		if step.OnFailure != nil {
 			for _, stepOnFailure := range step.OnFailure {
 				ExecuteWorkflowStep(stepOnFailure, requestContext, prefix)
 			}
