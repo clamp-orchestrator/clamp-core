@@ -162,8 +162,6 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		}
 		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
-		errFmt := fmt.Errorf("%s Failed executing step %s, %s \n", prefix, stepStatus.StepName, err.Error())
-		panic(errFmt)
 		return *clampErrorResponse
 	} else if step.DidStepExecute() && resp != nil && step.Type == "SYNC" {
 		log.Printf("%s Step response received: %s", prefix, resp.(string))
