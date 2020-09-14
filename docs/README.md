@@ -30,7 +30,7 @@ Clamp ships as a lightweight binary that can simply be dropped into your existin
 ### Installation
 #### Building from source
 - Install GoLang on your system, instructions for various platforms can be found [here](https://golang.org/doc/install).
-- Clone the Clamp repository.
+- Clone the [Clamp repository](https://gitlab.com/sahajsoft/clamp/clamp-core).
 - `cd` into the project.
 - Configure PostgreSQL, Kafka and RabbitMQ in *config/env.go* with your settings.
 - Run `go build main.go` to build the project.
