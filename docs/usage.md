@@ -211,7 +211,8 @@ There's some basic metadata that needs to be defined for a step.
         ```
         "val": {
                 "method": "POST",
-                "url": "https://run.mocky.io/v3/f4ee8258-49b1-4579-a8c2-5881a0c65206"
+                "url": "https://run.mocky.io/v3/f4ee8258-49b1-4579-a8c2-5881a0c65206",
+                "headers": "Content-Type:application/json"
             }
         ```
     - `AMQP`
@@ -234,9 +235,9 @@ There's some basic metadata that needs to be defined for a step.
 - `Context object` can be used in both `when` and `requestTransform`. The context object can be accessed by directly specifying the `step_name` and then specify whether `request` or `response` and specify the key to access it. Ex:`step_name.response.key`. It can be nested to any level like `step_name.response.key1.key1a`
 
 #### View Workflow
-Once a workflow is defined, you can view the structure and metadata of the workflow by performing a GET request to the `/workflow/{name}` endpoint for Clamp. For example, if your workflow was called `mtcReq` and Clamp was running on `localhost:8080`, you would make the following cURL request:
+Once a workflow is defined, you can view the structure and metadata of the workflow by performing a GET request to the `/workflow/{name}` endpoint for Clamp. For example, if your workflow was called `mtcReq` and Clamp was running on `http://54.149.76.62:8642`, you would make the following cURL request:
 ```
-curl http://localhost:8080/workflow/process_claim
+curl http://54.149.76.62:8642/workflow/process_claim
 ```
 This should return a response as below:
 <details>
@@ -397,7 +398,7 @@ The above request will trigger the `process_claim` workflow with the following i
 #### Check Status
 The status of a service request can be polled by making a GET request on the `/serviceRequest/{id}` endpoint, where the `{id}` parameter is the service request ID obtained during creation. Hence, the following request:
 ```
-curl http://localhost:8080/serviceRequest/6102fa39-d209-4b98-8c75-d9f2ef9aa791
+curl http://54.149.76.62:8642/serviceRequest/6102fa39-d209-4b98-8c75-d9f2ef9aa791
 ```
 should respond back with the status of service request "6102fa39-d209-4b98-8c75-d9f2ef9aa791", which would look as follows:
 ```
@@ -514,4 +515,3 @@ should respond back with the status of service request "6102fa39-d209-4b98-8c75-
 - In each step in `steps` the `status` defines the state of each step it went through. The possible values are `STARTED` / `COMPLETED` / `SKIPPED` / `FAILED`
 - The step status will be `SKIPPED` if the `when` condition is not met.
 
- 
