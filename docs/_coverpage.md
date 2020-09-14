@@ -1,4 +1,4 @@
-# **clamp**
+# **CLAMP**
 An opinionated approach to microservices orchestration ([more](/?id=introduction))
 
 [install](/?id=getting-clamp)
