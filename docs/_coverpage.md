@@ -1,6 +1,6 @@
 # **CLAMP**
-An opinionated approach to microservices orchestration ([more](/?id=introduction))
+An opinionated approach to microservices orchestration
 
-[install](/?id=getting-clamp)
-[get started](/?id=introduction)
-[contribute](https://gitlab.com/sahajsoft/clamp/clamp-core)
+[Install](/?id=getting-clamp)
+[Get Started](/?id=introduction)
+[Contribute](https://gitlab.com/sahajsoft/clamp/clamp-core)
