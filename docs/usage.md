@@ -525,3 +525,44 @@ should respond back with the status of service request "6102fa39-d209-4b98-8c75-
 - In each step in `steps` the `status` defines the state of each step it went through. The possible values are `STARTED` / `COMPLETED` / `SKIPPED` / `FAILED`
 - The step status will be `SKIPPED` if the `when` condition is not met.
 
+#### Send Response
+When an async step gets executed, the response for the step needs to be sent explicitly to clamp. The response can be sent back using an HTTP API or through AMQP / Kafka queue. 
+- HTTP
+
+    By making a POST request on `/stepResponse`, we can send response to Clamp. The response can be sent in below format.
+    
+    **Request**:
+    ```
+    curl -X POST 'http://54.149.76.62:8642/stepResponse' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+                    "serviceRequestId": "{{serviceRequestId}}",
+                    "stepId": 5,
+                    "response": {
+                        "claimId": "90990908324",
+                        ...
+                        "notes": "Inspection not required approved based on documentation. CASHLESS"
+                    }
+                }
+    }'
+    ```
+    The above request will trigger the workflow to resume execution.
+    
+    - When an async step gets executed, **clamp** sends the current id of the service request in the request body. The downstream service needs to send back the same **serviceRequestId** back in the response to continue the same service request. 
+    - The `stepId` is the next step id which needs to be executed. The value of this will also be sent as request to downstream services.
+    - The `response` field should contain the respective json response that needs to be sent back.
+    
+- AMQO / KAFKA
+
+    The reponse can be sent back through AMQP / KAFKA. Clamp listens to specific topic in both AMQP / KAFKA. `clamp_steps_response` is the topic name to which the below response can be sent.
+    ```
+  {
+      "serviceRequestId": "{{serviceRequestId}}",
+      "stepId": 5,
+      "response": {
+          "claimId": "90990908324",
+          ...
+          "notes": "Inspection not required approved based on documentation. CASHLESS"
+      }
+  }
+  ```
