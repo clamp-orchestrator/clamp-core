@@ -29,9 +29,8 @@ If you're someone who likes to get their hands dirty immediately, maybe you woul
 ### Workflows
 #### Creation
 Workflows are created in Clamp by making a **POST** request to its **`/workflow`** API endpoint. 
-##### Here's a sample payload:
 <details>
-  <summary>Click here to expand</summary>
+  <summary> Here's a sample payload: (Click to expand)</summary>
   
     ```
     {
@@ -250,9 +249,9 @@ Once a workflow is defined, you can view the structure and metadata of the workf
 ```
 curl http://54.149.76.62:8642/workflow/process_claim
 ```
-This should return a response as below:
+
 <details>
-  <summary>Click here to expand</summary>
+  <summary>This should return a response as below:(Click here to expand)</summary>
   
 ```
 {
