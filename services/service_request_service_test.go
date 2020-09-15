@@ -44,7 +44,7 @@ func TestShouldFailToSaveServiceRequestAndThrowError(t *testing.T) {
 	}
 	serviceReq.WorkflowName = ""
 	request, err := SaveServiceRequest(serviceReq)
-	assert.Equal(t, models.ServiceRequest{},request)
+	assert.Equal(t, models.ServiceRequest{}, request)
 	assert.NotNil(t, err)
 	assert.Equal(t, "insertion failed", err.Error())
 }
@@ -70,4 +70,16 @@ func TestFindByID(t *testing.T) {
 	_, err = FindServiceRequestByID(serviceReq.ID)
 	assert.NotNil(t, err)
 	assert.Equal(t, "select query failed", err.Error())
+}
+
+func TestFindServiceRequestsByWorkflowName(t *testing.T) {
+	serviceReq := models.ServiceRequest{
+		ID: uuid.UUID{},
+	}
+	findServiceRequestsByWorkflowName = func(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+		return []models.ServiceRequest{serviceReq}, nil
+	}
+	resp, err := findServiceRequestsByWorkflowName("test", 1, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(resp))
 }

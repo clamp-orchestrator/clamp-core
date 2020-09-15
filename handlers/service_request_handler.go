@@ -4,6 +4,7 @@ import (
 	. "clamp-core/models"
 	"clamp-core/services"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -32,6 +34,7 @@ var (
 		Help: "The total number of service requests enquired",
 	})
 )
+
 // Create Service Request godoc
 // @Summary Create a service request
 // @Description Create a service request and get service request id
@@ -77,7 +80,7 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	}
 }
 
-func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string{
+func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string {
 	var serviceRequestHeaders string
 	for key, value := range c.Request.Header {
 		serviceRequestHeaders += key + ":" + value[0] + ";"
@@ -108,6 +111,7 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 	}
 	return payload
 }
+
 // Get Service Request By Id godoc
 // @Summary Get service request details by service request id
 // @Description Get service request by service request id
@@ -137,4 +141,40 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 		serviceRequestByIdHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, stepsStatusResponse)
 	}
+}
+
+func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		log.Println("Get service request by workflow name handler")
+		pageSizeStr := c.Query("pageSize")
+		pageNumberStr := c.Query("pageNumber")
+		if pageSizeStr == "" || pageNumberStr == "" {
+			err := errors.New("page number or page size is not been defined")
+			prepareErrorResponse(err, c)
+			return
+		}
+		pageNumber, pageNumberErr := strconv.Atoi(pageNumberStr)
+		pageSize, pageSizeErr := strconv.Atoi(pageSizeStr)
+		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 0 || pageNumber < 0 {
+			err := errors.New("page number or page size is not in proper format")
+			prepareErrorResponse(err, c)
+			return
+		}
+		workflowName := c.Param("workflowName")
+		serviceRequests, err := services.FindServiceRequestByWorkflowName(workflowName, pageNumber, pageSize)
+		if err != nil {
+			prepareErrorResponse(err, c)
+			return
+		}
+		c.JSON(http.StatusOK, prepareServiceRequestsResponse(serviceRequests, pageNumber, pageSize))
+	}
+}
+
+func prepareServiceRequestsResponse(serviceRequests []ServiceRequest, pageNumber int, pageSize int) ServiceRequestPageResponse {
+	response := ServiceRequestPageResponse{
+		ServiceRequests: serviceRequests,
+		PageNumber:      pageNumber,
+		PageSize:        pageSize,
+	}
+	return response
 }

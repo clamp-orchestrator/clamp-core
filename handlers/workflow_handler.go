@@ -143,8 +143,8 @@ func getWorkflows() gin.HandlerFunc {
 	}
 }
 
-func prepareWorkflowResponse(workflows []models.Workflow, pageNumber int, pageSize int) models.WorkflowsResponse {
-	response := models.WorkflowsResponse{
+func prepareWorkflowResponse(workflows []models.Workflow, pageNumber int, pageSize int) models.WorkflowsPageResponse {
+	response := models.WorkflowsPageResponse{
 		Workflows:  workflows,
 		PageNumber: pageNumber,
 		PageSize:   pageSize,

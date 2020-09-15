@@ -164,3 +164,52 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 		services.SaveWorkflow(workflow)
 	}
 }
+
+func TestShouldFindServiceRequestByWorkflowNameByPage(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ServiceRequestPageResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.NotNil(t, jsonResp.ServiceRequests)
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotPassedInServiceRequestByWorkflowName(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInServiceRequestByWorkflowName(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=-1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
+}
