@@ -44,5 +44,7 @@ Clamp runs on port 8080 by default, and exposes Swagger UI on `<your_url>/swagge
 - Run `docker build -t clamp-docker .` to build the image.
 - Use `docker run --name=clamp-docker -d -p 9090:8080 clamp-docker` to spawn a container for Clamp.
 
+To know more about how to configure PostgreSQL, Kafka and RabbitMQ, you can check [usage section](/usage?id=pre-requisites)
+
 ## Contributing
 We are working on making it easy to contribute to Clamp. Please get in touch with [Lohith](mailto:lohithkm@sahaj.ai), [Tejash](mailto:tejashl@sahaj.ai), or [Dantin](mailto:dantink@sahaj.ai) for more information.
