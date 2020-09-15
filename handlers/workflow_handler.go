@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -34,7 +35,7 @@ var (
 
 type CustomError struct {
 	StatusCode int
-	Err error
+	Err        error
 }
 
 func (r *CustomError) Error() string {
@@ -47,6 +48,7 @@ func ErrorRequest() error {
 		Err:        errors.New("unavailable"),
 	}
 }
+
 // Create a Workflow godoc
 // @Summary Create workflow for execution
 // @Description Create workflow for sequential execution
@@ -84,9 +86,10 @@ func createWorkflowHandler() gin.HandlerFunc {
 }
 
 func prepareErrorResponse(err error, c *gin.Context) {
-		errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-		c.JSON(http.StatusBadRequest, errorResponse)
+	errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
+	c.JSON(http.StatusBadRequest, errorResponse)
 }
+
 // Fetch workflow details By Workflow Name godoc
 // @Summary Fetch workflow details By Workflow Name
 // @Description Fetch workflow details By Workflow Name
@@ -107,10 +110,44 @@ func fetchWorkflowBasedOnWorkflowName() gin.HandlerFunc {
 		//TODO - handle error scenario. Currently it is always 200 ok
 		workflowByWokflowNameHistogram.Observe(time.Since(startTime).Seconds())
 		if err != nil {
-			err := errors.New("No record exists with workflow name : " +workflowName)
+			err := errors.New("No record exists with workflow name : " + workflowName)
 			prepareErrorResponse(err, c)
 			return
 		}
 		c.JSON(http.StatusOK, result)
 	}
+}
+
+func getWorkflows() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		pageSizeStr := c.Query("pageSize")
+		pageNumberStr := c.Query("pageNumber")
+		if pageSizeStr == "" || pageNumberStr == "" {
+			err := errors.New("page number or page size is not been defined")
+			prepareErrorResponse(err, c)
+			return
+		}
+		pageNumber, pageNumberErr := strconv.Atoi(pageNumberStr)
+		pageSize, pageSizeErr := strconv.Atoi(pageSizeStr)
+		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 0 || pageNumber < 0 {
+			err := errors.New("page number or page size is not in proper format")
+			prepareErrorResponse(err, c)
+			return
+		}
+		workflows, err := services.GetWorkflows(pageNumber, pageSize)
+		if err != nil {
+			prepareErrorResponse(err, c)
+			return
+		}
+		c.JSON(http.StatusOK, prepareWorkflowResponse(workflows, pageNumber, pageSize))
+	}
+}
+
+func prepareWorkflowResponse(workflows []models.Workflow, pageNumber int, pageSize int) models.WorkflowsResponse {
+	response := models.WorkflowsResponse{
+		Workflows:  workflows,
+		PageNumber: pageNumber,
+		PageSize:   pageSize,
+	}
+	return response
 }

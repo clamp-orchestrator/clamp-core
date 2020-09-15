@@ -62,3 +62,14 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 	_, err = FindWorkflowByName(workflow.Name)
 	assert.NotNil(t, err)
 }
+
+func TestGetWorkflows(t *testing.T) {
+	workflow := prepareWorkflow()
+
+	getWorkflowsMock = func(pageNumber int, pageSize int) ([]models.Workflow, error) {
+		return []models.Workflow{workflow}, nil
+	}
+	resp, err := GetWorkflows(0, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(resp))
+}
