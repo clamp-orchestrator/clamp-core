@@ -35,7 +35,7 @@ var ENV = struct {
 	*/
 	KafkaDriver            string `env:"CLAMP_KAFKA_DRIVER" envDefault:"kafka"`
 	KafkaConnectionStr     string `env:"CLAMP_KAFKA_CONNECTION_STR" envDefault:"54.190.25.178:9092"`
-	KafkaTopicName         string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_topic"`
+	KafkaTopicName         string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_steps_response"`
 	KafkaConsumerTopicName string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_consumer_topic"`
 	/**
 	System Defaults
