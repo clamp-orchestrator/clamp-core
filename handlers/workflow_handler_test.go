@@ -210,7 +210,7 @@ func TestShouldGetAllWorkflowsByPage(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
-	var jsonResp models.WorkflowsResponse
+	var jsonResp models.WorkflowsPageResponse
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
