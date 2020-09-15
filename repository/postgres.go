@@ -142,6 +142,19 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int) ([]models.Workflow, error) {
+	var pgWorkflows []models.PGWorkflow
+	err := p.getDb().Model(&pgWorkflows).
+		Limit(pageSize).
+		Offset(pageNumber).
+		Select()
+	var workflows []models.Workflow
+	for _, pgWorkflow := range pgWorkflows {
+		workflows = append(workflows, pgWorkflow.ToWorkflow())
+	}
+	return workflows, err
+}
+
 func (p *postgres) getDb() *pg.DB {
 	singletonOnce.Do(func() {
 		log.Println("Connecting to DB")

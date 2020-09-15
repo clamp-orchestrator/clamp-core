@@ -24,6 +24,7 @@ func setupRouter() *gin.Engine {
 	r.GET("/workflow/:workflow", fetchWorkflowBasedOnWorkflowName())
 	r.POST("/stepResponse", createStepResponseHandler())
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	r.GET("/workflows", getWorkflows())
 	return r
 }
 

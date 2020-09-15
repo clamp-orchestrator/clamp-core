@@ -201,3 +201,51 @@ func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *t
 	assert.NotNil(t, errorJsonResp.Message)
 	assert.Equal(t, "ERROR #23505 duplicate key value violates unique constraint \"workflow_name_index\"", errorJsonResp.Message)
 }
+
+func TestShouldGetAllWorkflowsByPage(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.WorkflowsResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, 1, len(jsonResp.Workflows), fmt.Sprintf("The expected number of records was %d but we got %d", 1, len(jsonResp.Workflows)))
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=-1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
+}

@@ -16,6 +16,7 @@ type dbInterface interface {
 	FindStepStatusByServiceRequestIdAndStatus(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error)
 	FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error)
 	FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error)
+	GetWorkflows(pageNumber int, pageSize int) ([]models.Workflow, error)
 }
 
 var DB dbInterface
