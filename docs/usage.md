@@ -552,7 +552,7 @@ When an async step gets executed, the response for the step needs to be sent exp
     - The `stepId` is the next step id which needs to be executed. The value of this will also be sent as request to downstream services.
     - The `response` field should contain the respective json response that needs to be sent back.
     
-- AMQO / KAFKA
+- AMQP / KAFKA
 
     The reponse can be sent back through AMQP / KAFKA. Clamp listens to specific topic in both AMQP / KAFKA. `clamp_steps_response` is the topic name to which the below response can be sent.
     ```
