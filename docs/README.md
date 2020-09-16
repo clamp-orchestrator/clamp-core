@@ -25,6 +25,8 @@ Define and update workflows even at run-time, using our APIs.
 **Request profiling and time distribution** Know exactly which steps are taking time, with in-built profiling and time distribution metrics, connect your own monitoring systems, and much more!
 
 **Simple stateless design backed by a persistent store** Clamp can scale and manage high-throughput scenarios with minimal overhead.
+
+To know the benefits of microservices orchestration [click here](https://searchapparchitecture.techtarget.com/tip/Learn-the-benefits-of-microservices-orchestrationhttps://searchapparchitecture.techtarget.com/tip/Learn-the-benefits-of-microservices-orchestration).
 ## Getting Clamp
 Clamp ships as a lightweight binary that can simply be dropped into your existing setup. You can either [build it from source](/?id=building-from-source) or use [Docker](/?id=docker).
 ### Installation
