@@ -27,6 +27,7 @@ func setupRouter() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/workflows", getWorkflows())
 	r.GET("/serviceRequests/:workflowName", findServiceRequestByWorkflowNameHandler())
+	//Default() allows all origins
 	r.Use(cors.Default())
 	return r
 }
