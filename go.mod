@@ -7,7 +7,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/antonmedv/expr v1.8.8
 	github.com/caarlos0/env v3.5.0+incompatible
-	github.com/gin-contrib/cors v1.3.1 // indirect
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-pg/pg/v9 v9.1.6
 	github.com/gofrs/uuid v3.3.0+incompatible // indirect
