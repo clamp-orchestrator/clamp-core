@@ -20,7 +20,7 @@ func prepareStepRequestResponse() map[string]*StepContext {
 
 func prepareRequestContextForTests() RequestContext {
 	reqCtx := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "",
 		StepsContext:     prepareStepRequestResponse(),
 	}
@@ -29,7 +29,7 @@ func prepareRequestContextForTests() RequestContext {
 
 func TestStep_DoExecute(t *testing.T) {
 	type fields struct {
-		Id             int
+		ID             int
 		Name           string
 		StepType       string
 		Mode           string
@@ -54,13 +54,13 @@ func TestStep_DoExecute(t *testing.T) {
 		{
 			name: "ShouldExecuteStepIfWhenConditionSatisfied",
 			fields: fields{
-				Id:       1,
+				ID:       1,
 				Name:     "dummyStep",
 				Mode:     "HTTP",
 				StepType: "SYNC",
-				Val: &executors.HttpVal{
+				Val: &executors.HTTPVal{
 					Method: "POST",
-					Url:    "http://54.190.25.178:3333/api/v1/orders",
+					URL:    "http://54.190.25.178:3333/api/v1/orders",
 				},
 				Transform: false,
 				Enabled:   true,
@@ -68,8 +68,8 @@ func TestStep_DoExecute(t *testing.T) {
 			},
 			args: args{
 				requestBody: StepRequest{
-					ServiceRequestId: uuid.UUID{},
-					StepId:           0,
+					ServiceRequestID: uuid.UUID{},
+					StepID:           0,
 					Payload:          map[string]interface{}{"user_type": "admin"},
 				},
 				prefix: "",
@@ -82,13 +82,13 @@ func TestStep_DoExecute(t *testing.T) {
 		{
 			name: "ShouldNotExecuteStepIfWhenConditionNotSatisfied",
 			fields: fields{
-				Id:       1,
+				ID:       1,
 				Name:     "dummyStep",
 				Mode:     "HTTP",
 				StepType: "SYNC",
-				Val: &executors.HttpVal{
+				Val: &executors.HTTPVal{
 					Method: "POST",
-					Url:    "http://54.190.25.178:3333/api/v1/orders",
+					URL:    "http://54.190.25.178:3333/api/v1/orders",
 				},
 				Transform: false,
 				Enabled:   true,
@@ -96,13 +96,13 @@ func TestStep_DoExecute(t *testing.T) {
 			},
 			args: args{
 				requestBody: StepRequest{
-					ServiceRequestId: uuid.UUID{},
-					StepId:           0,
+					ServiceRequestID: uuid.UUID{},
+					StepID:           0,
 					Payload:          map[string]interface{}{"user_type": "admin"},
 				},
 				prefix: "",
 				requestContext: RequestContext{
-					ServiceRequestId: uuid.UUID{},
+					ServiceRequestID: uuid.UUID{},
 					WorkflowName:     "",
 					StepsContext:     prepareStepRequestResponse(),
 				},
@@ -116,7 +116,7 @@ func TestStep_DoExecute(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			step := &Step{
-				Id:             tt.fields.Id,
+				ID:             tt.fields.ID,
 				Name:           tt.fields.Name,
 				Type:           tt.fields.StepType,
 				Mode:           tt.fields.Mode,
@@ -140,7 +140,7 @@ func TestStep_DoExecute(t *testing.T) {
 
 func TestStep_DoTransform(t *testing.T) {
 	type fields struct {
-		Id               int
+		ID               int
 		Name             string
 		StepType         string
 		Mode             string
@@ -167,16 +167,16 @@ func TestStep_DoTransform(t *testing.T) {
 		{
 			name: "ShouldTransformRequestWhenTransformIsEnabledAndJsonTransformation",
 			fields: fields{
-				Id:       1,
+				ID:       1,
 				Name:     "dummyStep",
 				Mode:     "HTTP",
 				StepType: "SYNC",
-				RequestTransform: &transform.JsonTransform{
+				RequestTransform: &transform.JSONTransform{
 					Spec: map[string]interface{}{"userdetails.name": "dummyStep.request.user_name"},
 				},
-				Val: &executors.HttpVal{
+				Val: &executors.HTTPVal{
 					Method:  "POST",
-					Url:     "https://reqres.in/api/users",
+					URL:     "https://reqres.in/api/users",
 					Headers: "",
 				},
 				Transform: true,
@@ -184,7 +184,7 @@ func TestStep_DoTransform(t *testing.T) {
 			},
 			args: args{
 				reqCtx: RequestContext{
-					ServiceRequestId: uuid.UUID{},
+					ServiceRequestID: uuid.UUID{},
 					WorkflowName:     "",
 					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
@@ -200,7 +200,7 @@ func TestStep_DoTransform(t *testing.T) {
 		{
 			name: "ShouldTransformRequestWhenTransformIsEnabledAndXmlTransformation",
 			fields: fields{
-				Id:       1,
+				ID:       1,
 				Name:     "dummyStep",
 				Mode:     "HTTP",
 				StepType: "SYNC",
@@ -208,9 +208,9 @@ func TestStep_DoTransform(t *testing.T) {
 					Keys: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
 				TransformFormat: "XML",
-				Val: &executors.HttpVal{
+				Val: &executors.HTTPVal{
 					Method:  "POST",
-					Url:     "https://reqres.in/api/users",
+					URL:     "https://reqres.in/api/users",
 					Headers: "",
 				},
 				Transform: true,
@@ -218,7 +218,7 @@ func TestStep_DoTransform(t *testing.T) {
 			},
 			args: args{
 				reqCtx: RequestContext{
-					ServiceRequestId: uuid.UUID{},
+					ServiceRequestID: uuid.UUID{},
 					WorkflowName:     "",
 					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
@@ -239,16 +239,16 @@ func TestStep_DoTransform(t *testing.T) {
 		{
 			name: "ShouldNotTransformRequestWhenTransformIsDisabled",
 			fields: fields{
-				Id:       1,
+				ID:       1,
 				Name:     "dummyStep",
 				Mode:     "HTTP",
 				StepType: "SYNC",
-				RequestTransform: &transform.JsonTransform{
+				RequestTransform: &transform.JSONTransform{
 					Spec: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
-				Val: &executors.HttpVal{
+				Val: &executors.HTTPVal{
 					Method:  "POST",
-					Url:     "https://reqres.in/api/users",
+					URL:     "https://reqres.in/api/users",
 					Headers: "",
 				},
 				Transform: false,
@@ -256,7 +256,7 @@ func TestStep_DoTransform(t *testing.T) {
 			},
 			args: args{
 				reqCtx: RequestContext{
-					ServiceRequestId: uuid.UUID{},
+					ServiceRequestID: uuid.UUID{},
 					WorkflowName:     "",
 					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
@@ -276,16 +276,16 @@ func TestStep_DoTransform(t *testing.T) {
 		{
 			name: "ShouldNotTransformRequestWhenTransformationFailsDueToSomeError",
 			fields: fields{
-				Id:       1,
+				ID:       1,
 				Name:     "dummyStep",
 				Mode:     "HTTP",
 				StepType: "SYNC",
-				RequestTransform: &transform.JsonTransform{
+				RequestTransform: &transform.JSONTransform{
 					Spec: map[string]interface{}{},
 				},
-				Val: &executors.HttpVal{
+				Val: &executors.HTTPVal{
 					Method:  "POST",
-					Url:     "https://reqres.in/api/users",
+					URL:     "https://reqres.in/api/users",
 					Headers: "",
 				},
 				Transform: true,
@@ -293,7 +293,7 @@ func TestStep_DoTransform(t *testing.T) {
 			},
 			args: args{
 				reqCtx: RequestContext{
-					ServiceRequestId: uuid.UUID{},
+					ServiceRequestID: uuid.UUID{},
 					WorkflowName:     "",
 					StepsContext: map[string]*StepContext{"dummyStep": {
 						Request:  map[string]interface{}{"user_type": "admin", "user_name": "superadmin"},
@@ -310,7 +310,7 @@ func TestStep_DoTransform(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			step := &Step{
-				Id:               tt.fields.Id,
+				ID:               tt.fields.ID,
 				Name:             tt.fields.Name,
 				Type:             tt.fields.StepType,
 				Mode:             tt.fields.Mode,

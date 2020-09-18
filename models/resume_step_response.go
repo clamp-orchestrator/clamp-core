@@ -5,12 +5,12 @@ import (
 )
 
 type AsyncStepResponse struct {
-	ServiceRequestId   uuid.UUID              `json:"serviceRequestId"`
-	StepId             int                    `json:"stepId"`
+	ServiceRequestID   uuid.UUID              `json:"serviceRequestId"`
+	StepID             int                    `json:"stepId"`
 	Response           map[string]interface{} `json:"response"`
 	Error              ClampErrorResponse     `json:"error"`
 	stepStatusRecorded bool
-	RequestHeaders string
+	RequestHeaders     string
 }
 
 func (res *AsyncStepResponse) SetStepStatusRecorded(stepStatusRecorded bool) {

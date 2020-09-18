@@ -96,10 +96,10 @@ func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string
 	return w, bodyStr
 }
 
-func callGetServiceRequestStatus(serviceRequestId uuid.UUID) (*httptest.ResponseRecorder, string) {
+func callGetServiceRequestStatus(serviceRequestID uuid.UUID) (*httptest.ResponseRecorder, string) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestId.String(), nil)
+	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestID.String(), nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -113,9 +113,9 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 		Mode:      "HTTP",
 		Transform: false,
 		Enabled:   false,
-		Val: &executors.HttpVal{
+		Val: &executors.HTTPVal{
 			Method:  "POST",
-			Url:     "http://54.190.25.178:3333/api/v1/login",
+			URL:     "http://54.190.25.178:3333/api/v1/login",
 			Headers: "",
 		},
 	}
@@ -144,12 +144,12 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 		Mode:      "HTTP",
 		Transform: true,
 		Enabled:   false,
-		RequestTransform: &transform.JsonTransform{
+		RequestTransform: &transform.JSONTransform{
 			Spec: map[string]interface{}{"name": "test"},
 		},
-		Val: &executors.HttpVal{
+		Val: &executors.HTTPVal{
 			Method:  "POST",
-			Url:     "https://reqres.in/api/users",
+			URL:     "https://reqres.in/api/users",
 			Headers: "",
 		},
 	}

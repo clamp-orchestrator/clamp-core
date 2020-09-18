@@ -11,7 +11,7 @@ type StepContext struct {
 }
 
 type RequestContext struct {
-	ServiceRequestId uuid.UUID               `json:"service_request_id"`
+	ServiceRequestID uuid.UUID               `json:"service_request_id"`
 	WorkflowName     string                  `json:"workflow_name"`
 	StepsContext     map[string]*StepContext `json:"step_context"`
 }

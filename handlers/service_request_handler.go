@@ -25,11 +25,11 @@ var (
 		Name: "create_service_request_handler_histogram",
 		Help: "The total number of service requests created",
 	})
-	serviceRequestByIdCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+	serviceRequestByIDCounter = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "get_service_request_handler_by_id_counter",
 		Help: "The total number of service requests enquired",
 	}, []string{"service_request_id"})
-	serviceRequestByIdHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+	serviceRequestByIDHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "get_service_request_handler_by_id_histogram",
 		Help: "The total number of service requests enquired",
 	})
@@ -112,12 +112,12 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 	return payload
 }
 
-// Get Service Request By Id godoc
+// Get Service Request By ID godoc
 // @Summary Get service request details by service request id
 // @Description Get service request by service request id
 // @Accept json
 // @Produce json
-// @Param serviceRequestId path string true "Service Request Id"
+// @Param serviceRequestId path string true "Service Request ID"
 // @Success 200 {object} models.ServiceRequestStatusResponse
 // @Failure 400 {object} models.ClampErrorResponse
 // @Failure 404 {object} models.ClampErrorResponse
@@ -126,19 +126,19 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 func getServiceRequestStatusHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
-		serviceRequestId := c.Param("serviceRequestId")
+		serviceRequestID := c.Param("serviceRequestId")
 
-		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestId))
+		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestID))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, CreateErrorResponse(http.StatusBadRequest, err.Error()))
 			return
 		}
-		serviceRequestByIdCounter.WithLabelValues(serviceRequestId).Inc()
+		serviceRequestByIDCounter.WithLabelValues(serviceRequestID).Inc()
 		workflow, _ := services.FindWorkflowByName(serviceRequest.WorkflowName)
-		stepsStatues, _ := services.FindStepStatusByServiceRequestId(uuid.MustParse(serviceRequestId))
-		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestId), workflow, stepsStatues)
+		stepsStatues, _ := services.FindStepStatusByServiceRequestID(uuid.MustParse(serviceRequestID))
+		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestID), workflow, stepsStatues)
 		//TODO - handle error scenario. Currently it is always 200 ok
-		serviceRequestByIdHistogram.Observe(time.Since(startTime).Seconds())
+		serviceRequestByIDHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, stepsStatusResponse)
 	}
 }

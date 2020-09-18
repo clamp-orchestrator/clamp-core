@@ -10,20 +10,20 @@ import (
 	"strings"
 	"time"
 )
-
-type HttpVal struct {
+// HTTPVal : Http configuration details
+type HTTPVal struct {
 	Method  string `json:"method" binding:"required,oneof=GET POST PUT PATCH DELETE"`
-	Url     string `json:"url" binding:"required,url"`
+	URL     string `json:"url" binding:"required,url"`
 	Headers string `json:"headers"`
 }
-
-func (httpVal HttpVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
-	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.Url, requestBody)
+// DoExecute : Preparing to make a http call with request body
+func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
+	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.URL, requestBody)
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
 	}
-	requestJsonBytes, _ := json.Marshal(requestBody)
-	request, err := http.NewRequest(httpVal.Method, httpVal.Url, bytes.NewBuffer(requestJsonBytes))
+	requestJSONBytes, _ := json.Marshal(requestBody)
+	request, err := http.NewRequest(httpVal.Method, httpVal.URL, bytes.NewBuffer(requestJSONBytes))
 	fetchAndLoadRequestWithHeadersIfDefined(httpVal, request)
 	if err != nil {
 		return nil, err
@@ -35,15 +35,15 @@ func (httpVal HttpVal) DoExecute(requestBody interface{}, prefix string) (interf
 	if resp.StatusCode != 200 && resp.StatusCode != 201 {
 		data, _ := ioutil.ReadAll(resp.Body)
 		err := errors.New(string(data))
-		log.Println("Unable to execute \t", httpVal.Url, " with error message", err)
+		log.Println("Unable to execute \t", httpVal.URL, " with error message", err)
 		return nil, err
 	}
 	data, _ := ioutil.ReadAll(resp.Body)
-	log.Printf("%sHTTP Executor: Successfully called http %s:%s", prefix, httpVal.Method, httpVal.Url)
+	log.Printf("%sHTTP Executor: Successfully called http %s:%s", prefix, httpVal.Method, httpVal.URL)
 	return string(data), err
 }
 
-func fetchAndLoadRequestWithHeadersIfDefined(httpVal HttpVal, request *http.Request) {
+func fetchAndLoadRequestWithHeadersIfDefined(httpVal HTTPVal, request *http.Request) {
 	if httpVal.Headers != "" {
 		httpHeaders := strings.Split(httpVal.Headers, ";")
 		for _, header := range httpHeaders[:len(httpHeaders)-1] {
