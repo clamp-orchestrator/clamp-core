@@ -13,7 +13,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 	}
 	tests := []struct {
 		name       string
-		fields     HttpVal
+		fields     HTTPVal
 		args       args
 		want       interface{}
 		wantErr    bool
@@ -21,9 +21,9 @@ func TestHttpVal_DoExecute(t *testing.T) {
 	}{
 		{
 			name: "TestShouldExecuteHTTPStep",
-			fields: HttpVal{
+			fields: HTTPVal{
 				Method:  "GET",
-				Url:     "http://54.190.25.178:3333/api/v1/user",
+				URL:     "http://54.190.25.178:3333/api/v1/user",
 				Headers: "",
 			},
 			args: args{
@@ -35,9 +35,9 @@ func TestHttpVal_DoExecute(t *testing.T) {
 		},
 		{
 			name: "TestShouldExecuteHTTPStepWithHeaders",
-			fields: HttpVal{
+			fields: HTTPVal{
 				Method:  "GET",
-				Url:     "http://54.190.25.178:3333/api/v1/user",
+				URL:     "http://54.190.25.178:3333/api/v1/user",
 				Headers: "Content-Type:application/json;token:abc",
 			},
 			args: args{
@@ -49,9 +49,9 @@ func TestHttpVal_DoExecute(t *testing.T) {
 		},
 		{
 			name: "TestShouldThrowErrorWhileExecutingStep",
-			fields: HttpVal{
+			fields: HTTPVal{
 				Method:  "GET",
-				Url:     "http://54.190.25.178:3333/api/v1/asd",
+				URL:     "http://54.190.25.178:3333/api/v1/asd",
 				Headers: "",
 			},
 			args: args{
@@ -63,9 +63,9 @@ func TestHttpVal_DoExecute(t *testing.T) {
 		},
 		//{
 		//	name: "TestShouldThrowErrorForHTTPStep",
-		//	fields: HttpVal{
+		//	fields: HTTPVal{
 		//		Method:  "GET",
-		//		Url:     "http://localhost:3333/api/v1/user",
+		//		URL:     "http://localhost:3333/api/v1/user",
 		//		Headers: "",
 		//	},
 		//	args: args{
@@ -78,9 +78,9 @@ func TestHttpVal_DoExecute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			httpVal := HttpVal{
+			httpVal := HTTPVal{
 				Method:  tt.fields.Method,
-				Url:     tt.fields.Url,
+				URL:     tt.fields.URL,
 				Headers: tt.fields.Headers,
 			}
 			got, err := httpVal.DoExecute(tt.args.requestBody, "")

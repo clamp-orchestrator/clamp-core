@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var serviceRequestId = uuid.New()
+var serviceRequestID = uuid.New()
 
 func prepareRequestPayload() map[string]interface{} {
 	var payload = map[string]interface{}{
@@ -30,17 +30,17 @@ func prepareResponsePayload() map[string]interface{} {
 func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 	var functionCalledStack []string
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
-		workflow.Id = "TEST_WF"
+		workflow.ID = "TEST_WF"
 		step := models.Step{
-			Id:        1,
+			ID:        1,
 			Name:      "1",
 			Type:      "ASYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
-			Val: &executors.HttpVal{
+			Val: &executors.HTTPVal{
 				Method:  "POST",
-				Url:     "http://54.190.25.178:3333/api/v1/login",
+				URL:     "http://54.190.25.178:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -64,8 +64,8 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			name: "Should process Async Step Response request",
 			args: args{
 				asyncStepResponseReq: models.AsyncStepResponse{
-					ServiceRequestId: serviceRequestId,
-					StepId:           1,
+					ServiceRequestID: serviceRequestID,
+					StepID:           1,
 					Response:         prepareResponsePayload(),
 					Error:            models.ClampErrorResponse{},
 				},
@@ -73,24 +73,24 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		},
 	}
 
-	findServiceRequestByIdMock = func(u uuid.UUID) (request models.ServiceRequest, err error) {
+	findServiceRequestByIDMock = func(u uuid.UUID) (request models.ServiceRequest, err error) {
 		serviceRequest := models.ServiceRequest{
-			ID:            serviceRequestId,
+			ID:            serviceRequestID,
 			WorkflowName:  workflowName,
 			Status:        models.STATUS_NEW,
 			CreatedAt:     time.Time{},
 			Payload:       prepareRequestPayload(),
-			CurrentStepId: 1,
+			CurrentStepID: 1,
 		}
 		functionCalledStack = append(functionCalledStack, "findServiceRequestById")
 		return serviceRequest, err
 	}
 
-	findAllStepStatusByServiceRequestIdAndStepIdMock = func(serviceRequestId uuid.UUID, stepId int) (stepsStatus []models.StepsStatus, err error) {
+	findAllStepStatusByServiceRequestIDAndStepIDMock = func(serviceRequestId uuid.UUID, stepId int) (stepsStatus []models.StepsStatus, err error) {
 		var statuses = make([]models.StepsStatus, 1)
 		stepStatus := models.StepsStatus{
 			ID:               "2",
-			ServiceRequestId: serviceRequestId,
+			ServiceRequestID: serviceRequestId,
 			WorkflowName:     workflowName,
 			Status:           models.STATUS_STARTED,
 			CreatedAt:        time.Now(),
@@ -101,7 +101,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 				Request:  prepareRequestPayload(),
 				Response: nil,
 			},
-			StepId: 1,
+			StepID: 1,
 		}
 		statuses[0] = stepStatus
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")
@@ -121,17 +121,17 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 	var functionCalledStack []string
 	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
-		workflow.Id = "TEST_WF"
+		workflow.ID = "TEST_WF"
 		step := models.Step{
-			Id:        1,
+			ID:        1,
 			Name:      "1",
 			Type:      "ASYNC",
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
-			Val: &executors.HttpVal{
+			Val: &executors.HTTPVal{
 				Method:  "POST",
-				Url:     "http://54.190.25.178:3333/api/v1/login",
+				URL:     "http://54.190.25.178:3333/api/v1/login",
 				Headers: "",
 			},
 		}
@@ -155,8 +155,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			name: "Should process Async Step Response request",
 			args: args{
 				asyncStepResponseReq: models.AsyncStepResponse{
-					ServiceRequestId: serviceRequestId,
-					StepId:           1,
+					ServiceRequestID: serviceRequestID,
+					StepID:           1,
 					Response:         prepareResponsePayload(),
 					Error: models.ClampErrorResponse{
 						Code:    400,
@@ -167,11 +167,11 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		},
 	}
 
-	findAllStepStatusByServiceRequestIdAndStepIdMock = func(serviceRequestId uuid.UUID, stepId int) (stepsStatus []models.StepsStatus, err error) {
+	findAllStepStatusByServiceRequestIDAndStepIDMock = func(serviceRequestId uuid.UUID, stepId int) (stepsStatus []models.StepsStatus, err error) {
 		var statuses = make([]models.StepsStatus, 1)
 		stepStatus := models.StepsStatus{
 			ID:               "2",
-			ServiceRequestId: serviceRequestId,
+			ServiceRequestID: serviceRequestId,
 			WorkflowName:     workflowName,
 			Status:           models.STATUS_STARTED,
 			CreatedAt:        time.Now(),
@@ -182,7 +182,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 				Request:  prepareRequestPayload(),
 				Response: nil,
 			},
-			StepId: 1,
+			StepID: 1,
 		}
 		statuses[0] = stepStatus
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")

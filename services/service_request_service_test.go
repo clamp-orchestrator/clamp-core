@@ -54,7 +54,7 @@ func TestFindByID(t *testing.T) {
 	serviceReq := models.ServiceRequest{
 		ID: uuid.UUID{},
 	}
-	findServiceRequestByIdMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
+	findServiceRequestByIDMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
 		request.WorkflowName = "TEST_WF"
 		request.Status = models.STATUS_COMPLETED
 		return request, nil
@@ -64,7 +64,7 @@ func TestFindByID(t *testing.T) {
 	assert.Equal(t, "TEST_WF", resp.WorkflowName)
 	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
 
-	findServiceRequestByIdMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
+	findServiceRequestByIDMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
 		return request, errors.New("select query failed")
 	}
 	_, err = FindServiceRequestByID(serviceReq.ID)

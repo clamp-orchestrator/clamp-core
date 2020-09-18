@@ -9,7 +9,7 @@ import (
 
 //Workflow is a structure to store the service request details
 type Workflow struct {
-	Id          string    `json:"id"`
+	ID          string    `json:"id"`
 	Name        string    `json:"name" binding:"required"`
 	Description string    `json:"description"`
 	Enabled     bool      `json:"enabled"`
@@ -23,7 +23,7 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 	stepCounter :=0
 	for i := 0; i < len(workflowRequest.Steps); i++ {
 		stepCounter++
-		workflowRequest.Steps[i].Id = stepCounter
+		workflowRequest.Steps[i].ID = stepCounter
 		switch workflowRequest.Steps[i].Mode {
 			case "AMQP":
 				{
@@ -56,20 +56,20 @@ func UpdateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCou
 func UpdateSubStepsIds(workflowRequest Workflow, i int, stepCounter int) int {
 	var subSteps []Step
 	subSteps = workflowRequest.Steps[i].OnFailure
-	for subStepId, _ := range subSteps {
+	for subStepID := range subSteps {
 		stepCounter++
-		subSteps[subStepId].Id = stepCounter
+		subSteps[subStepID].ID = stepCounter
 	}
 	return stepCounter
 }
 
 func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{Id: workflow.Id, Name: workflow.Name, Description: workflow.Description, Enabled: true, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, Steps: workflow.Steps}
+	return Workflow{ID: workflow.ID, Name: workflow.Name, Description: workflow.Description, Enabled: true, CreatedAt: time.Time{}, UpdatedAt: time.Time{}, Steps: workflow.Steps}
 }
 
 type PGWorkflow struct {
 	tableName   struct{} `pg:"workflows"`
-	Id          string
+	ID          string
 	Name        string
 	Description string
 	Enabled     bool
@@ -80,7 +80,7 @@ type PGWorkflow struct {
 
 func (workflow Workflow) ToPGWorkflow() PGWorkflow {
 	return PGWorkflow{
-		Id:          workflow.Id,
+		ID:          workflow.ID,
 		Name:        workflow.Name,
 		Description: workflow.Description,
 		Enabled:     workflow.Enabled,
@@ -92,7 +92,7 @@ func (workflow Workflow) ToPGWorkflow() PGWorkflow {
 
 func (pgWorkflow PGWorkflow) ToWorkflow() Workflow {
 	return Workflow{
-		Id:          pgWorkflow.Id,
+		ID:          pgWorkflow.ID,
 		Name:        pgWorkflow.Name,
 		Description: pgWorkflow.Description,
 		Enabled:     pgWorkflow.Enabled,

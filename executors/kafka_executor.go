@@ -5,14 +5,14 @@ import (
 	"github.com/Shopify/sarama"
 	log "log"
 )
-
+// KafkaVal : Kafka configurations details
 type KafkaVal struct {
 	ConnectionURL string `json:"connection_url" binding:"required"`
 	TopicName     string `json:"topic_name"`
 	ContentType   string `json:"content_type"`
 	ReplyTo       string `json:"reply_to"`
 }
-
+// DoExecute : Connecting to Kakfa URL and producing a message to Topic
 func (val KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s Kafka Executor: Executing kafka %s body:%v", prefix, val.TopicName, requestBody)
 	syncProducer, err := sarama.NewSyncProducer([]string{val.ConnectionURL}, nil)
@@ -22,10 +22,10 @@ func (val KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface
 		return nil, err
 	}
 
-	requestJsonBytes, _ := json.Marshal(requestBody)
+	requestJSONBytes, _ := json.Marshal(requestBody)
 	msg := &sarama.ProducerMessage{
 		Topic: val.TopicName,
-		Value: sarama.StringEncoder(requestJsonBytes),
+		Value: sarama.StringEncoder(requestJSONBytes),
 	}
 
 	_, _, err = syncProducer.SendMessage(msg)
@@ -36,7 +36,7 @@ func (val KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface
 
 	//asyncProducer.Input() <- &sarama.ProducerMessage{
 	//	Topic: config.ENV.KafkaTopicName,
-	//	Value: sarama.StringEncoder(requestJsonBytes),
+	//	Value: sarama.StringEncoder(requestJSONBytes),
 	//}
 	//log.Printf("%s Kafka Executor: pushed async message successfully", prefix)
 	return nil, nil

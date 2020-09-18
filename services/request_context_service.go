@@ -4,7 +4,7 @@ import "clamp-core/models"
 
 func CreateRequestContext(workflow models.Workflow, request models.ServiceRequest) (context models.RequestContext) {
 	context = models.RequestContext{
-		ServiceRequestId: request.ID,
+		ServiceRequestID: request.ID,
 		WorkflowName:     workflow.Name,
 	}
 	context.StepsContext = make(map[string]*models.StepContext)
@@ -20,7 +20,7 @@ func CreateRequestContext(workflow models.Workflow, request models.ServiceReques
 }
 
 func EnhanceRequestContextWithExecutedSteps(context *models.RequestContext) {
-	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatus(context.ServiceRequestId, models.STATUS_COMPLETED)
+	stepsStatuses, err := FindStepStatusByServiceRequestIDAndStatus(context.ServiceRequestID, models.STATUS_COMPLETED)
 	if err == nil {
 		for _, stepsStatus := range stepsStatuses {
 			context.StepsContext[stepsStatus.StepName] = &models.StepContext{
