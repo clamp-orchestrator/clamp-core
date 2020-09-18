@@ -31,7 +31,7 @@ func TestCreateRequestContext(t *testing.T) {
 				},
 			},
 			wantContext: models.RequestContext{
-				ServiceRequestId: id,
+				ServiceRequestID: id,
 				WorkflowName:     "TEST_WF",
 				StepsContext: map[string]*models.StepContext{"step1": {
 					Request:  nil,
@@ -60,7 +60,7 @@ func TestShouldEnhanceRequestContext(t *testing.T) {
 	}, models.ServiceRequest{
 		ID: uuid.New(),
 	})
-	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
 		stepsStatus := make([]models.StepsStatus, 2)
 		stepsStatus[0].StepName = "step1"
 		stepsStatus[0].Payload.Request = map[string]interface{}{"k": "v"}

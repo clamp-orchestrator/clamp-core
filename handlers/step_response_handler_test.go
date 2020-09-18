@@ -15,12 +15,12 @@ func TestRecordStepResponse(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	res := models.AsyncStepResponse{
-		ServiceRequestId: uuid.UUID{},
-		StepId:           0,
+		ServiceRequestID: uuid.UUID{},
+		StepID:           0,
 		Response:         nil,
 	}
-	workflowJsonReg, _ := json.Marshal(res)
-	requestReader := bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ := json.Marshal(res)
+	requestReader := bytes.NewReader(workflowJSONReg)
 
 	req, _ := http.NewRequest("POST", "/stepResponse", requestReader)
 	router.ServeHTTP(w, req)

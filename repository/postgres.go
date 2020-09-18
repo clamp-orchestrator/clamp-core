@@ -78,9 +78,9 @@ func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNu
 	return workflows, err
 }
 
-func (p *postgres) FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error) {
+func (p *postgres) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ?", serviceRequestId, stepId).Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ?", serviceRequestID, stepID).Select()
 	var stepStatuses []models.StepsStatus
 	for _, status := range pgStepStatus {
 		stepStatuses = append(stepStatuses, status.ToStepStatus())
@@ -88,20 +88,20 @@ func (p *postgres) FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId
 	return stepStatuses, err
 }
 
-func (p *postgres) FindStepStatusByServiceRequestIdAndStepIdAndStatus(serviceRequestId uuid.UUID, stepId int, status models.Status) (models.StepsStatus, error) {
+func (p *postgres) FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error) {
 	var pgStepStatus models.PGStepStatus
 	var stepStatuses models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ? and status = ?", serviceRequestId, stepId, status).Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ? and status = ?", serviceRequestID, stepID, status).Select()
 	if err != nil {
 		return stepStatuses, err
 	}
 	return pgStepStatus.ToStepStatus(), err
 }
 
-func (p *postgres) FindStepStatusByServiceRequestIdAndStatus(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
+func (p *postgres) FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	var stepStatuses []models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestId, status).Order("created_at ASC").Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestID, status).Order("created_at ASC").Select()
 	if err != nil {
 		return stepStatuses, err
 	}
@@ -111,9 +111,9 @@ func (p *postgres) FindStepStatusByServiceRequestIdAndStatus(serviceRequestId uu
 	return stepStatuses, err
 }
 
-func (p *postgres) FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
+func (p *postgres) FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestId).Order("created_at ASC").Select()
+	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestID).Order("created_at ASC").Select()
 	var stepStatuses []models.StepsStatus
 	for _, status := range pgStepStatus {
 		stepStatuses = append(stepStatuses, status.ToStepStatus())
@@ -140,8 +140,8 @@ func (p *postgres) SaveWorkflow(workflowReq models.Workflow) (models.Workflow, e
 	return pgWorkflow.ToWorkflow(), err
 }
 
-func (p *postgres) FindServiceRequestById(serviceRequestId uuid.UUID) (models.ServiceRequest, error) {
-	pgServiceRequest := &models.PGServiceRequest{ID: serviceRequestId}
+func (p *postgres) FindServiceRequestByID(serviceRequestID uuid.UUID) (models.ServiceRequest, error) {
+	pgServiceRequest := &models.PGServiceRequest{ID: serviceRequestID}
 	err := p.getDb().Select(pgServiceRequest)
 	if err != nil {
 		panic(err)

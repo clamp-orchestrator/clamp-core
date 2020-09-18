@@ -48,8 +48,8 @@ func createServiceRequestWorkers() {
 	}
 }
 
-func worker(workerId int, serviceReqChan <-chan models.ServiceRequest) {
-	prefix := fmt.Sprintf("[WORKER_%d] ", workerId)
+func worker(workerID int, serviceReqChan <-chan models.ServiceRequest) {
+	prefix := fmt.Sprintf("[WORKER_%d] ", workerID)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s : Started listening to service request channel\n", prefix)
 	for serviceReq := range serviceReqChan {
@@ -64,7 +64,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
 		lastStep := workflow.Steps[len(workflow.Steps)-1]
-		if serviceReq.CurrentStepId == 0 || serviceReq.CurrentStepId != lastStep.Id {
+		if serviceReq.CurrentStepID == 0 || serviceReq.CurrentStepID != lastStep.ID {
 			status := executeWorkflowSteps(workflow, prefix, serviceReq)
 			if status == models.STATUS_COMPLETED {
 				completedServiceRequestCounter.Inc()
@@ -80,16 +80,16 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 
 }
 
-func catchErrors(prefix string, requestId uuid.UUID) {
+func catchErrors(prefix string, requestID uuid.UUID) {
 	if r := recover(); r != nil {
 		log.Println("[ERROR]", r)
-		log.Printf("%s Failed processing service request id %s\n", prefix, requestId)
+		log.Printf("%s Failed processing service request id %s\n", prefix, requestID)
 	}
 }
 
 func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) models.Status {
 	stepRequestPayload := serviceRequest.Payload
-	lastStepExecuted := serviceRequest.CurrentStepId
+	lastStepExecuted := serviceRequest.CurrentStepID
 	executeStepsFromIndex := 0
 	if lastStepExecuted > 0 {
 		executeStepsFromIndex = lastStepExecuted
@@ -118,24 +118,24 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 
 //TODO: replace prefix with other standard way like MDC
 func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
-	serviceRequestId := requestContext.ServiceRequestId
+	serviceRequestID := requestContext.ServiceRequestID
 	workflowName := requestContext.WorkflowName
 	stepRequest := requestContext.StepsContext[step.Name].Request
 
-	defer catchErrors(prefix, serviceRequestId)
+	defer catchErrors(prefix, serviceRequestID)
 
 	requestContext.SetStepRequestToContext(step.Name, stepRequest)
 
 	stepStartTime := time.Now()
 	stepStatus := models.StepsStatus{
-		ServiceRequestId: serviceRequestId,
+		ServiceRequestID: serviceRequestID,
 		WorkflowName:     workflowName,
 		StepName:         step.Name,
 		Payload: models.Payload{
 			Request:  stepRequest,
 			Response: nil,
 		},
-		StepId: step.Id,
+		StepID: step.ID,
 	}
 
 	//TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered

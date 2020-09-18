@@ -34,15 +34,15 @@ func createResumeStepsWorkers() {
 	}
 }
 
-func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepResponse) {
+func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepResponse) {
 	duplicateStepResponse := false
-	prefix := fmt.Sprintf("[RESUME_STEP_WORKER_%d] ", workerId)
+	prefix := fmt.Sprintf("[RESUME_STEP_WORKER_%d] ", workerID)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Printf("%s : Started listening to resume steps channel\n", prefix)
 	for stepResponse := range resumeStepsChannel {
-		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestId)
+		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestID)
 		log.Printf("%s : Received step response : %v \n", prefix, stepResponse)
-		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIdAndStepId(stepResponse.ServiceRequestId, stepResponse.StepId)
+		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
 		var currentStepStatus models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
 			if stepStatus.Status == models.STATUS_STARTED {
@@ -59,7 +59,7 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 				currentStepStatus.ID = ""
 				resumeStepStartTime := currentStepStatus.CreatedAt
 				currentStepStatus.CreatedAt = time.Time{}
-				//TODO Setting Id empty and also errors validations
+				//TODO Setting ID empty and also errors validations
 				//TODO subtracting -5.30 since time is stored in GMT in PSql
 				if !stepResponse.Error.IsNil() {
 					recordStepFailedStatus(currentStepStatus, stepResponse.Error, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
@@ -69,12 +69,12 @@ func resumeSteps(workerId int, resumeStepsChannel <-chan models.AsyncStepRespons
 					recordStepCompletionStatus(currentStepStatus, resumeStepStartTime)
 				}
 			}
-			serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestId)
+			serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestID)
 			if err != nil {
 				//TODO
 			} else {
 				serviceRequest.Payload = stepResponse.Response
-				serviceRequest.CurrentStepId = stepResponse.StepId
+				serviceRequest.CurrentStepID = stepResponse.StepID
 				serviceRequest.RequestHeaders = stepResponse.RequestHeaders
 				AddServiceRequestToChannel(serviceRequest)
 			}
@@ -91,7 +91,7 @@ func getResumeStepResponseChannel() chan models.AsyncStepResponse {
 }
 
 func AddStepResponseToResumeChannel(response models.AsyncStepResponse) {
-	if response.ServiceRequestId == uuid.Nil || response.StepId == 0 || (response.Response == nil && response.Error.Code == 0) {
+	if response.ServiceRequestID == uuid.Nil || response.StepID == 0 || (response.Response == nil && response.Error.Code == 0) {
 		log.Printf("Invalid step resume request received %v", response)
 		return
 	}

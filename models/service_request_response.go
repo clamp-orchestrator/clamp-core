@@ -2,7 +2,7 @@ package models
 
 import "github.com/google/uuid"
 
-//ServiceRequest is a structure to store the service request details
+// ServiceRequestResponse is a structure to store the service request details
 type ServiceRequestResponse struct {
 	URL    string    `json:"pollUrl"`
 	Status Status    `json:"status"`
