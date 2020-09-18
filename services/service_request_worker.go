@@ -1,8 +1,8 @@
 package services
 
 import (
-	"clamp-core/config"
 	"clamp-core/models"
+	"clamp-core/utils"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,9 +14,6 @@ import (
 	"sync"
 	"time"
 )
-
-const ServiceRequestChannelSize = 1000
-const ServiceRequestWorkersSize = 100
 
 var (
 	completedServiceRequestCounter = promauto.NewCounter(prometheus.CounterOpts{
@@ -35,7 +32,7 @@ var (
 
 func createServiceRequestChannel() chan models.ServiceRequest {
 	singletonOnce.Do(func() {
-		serviceRequestChannel = make(chan models.ServiceRequest, ServiceRequestChannelSize)
+		serviceRequestChannel = make(chan models.ServiceRequest, utils.ServiceRequestChannelSize)
 	})
 	return serviceRequestChannel
 }
@@ -46,7 +43,7 @@ func init() {
 }
 
 func createServiceRequestWorkers() {
-	for i := 0; i < ServiceRequestWorkersSize; i++ {
+	for i := 0; i < utils.ServiceRequestWorkersSize; i++ {
 		go worker(i, serviceRequestChannel)
 	}
 }
@@ -111,7 +108,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		if !err.IsNil() {
 			return models.STATUS_FAILED
 		}
-		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == config.ENV.AsyncStepType {
+		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.AsyncStepType {
 			log.Printf("%s : Pushed to sleep mode until response for step - %s is recieved", prefix, step.Name)
 			return models.STATUS_PAUSED
 		}
@@ -183,25 +180,25 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_COMPLETED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepSkippedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_SKIPPED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_PAUSED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_STARTED
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
@@ -215,7 +212,7 @@ func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse mo
 	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
 	stepStatus.Reason = clampErrorResponse.Message
-	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / models.MilliSecondsDivisor
+	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 

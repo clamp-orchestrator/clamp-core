@@ -2,6 +2,7 @@ package services
 
 import (
 	"clamp-core/models"
+	"clamp-core/utils"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -10,10 +11,6 @@ import (
 	"time"
 )
 
-//TODO Channel name to be changed
-const ResumeStepResponseChannelSize = 1000
-const ResumeStepResponseWorkersSize = 100
-
 var (
 	resumeStepsChannel chan models.AsyncStepResponse
 	singleton          sync.Once
@@ -21,7 +18,7 @@ var (
 
 func createResumeStepsChannel() chan models.AsyncStepResponse {
 	singleton.Do(func() {
-		resumeStepsChannel = make(chan models.AsyncStepResponse, ResumeStepResponseChannelSize)
+		resumeStepsChannel = make(chan models.AsyncStepResponse, utils.ResumeStepResponseChannelSize)
 	})
 	return resumeStepsChannel
 }
@@ -32,7 +29,7 @@ func init() {
 }
 
 func createResumeStepsWorkers() {
-	for i := 0; i < ResumeStepResponseWorkersSize; i++ {
+	for i := 0; i < utils.ResumeStepResponseWorkersSize; i++ {
 		go resumeSteps(i, resumeStepsChannel)
 	}
 }

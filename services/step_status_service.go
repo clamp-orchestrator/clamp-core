@@ -3,6 +3,7 @@ package services
 import (
 	"clamp-core/models"
 	"clamp-core/repository"
+	"clamp-core/utils"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -106,7 +107,7 @@ func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, ste
 			srvReqStatusRes.Status = models.STATUS_INPROGRESS
 		}
 		timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
-		srvReqStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / models.MilliSecondsDivisor
+		srvReqStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / utils.MilliSecondsDivisor
 		srvReqStatusRes.Steps = stepsStatusRes
 	}
 	return srvReqStatusRes
