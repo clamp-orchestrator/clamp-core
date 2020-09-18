@@ -6,7 +6,7 @@ import (
 	"github.com/streadway/amqp"
 	"log"
 )
-
+// AMQPVal : Rabbitmq configuration details
 type AMQPVal struct {
 	ConnectionURL string `json:"connection_url" binding:"required"`
 	QueueName     string `json:"queue_name"`
@@ -15,7 +15,7 @@ type AMQPVal struct {
 	ContentType   string `json:"content_type"`
 	ReplyTo       string `json:"reply_to"`
 }
-
+// DoExecute : Connection to Rabbitmq and sending message into Exchange
 func (val AMQPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s AMQP Executor: Executing amqp %s body:%v", prefix, val.getName(), requestBody)
 
@@ -58,9 +58,8 @@ func sendMessageToQueue(ch *amqp.Channel, val AMQPVal, body interface{}, prefix 
 		})
 	if err != nil {
 		return nil, err
-	} else {
-		log.Printf("%s AMQP Executor: pushed message successfully", prefix)
 	}
+	log.Printf("%s AMQP Executor: pushed message successfully", prefix)
 	return nil, nil
 }
 
@@ -77,9 +76,8 @@ func sendMessageToExchange(ch *amqp.Channel, val AMQPVal, body interface{}, pref
 		})
 	if err != nil {
 		return nil, err
-	} else {
-		log.Printf("%s AMQP Executor: pushed message successfully", prefix)
 	}
+	log.Printf("%s AMQP Executor: pushed message successfully", prefix)
 	return nil, nil
 }
 

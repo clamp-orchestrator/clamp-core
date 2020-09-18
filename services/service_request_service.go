@@ -8,11 +8,11 @@ import (
 )
 
 //FindServiceRequestByID is
-func FindServiceRequestByID(serviceRequestId uuid.UUID) (models.ServiceRequest, error) {
-	log.Printf("Find service Request request by id: %s", serviceRequestId)
-	serviceRequest, err := repository.GetDB().FindServiceRequestById(serviceRequestId)
+func FindServiceRequestByID(serviceRequestID uuid.UUID) (models.ServiceRequest, error) {
+	log.Printf("Find service Request request by id: %s", serviceRequestID)
+	serviceRequest, err := repository.GetDB().FindServiceRequestByID(serviceRequestID)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestId)
+		log.Printf("No record found with given service request id %s", serviceRequestID)
 	}
 	return serviceRequest, err
 }
