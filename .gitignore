@@ -3,3 +3,4 @@ clamp-core
 .idea/
 main
 cp.out
+*.tmp

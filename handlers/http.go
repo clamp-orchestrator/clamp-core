@@ -10,13 +10,6 @@ import (
 	"time"
 )
 
-// @title Clamp Swagger API
-// @version 1.0
-// @description This is a sample server Petstore server.
-// @termsOfService http://swagger.io/terms/
-
-// @host localhost:8080
-// @BasePath /
 func setupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -39,12 +32,9 @@ func setupRouter() *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.GET("/workflows", getWorkflows())
 	r.GET("/serviceRequests/:workflowName", findServiceRequestByWorkflowNameHandler())
-	//Default() allows all origins
-
 	return r
 }
 
-//LoadHTTPRoutes loads all HTTP api routes
 func LoadHTTPRoutes() {
 	r := setupRouter()
 	err := r.Run()
