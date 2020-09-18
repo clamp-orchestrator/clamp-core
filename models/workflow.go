@@ -3,6 +3,7 @@ package models
 import (
 	"clamp-core/config"
 	"clamp-core/executors"
+	"clamp-core/utils"
 	"time"
 )
 
@@ -27,18 +28,18 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 			case "AMQP":
 				{
 					workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
-					workflowRequest.Steps[i].Type = config.ENV.AsyncStepType
+					workflowRequest.Steps[i].Type = utils.AsyncStepType
 				}
 			case "HTTP":
 				{
 					if workflowRequest.Steps[i].Type == "" {
-						workflowRequest.Steps[i].Type = config.ENV.SyncStepType
+						workflowRequest.Steps[i].Type = utils.SyncStepType
 					}
 				}
 			case "KAFKA":
 				{
 					workflowRequest.Steps[i].Val.(*executors.KafkaVal).ReplyTo = config.ENV.KafkaConsumerTopicName
-					workflowRequest.Steps[i].Type = config.ENV.AsyncStepType
+					workflowRequest.Steps[i].Type = utils.AsyncStepType
 				}
 		}
 		UpdateStepCounterForEachOfSubSteps(workflowRequest, i, stepCounter)
