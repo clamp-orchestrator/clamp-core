@@ -9,8 +9,6 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/gin-gonic/gin/binding"
 	"log"
-	"os"
-	"os/signal"
 	"strings"
 )
 
@@ -40,10 +38,6 @@ func (c *Consumer) Listen() {
 		//topics, _ := master.Topics()
 		topics := config.ENV.KafkaConsumerTopicName
 		consumer, errors := consume(topics, master)
-
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals, os.Interrupt)
-
 		// Count how many message processed
 		msgCount := 0
 
@@ -72,9 +66,6 @@ func (c *Consumer) Listen() {
 					msgCount++
 					fmt.Println("Received consumerError ", string(consumerError.Topic), string(consumerError.Partition), consumerError.Err)
 					doneCh <- struct{}{}
-				case <-signals:
-					fmt.Println("Interrupt is detected")
-					doneCh <- struct{}{}
 				}
 			}
 			fmt.Println("Processed", msgCount, "messages")
@@ -94,7 +85,7 @@ func consume(topic string, master sarama.Consumer) (chan *sarama.ConsumerMessage
 			fmt.Printf("Topic %v Partitions: %v", topic, partition)
 			panic(err)
 		}
-		fmt.Println(" Start consuming topic ", topic)
+		fmt.Println(" Starting Kafka consumer topic ", topic)
 		go func(topic string, consumer sarama.PartitionConsumer) {
 			for {
 				select {
