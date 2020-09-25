@@ -11,7 +11,7 @@ The clamp core that can be deployed as a binary and does service orchestration
 5. `Postgres DB` and `RabbitMq` can be configured in `config/env.go` file
 6. Presently we are using common postgres 
    ```
-   hostname : 18.236.212.57:5432 
+   hostname : 54.70.48.149:5432 
    user : clamp 
    dbname : clampdev
    password : clamppass
@@ -42,19 +42,19 @@ You can change it to any other port via `-p ANYOTHERPORT:8080`
 
 ## Documentation
 
-- [Clamp Swagger Documentation](http://54.190.89.41:8080/swagger/index.html)
+- [Clamp Swagger Documentation](http://34.222.166.218:8080/swagger/index.html)
 
 ## Monitoring & Metrics
 
 ``
-Grafana Credentials: admin/admin
+Grafana Credentials: admin/Metrics@2468
 ``
 
-- [Prometheus Dashboard](http://54.190.89.41:9090/graph)
+- [Prometheus Dashboard](http://34.222.166.218:9090/graph)
 
-- [Grafana Clamp Dashboard](http://54.190.89.41:3000/d/Ai6xpCgGz/clamp-dashboard?orgId=1)
+- [Grafana Clamp Dashboard](http://34.222.166.218:3000/d/ihhU4aZMz/clamp-metrics?orgId=1&refresh=5s)
 
-- [Grafana System Dashboard](http://54.190.89.41:3000/d/rYdddlPWk/node-exporter-full?orgId=1&from=now-3h&to=now)
+- [Grafana System Dashboard](http://34.222.166.218:3000/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=5s)
 
 ## Backlogs & Issues
 

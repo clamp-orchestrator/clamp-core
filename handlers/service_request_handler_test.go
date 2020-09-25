@@ -97,10 +97,10 @@ func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string
 	return w, bodyStr
 }
 
-func callGetServiceRequestStatus(serviceRequestId uuid.UUID) (*httptest.ResponseRecorder, string) {
+func callGetServiceRequestStatus(serviceRequestID uuid.UUID) (*httptest.ResponseRecorder, string) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestId.String(), nil)
+	req, _ := http.NewRequest("GET", "/serviceRequest/"+serviceRequestID.String(), nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -114,9 +114,9 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 		Mode:      "HTTP",
 		Transform: false,
 		Enabled:   false,
-		Val: &executors.HttpVal{
+		Val: &executors.HTTPVal{
 			Method:  "POST",
-			Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+			URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 			Headers: "",
 		},
 	}
@@ -145,12 +145,12 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 		Mode:      "HTTP",
 		Transform: true,
 		Enabled:   false,
-		RequestTransform: &transform.JsonTransform{
+		RequestTransform: &transform.JSONTransform{
 			Spec: map[string]interface{}{"name": "test"},
 		},
-		Val: &executors.HttpVal{
+		Val: &executors.HTTPVal{
 			Method:  "POST",
-			Url:     "https://reqres.in/api/users",
+			URL:     "https://reqres.in/api/users",
 			Headers: "",
 		},
 	}
@@ -164,4 +164,53 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 	if err != nil {
 		services.SaveWorkflow(workflow)
 	}
+}
+
+func TestShouldFindServiceRequestByWorkflowNameByPage(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ServiceRequestPageResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.NotNil(t, jsonResp.ServiceRequests)
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotPassedInServiceRequestByWorkflowName(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInServiceRequestByWorkflowName(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=-1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
 }

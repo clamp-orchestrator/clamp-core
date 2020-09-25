@@ -5,14 +5,14 @@ import (
 	"github.com/qntfy/kazaam"
 	"log"
 )
-
+// TransformHook : Request Transform hook
 type TransformHook struct {
 }
-
+// ShouldStepExecute : Implementation method but its not required for Request Transformation
 func (e *TransformHook) ShouldStepExecute(string, map[string]interface{}, string) (bool, error) {
 	panic("implement me")
 }
-
+// TransformRequest : Implementation method where request will be transformed based on transformed structure
 func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{}, transformedStructure map[string]interface{}) (map[string]interface{}, error) {
 	var transformedRequestBody map[string]interface{}
 

@@ -3,6 +3,7 @@ package services
 import (
 	"clamp-core/models"
 	"clamp-core/repository"
+	"clamp-core/utils"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -30,45 +31,45 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 	if err != nil {
 		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
-	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestId.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
-	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestId.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Inc()
+	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
+	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Inc()
 	serviceRequestStepNameTimeExecutorHistogram.Observe(float64(stepStatusReq.TotalTimeInMs))
 	return stepStatusReq, err
 }
 
-func FindStepStatusByServiceRequestId(serviceRequestId uuid.UUID) ([]models.StepsStatus, error) {
-	log.Printf("Find step statues by request id : %s ", serviceRequestId)
-	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestId(serviceRequestId)
+func FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]models.StepsStatus, error) {
+	log.Printf("Find step statues by request id : %s ", serviceRequestID)
+	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestID(serviceRequestID)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestId)
+		log.Printf("No record found with given service request id %s", serviceRequestID)
 		return []models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
 
-func FindStepStatusByServiceRequestIdAndStatus(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
-	log.Printf("Find step statues by request id : %s ", serviceRequestId)
-	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestIdAndStatus(serviceRequestId, status)
+func FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
+	log.Printf("Find step statues by request id : %s ", serviceRequestID)
+	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestIDAndStatus(serviceRequestID, status)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestId)
+		log.Printf("No record found with given service request id %s", serviceRequestID)
 		return []models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
 
-func FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId uuid.UUID, stepId int) ([]models.StepsStatus, error) {
-	log.Printf("Find all step statues by request id : %s and step id : %d", serviceRequestId, stepId)
-	stepsStatuses, err := repository.GetDB().FindAllStepStatusByServiceRequestIdAndStepId(serviceRequestId, stepId)
+func FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error) {
+	log.Printf("Find all step statues by request id : %s and step id : %d", serviceRequestID, stepID)
+	stepsStatuses, err := repository.GetDB().FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID, stepID)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestId)
+		log.Printf("No record found with given service request id %s", serviceRequestID)
 		return []models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
 
-func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, stepsStatusArr []models.StepsStatus) models.ServiceRequestStatusResponse {
+func PrepareStepStatusResponse(srvReqID uuid.UUID, workflow models.Workflow, stepsStatusArr []models.StepsStatus) models.ServiceRequestStatusResponse {
 	var srvReqStatusRes models.ServiceRequestStatusResponse
-	srvReqStatusRes.ServiceRequestId = srvReqId
+	srvReqStatusRes.ServiceRequestID = srvReqID
 	srvReqStatusRes.WorkflowName = workflow.Name
 	stepsStatusRes := make([]models.StepStatusResponse, len(stepsStatusArr))
 	stepsCount := len(workflow.Steps)
@@ -76,7 +77,7 @@ func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, ste
 		var startedStepsCount, completedStepsCount, failedStepsCount, pausedStepsCount, skippedStepsCount int
 		for i, stepsStatus := range stepsStatusArr {
 			stepsStatusRes[i] = models.StepStatusResponse{
-				Id:        stepsStatus.StepId,
+				ID:        stepsStatus.StepID,
 				Name:      stepsStatus.StepName,
 				Status:    stepsStatus.Status,
 				TimeTaken: stepsStatus.TotalTimeInMs,
@@ -106,7 +107,7 @@ func PrepareStepStatusResponse(srvReqId uuid.UUID, workflow models.Workflow, ste
 			srvReqStatusRes.Status = models.STATUS_INPROGRESS
 		}
 		timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
-		srvReqStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / models.MilliSecondsDivisor
+		srvReqStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / utils.MilliSecondsDivisor
 		srvReqStatusRes.Steps = stepsStatusRes
 	}
 	return srvReqStatusRes

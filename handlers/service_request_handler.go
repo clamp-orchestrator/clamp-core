@@ -4,6 +4,7 @@ import (
 	. "clamp-core/models"
 	"clamp-core/services"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
@@ -11,6 +12,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -23,15 +25,16 @@ var (
 		Name: "create_service_request_handler_histogram",
 		Help: "The total number of service requests created",
 	})
-	serviceRequestByIdCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+	serviceRequestByIDCounter = promauto.NewCounterVec(prometheus.CounterOpts{
 		Name: "get_service_request_handler_by_id_counter",
 		Help: "The total number of service requests enquired",
 	}, []string{"service_request_id"})
-	serviceRequestByIdHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+	serviceRequestByIDHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "get_service_request_handler_by_id_histogram",
 		Help: "The total number of service requests enquired",
 	})
 )
+
 // Create Service Request godoc
 // @Summary Create a service request
 // @Description Create a service request and get service request id
@@ -77,7 +80,7 @@ func createServiceRequestHandler() gin.HandlerFunc {
 	}
 }
 
-func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string{
+func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string {
 	var serviceRequestHeaders string
 	for key, value := range c.Request.Header {
 		serviceRequestHeaders += key + ":" + value[0] + ";"
@@ -108,12 +111,13 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 	}
 	return payload
 }
-// Get Service Request By Id godoc
+
+// Get Service Request By ID godoc
 // @Summary Get service request details by service request id
 // @Description Get service request by service request id
 // @Accept json
 // @Produce json
-// @Param serviceRequestId path string true "Service Request Id"
+// @Param serviceRequestId path string true "Service Request ID"
 // @Success 200 {object} models.ServiceRequestStatusResponse
 // @Failure 400 {object} models.ClampErrorResponse
 // @Failure 404 {object} models.ClampErrorResponse
@@ -122,19 +126,55 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 func getServiceRequestStatusHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
-		serviceRequestId := c.Param("serviceRequestId")
+		serviceRequestID := c.Param("serviceRequestId")
 
-		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestId))
+		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestID))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, CreateErrorResponse(http.StatusBadRequest, err.Error()))
 			return
 		}
-		serviceRequestByIdCounter.WithLabelValues(serviceRequestId).Inc()
+		serviceRequestByIDCounter.WithLabelValues(serviceRequestID).Inc()
 		workflow, _ := services.FindWorkflowByName(serviceRequest.WorkflowName)
-		stepsStatues, _ := services.FindStepStatusByServiceRequestId(uuid.MustParse(serviceRequestId))
-		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestId), workflow, stepsStatues)
+		stepsStatues, _ := services.FindStepStatusByServiceRequestID(uuid.MustParse(serviceRequestID))
+		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestID), workflow, stepsStatues)
 		//TODO - handle error scenario. Currently it is always 200 ok
-		serviceRequestByIdHistogram.Observe(time.Since(startTime).Seconds())
+		serviceRequestByIDHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, stepsStatusResponse)
 	}
+}
+
+func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		log.Println("Get service request by workflow name handler")
+		pageSizeStr := c.Query("pageSize")
+		pageNumberStr := c.Query("pageNumber")
+		if pageSizeStr == "" || pageNumberStr == "" {
+			err := errors.New("page number or page size is not been defined")
+			prepareErrorResponse(err, c)
+			return
+		}
+		pageNumber, pageNumberErr := strconv.Atoi(pageNumberStr)
+		pageSize, pageSizeErr := strconv.Atoi(pageSizeStr)
+		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 0 || pageNumber < 0 {
+			err := errors.New("page number or page size is not in proper format")
+			prepareErrorResponse(err, c)
+			return
+		}
+		workflowName := c.Param("workflowName")
+		serviceRequests, err := services.FindServiceRequestByWorkflowName(workflowName, pageNumber, pageSize)
+		if err != nil {
+			prepareErrorResponse(err, c)
+			return
+		}
+		c.JSON(http.StatusOK, prepareServiceRequestsResponse(serviceRequests, pageNumber, pageSize))
+	}
+}
+
+func prepareServiceRequestsResponse(serviceRequests []ServiceRequest, pageNumber int, pageSize int) ServiceRequestPageResponse {
+	response := ServiceRequestPageResponse{
+		ServiceRequests: serviceRequests,
+		PageNumber:      pageNumber,
+		PageSize:        pageSize,
+	}
+	return response
 }

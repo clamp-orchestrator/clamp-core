@@ -1,10 +1,11 @@
-basePath: /
 definitions:
   models.AsyncStepResponse:
     properties:
       error:
         $ref: '#/definitions/models.ClampErrorResponse'
         type: object
+      requestHeaders:
+        type: string
       response:
         additionalProperties: true
         type: object
@@ -82,10 +83,6 @@ definitions:
         items:
           $ref: '#/definitions/models.Step'
         type: array
-      onSuccess:
-        items:
-          $ref: '#/definitions/models.Step'
-        type: array
       requestTransform:
         $ref: '#/definitions/models.RequestTransform'
         type: object
@@ -103,7 +100,6 @@ definitions:
     required:
     - mode
     - name
-    - type
     - val
     type: object
   models.StepStatusResponse:
@@ -147,7 +143,7 @@ definitions:
 host: localhost:8080
 info:
   contact: {}
-  description: This is a sample server Petstore server.
+  description: An opinionated approach to microservices architecture and orchestration
   license: {}
   termsOfService: http://swagger.io/terms/
   title: Clamp Swagger API

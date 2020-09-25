@@ -23,13 +23,27 @@ var ENV = struct {
 
 	*/
 	QueueDriver        string `env:"CLAMP_QUEUE_DRIVER" envDefault:"amqp"`
-	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clamp@18.236.212.57:5672/"`
+	QueueConnectionStr string `env:"CLAMP_QUEUE_CONNECTION_STR" envDefault:"amqp://clamp:clampdev!@54.190.25.178:5672/"`
 	QueueName          string `env:"CLAMP_QUEUE_NAME" envDefault:"clamp_steps_response"`
+	/**
+	Examples:
+
+	CLAMP_QUEUE_DRIVER     CLAMP_QUEUE_CONNECTION_STR
+	=================     ===============================================================
+	"kafka"            "amqp://guest:guest@localhost:5672/"
+
+	*/
+	KafkaDriver            string `env:"CLAMP_KAFKA_DRIVER" envDefault:"kafka"`
+	KafkaConnectionStr     string `env:"CLAMP_KAFKA_CONNECTION_STR" envDefault:"54.190.25.178:9092"`
+	KafkaTopicName         string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_steps_response"`
+	KafkaConsumerTopicName string `env:"CLAMP_KAFKA_TOPIC_NAME" envDefault:"clamp_consumer_topic"`
 	/**
 	System Defaults
 	*/
-	AsyncStepType string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
-	SyncStepType  string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
+	AsyncStepType string   `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
+	SyncStepType  string   `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
+	PORT          string   `env:"APP_PORT" envDefault:"8080"`
+	AllowOrigins  []string `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000,http://http://54.149.76.62"`
 }{}
 
 func init() {

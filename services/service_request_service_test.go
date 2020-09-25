@@ -44,7 +44,7 @@ func TestShouldFailToSaveServiceRequestAndThrowError(t *testing.T) {
 	}
 	serviceReq.WorkflowName = ""
 	request, err := SaveServiceRequest(serviceReq)
-	assert.Equal(t, models.ServiceRequest{},request)
+	assert.Equal(t, models.ServiceRequest{}, request)
 	assert.NotNil(t, err)
 	assert.Equal(t, "insertion failed", err.Error())
 }
@@ -54,7 +54,7 @@ func TestFindByID(t *testing.T) {
 	serviceReq := models.ServiceRequest{
 		ID: uuid.UUID{},
 	}
-	findServiceRequestByIdMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
+	findServiceRequestByIDMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
 		request.WorkflowName = "TEST_WF"
 		request.Status = models.STATUS_COMPLETED
 		return request, nil
@@ -64,10 +64,22 @@ func TestFindByID(t *testing.T) {
 	assert.Equal(t, "TEST_WF", resp.WorkflowName)
 	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
 
-	findServiceRequestByIdMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
+	findServiceRequestByIDMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
 		return request, errors.New("select query failed")
 	}
 	_, err = FindServiceRequestByID(serviceReq.ID)
 	assert.NotNil(t, err)
 	assert.Equal(t, "select query failed", err.Error())
+}
+
+func TestFindServiceRequestsByWorkflowName(t *testing.T) {
+	serviceReq := models.ServiceRequest{
+		ID: uuid.UUID{},
+	}
+	findServiceRequestsByWorkflowName = func(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+		return []models.ServiceRequest{serviceReq}, nil
+	}
+	resp, err := findServiceRequestsByWorkflowName("test", 1, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(resp))
 }
