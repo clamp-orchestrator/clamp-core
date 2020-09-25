@@ -6,13 +6,14 @@ import (
 	"clamp-core/models"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const workflowDescription string = "Testing workflow service"
@@ -35,7 +36,7 @@ func setUpWorkflowRequest() models.Workflow {
 	steps := make([]models.Step, 1)
 	httpVal := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http: //18.236.212.57:3333/api/v1/user",
+		Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		Headers: "",
 	}
 	steps[0] = models.Step{
@@ -164,7 +165,6 @@ func TestShouldReturnCreatedWorkflowSuccessfullyByWorkflowNameRoute(t *testing.T
 	assert.Equal(t, workflowName, jsonResp.Name, fmt.Sprintf("The expected name was %s but we got %s", workflowReg.Name, jsonResp.Name))
 	assert.NotNil(t, jsonResp.Steps)
 }
-
 
 func TestShouldFailToReturnWorkflowIfInvalidWorkflowNameIsProvidedInTheRoute(t *testing.T) {
 	router := setupRouter()

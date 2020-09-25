@@ -4,10 +4,11 @@ import (
 	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/transform"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 const workflowName string = "testWF"
@@ -24,7 +25,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
@@ -80,7 +81,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 			},
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
@@ -131,10 +132,10 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
-			When:"skipStep.request.id1 == 'val3'",
+			When:      "skipStep.request.id1 == 'val3'",
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
@@ -160,7 +161,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 					ID:           uuid.New(),
 					WorkflowName: workflowName,
 					Status:       models.STATUS_NEW,
-					Payload:prepareRequestPayload(),
+					Payload:      prepareRequestPayload(),
 				},
 			},
 		},
@@ -186,10 +187,10 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
-			When:"firstStep.request.id1 == 'val1'",
+			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
@@ -199,14 +200,14 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			Mode:      "HTTP",
 			Transform: false,
 			Enabled:   false,
-			When:"firstStep.request.id1 == 'val1'",
+			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
-		workflow.Steps = []models.Step{step,step1}
+		workflow.Steps = []models.Step{step, step1}
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
@@ -233,11 +234,11 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			name: "Should continue execution from next step",
 			args: args{
 				serviceReq: models.ServiceRequest{
-					ID:           uuid.New(),
-					WorkflowName: workflowName,
-					Status:       models.STATUS_NEW,
-					Payload:prepareRequestPayload(),
-					CurrentStepId:1,
+					ID:            uuid.New(),
+					WorkflowName:  workflowName,
+					Status:        models.STATUS_NEW,
+					Payload:       prepareRequestPayload(),
+					CurrentStepId: 1,
 				},
 			},
 		},

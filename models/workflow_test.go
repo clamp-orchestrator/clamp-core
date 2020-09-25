@@ -4,9 +4,10 @@ import (
 	"clamp-core/config"
 	"clamp-core/executors"
 	"fmt"
-	"github.com/gin-gonic/gin/binding"
 	"log"
 	"testing"
+
+	"github.com/gin-gonic/gin/binding"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -14,7 +15,7 @@ import (
 func TestShouldCreateANewWorkflow(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://18.236.212.57:3333/api/v1/user",
+		Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		Headers: "",
 	}
 	steps := []Step{{}}
@@ -47,7 +48,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
 	assert.Equal(t, serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name))
 	assert.Equal(t, "GET", workflowResponse.Steps[0].getHttpVal().Method)
-	assert.Equal(t, "http://18.236.212.57:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
+	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].getHttpVal().Url)
 	assert.Equal(t, "", workflowResponse.Steps[0].getHttpVal().Headers)
 }
 
@@ -78,7 +79,7 @@ func TestShouldNotCreateWorkflowIfStepValIsNotPresent(t *testing.T) {
 func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://18.236.212.57:3333/api/v1/user",
+		Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		Headers: "",
 	}
 	steps := []Step{{}}
@@ -108,7 +109,7 @@ func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 
 func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
 	queue := executors.AMQPVal{
-		ConnectionURL: "http://18.236.212.57:3333",
+		ConnectionURL: "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		QueueName:     "topic-a",
 	}
 	steps := []Step{{}}
@@ -166,7 +167,7 @@ func TestShouldThrowErrorIfGetHTTPValUrlIsEmpty(t *testing.T) {
 
 func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefaultValueFromConfig(t *testing.T) {
 	queue := &executors.AMQPVal{
-		ConnectionURL: "http://18.236.212.57:3333",
+		ConnectionURL: "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		QueueName:     "topic-a",
 	}
 	steps := []Step{{}}
@@ -198,7 +199,7 @@ func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefault
 	assert.Equal(t, serviceFlowRequest.Description, workflowResponse.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.Description, workflowResponse.Description))
 	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
 	assert.Equal(t, serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name))
-	assert.Equal(t, "http://18.236.212.57:3333", workflowResponse.Steps[0].getAMQPVal().ConnectionURL)
+	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].getAMQPVal().ConnectionURL)
 	assert.Equal(t, config.ENV.QueueName, workflowResponse.Steps[0].getAMQPVal().ReplyTo)
 	assert.Equal(t, "topic-a", workflowResponse.Steps[0].getAMQPVal().QueueName)
 }
@@ -206,7 +207,7 @@ func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefault
 func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 	http := executors.HttpVal{
 		Method:  "GET",
-		Url:     "http://18.236.212.57:3333/api/v1/user",
+		Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		Headers: "",
 	}
 	steps := []Step{{}}
@@ -218,10 +219,10 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 		Enabled: true,
 	}
 	steps[0] = Step{
-		Name:    "firstStep",
-		Mode:    "HTTP",
-		Val:     http,
-		Enabled: true,
+		Name:      "firstStep",
+		Mode:      "HTTP",
+		Val:       http,
+		Enabled:   true,
 		OnFailure: failureSteps,
 	}
 	workflow := Workflow{
@@ -245,9 +246,9 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 	assert.Equal(t, serviceFlowRequest.Description, workflowResponse.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", serviceFlowRequest.Description, workflowResponse.Description))
 	assert.Equal(t, serviceFlowRequest.Name, workflowResponse.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", serviceFlowRequest.Name, workflowResponse.Name))
 	assert.Equal(t, serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", serviceFlowRequest.Steps[0].Name, workflowResponse.Steps[0].Name))
-	assert.Equal(t, "http://18.236.212.57:3333/api/v1/user", workflowResponse.Steps[0].getHttpVal().Url)
-	assert.NotNil(t,  workflowResponse.Steps[0].OnFailure)
+	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].getHttpVal().Url)
+	assert.NotNil(t, workflowResponse.Steps[0].OnFailure)
 	assert.Equal(t, "onFailureStep", workflowResponse.Steps[0].OnFailure[0].Name)
 	assert.Equal(t, "HTTP", workflowResponse.Steps[0].OnFailure[0].Mode)
-	assert.Equal(t, "http://18.236.212.57:3333/api/v1/user", workflowResponse.Steps[0].OnFailure[0].getHttpVal().Url)
+	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].OnFailure[0].getHttpVal().Url)
 }
