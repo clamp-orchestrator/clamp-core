@@ -8,13 +8,14 @@ import (
 	"clamp-core/transform"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 const workflowName string = "testWorkflow"
@@ -88,8 +89,8 @@ func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string
 	w := httptest.NewRecorder()
 	marshal, _ := json.Marshal(prepareServiceRequestPayload())
 	req, _ := http.NewRequest("POST", "/serviceRequest/"+wfName, bytes.NewReader(marshal))
-	req.Header.Add("Content-Type","application/json")
-	req.Header.Add("token","abc")
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("token", "abc")
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -115,7 +116,7 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 		Enabled:   false,
 		Val: &executors.HttpVal{
 			Method:  "POST",
-			Url:     "http://18.236.212.57:3333/api/v1/login",
+			Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 			Headers: "",
 		},
 	}

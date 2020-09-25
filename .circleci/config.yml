@@ -8,6 +8,13 @@ jobs:
       # specify the version
       - image: cimg/go:1.13.15
 
+      - image: circleci/postgres:12.4-postgis-ram
+        environment:
+          POSTGRES_USER: clamptest
+          POSTGRES_DB: clamptest
+          POSTGRES_PASSWORD: cl@mpt3st
+
+
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
@@ -21,8 +28,17 @@ jobs:
     steps:
       - checkout
 
-      # specify any bash command here prefixed with `run: `
-      - run: go test clamp-core/executors clamp-core/models clamp-core/services
+      - run:
+          name: Waiting for Postgres to be ready
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+
+      - run: 
+          name: run unit tests
+          environment:
+            CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
+          command: go test clamp-core/executors clamp-core/models clamp-core/services
+
+
 
 workflows:
   version: 2

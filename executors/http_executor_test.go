@@ -2,9 +2,10 @@ package executors
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestHttpVal_DoExecute(t *testing.T) {
@@ -23,7 +24,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			name: "TestShouldExecuteHTTPStep",
 			fields: HttpVal{
 				Method:  "GET",
-				Url:     "http://18.236.212.57:3333/api/v1/user",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 			args: args{
@@ -37,7 +38,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			name: "TestShouldExecuteHTTPStepWithHeaders",
 			fields: HttpVal{
 				Method:  "GET",
-				Url:     "http://18.236.212.57:3333/api/v1/user",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "Content-Type:application/json;token:abc",
 			},
 			args: args{
@@ -51,7 +52,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			name: "TestShouldThrowErrorWhileExecutingStep",
 			fields: HttpVal{
 				Method:  "GET",
-				Url:     "http://18.236.212.57:3333/api/v1/asd",
+				Url:     "https://run.mocky.io/v3/nonexistent",
 				Headers: "",
 			},
 			args: args{
@@ -59,7 +60,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			},
 			want:       nil,
 			wantErr:    true,
-			wantErrMsg: "404 page not found",
+			wantErrMsg: "Not found",
 		},
 		{
 			name: "TestShouldThrowErrorForHTTPStep",
@@ -73,7 +74,7 @@ func TestHttpVal_DoExecute(t *testing.T) {
 			},
 			want:       map[string]interface{}{"id": "1234", "name": "ABC", "email": "abc@sahaj.com", "org": "sahaj"},
 			wantErr:    true,
-			wantErrMsg: "Get http://localhost:3333/api/v1/user: dial tcp [::1]:3333: connect: connection refused",
+			wantErrMsg: "Get http://localhost:3333/api/v1/user: dial tcp 127.0.0.1:3333: connect: connection refused",
 		},
 	}
 	for _, tt := range tests {

@@ -13,7 +13,7 @@ var ENV = struct {
 
 	*/
 	DBDriver        string `env:"CLAMP_DB_DRIVER" envDefault:"postgres"`
-	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=18.236.212.57:5432 user=clamp dbname=clampdev password=clamppass"`
+	DBConnectionStr string `env:"CLAMP_DB_CONNECTION_STR" envDefault:"host=localhost:5432 user=clamp dbname=clampdev password=clamppass"`
 	/**
 	Examples:
 
@@ -27,9 +27,9 @@ var ENV = struct {
 	QueueName          string `env:"CLAMP_QUEUE_NAME" envDefault:"clamp_steps_response"`
 	/**
 	System Defaults
-	 */
-	AsyncStepType          string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
-	SyncStepType          string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
+	*/
+	AsyncStepType string `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
+	SyncStepType  string `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
 }{}
 
 func init() {

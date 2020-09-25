@@ -3,10 +3,11 @@ package services
 import (
 	"clamp-core/executors"
 	"clamp-core/models"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 var serviceRequestId = uuid.New()
@@ -40,7 +41,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
@@ -131,7 +132,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HttpVal{
 				Method:  "POST",
-				Url:     "http://18.236.212.57:3333/api/v1/login",
+				Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				Headers: "",
 			},
 		}
