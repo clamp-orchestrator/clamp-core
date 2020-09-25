@@ -17,10 +17,10 @@ type RequestTransform interface {
 }
 
 type Step struct {
-	Id               int              `json:"id"`
+	ID               int              `json:"id"`
 	Name             string           `json:"name" binding:"required"`
 	Type             string           `json:"type"`
-	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP"`
+	Mode             string           `json:"mode" binding:"required,oneof=HTTP AMQP KAFKA"`
 	Val              Val              `json:"val" binding:"required"`
 	Transform        bool             `json:"transform"`
 	Enabled          bool             `json:"enabled"`
@@ -55,24 +55,27 @@ func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interf
 	switch step.Mode {
 	case "HTTP":
 		step.UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody)
-		res, err := step.Val.(*executors.HttpVal).DoExecute(requestBody.Payload, prefix)
+		res, err := step.Val.(*executors.HTTPVal).DoExecute(requestBody.Payload, prefix)
 		return res, err
 	case "AMQP":
 		res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
+		return res, err
+	case "KAFKA":
+		res, err := step.Val.(*executors.KafkaVal).DoExecute(requestBody, prefix)
 		return res, err
 	}
 	panic("Invalid mode specified")
 }
 
 func (step *Step) UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody *StepRequest) {
-	headers := step.Val.(*executors.HttpVal).Headers
+	headers := step.Val.(*executors.HTTPVal).Headers
 	requestHeaders := requestBody.Headers
 	if requestHeaders != "" && headers != "" {
 		headers = requestHeaders + headers
 	} else if requestHeaders != "" && headers == "" {
 		headers = requestHeaders
 	}
-	step.Val.(*executors.HttpVal).Headers = headers
+	step.Val.(*executors.HTTPVal).Headers = headers
 }
 
 func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ interface{}, _ error) {
@@ -86,7 +89,7 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}
-	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestId, step.Id, request,  requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
+	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestID, step.ID, request,  requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
 	//post Step execution
 	return res, err
 }
@@ -102,7 +105,7 @@ func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map
 			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(stepRequestResponsePayload, prefix)
 			return res, err
 		default:
-			res, err := step.RequestTransform.(*transform.JsonTransform).DoTransform(stepRequestResponsePayload, prefix)
+			res, err := step.RequestTransform.(*transform.JSONTransform).DoTransform(stepRequestResponsePayload, prefix)
 			return res, err
 		}
 	}
@@ -115,7 +118,7 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	mode := v["mode"]
-	//TODO I guess this is initialization section otherwise transform.JsonTransform was not getting called.
+	//TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
 	requestTransform := v["transformFormat"]
 
 	if requestTransform != nil {
@@ -142,7 +145,7 @@ func (step *Step) setRequestTransform(requestTransform interface{}) error {
 	case "XML":
 		step.RequestTransform = &transform.XMLTransform{}
 	default:
-		step.RequestTransform = &transform.JsonTransform{}
+		step.RequestTransform = &transform.JSONTransform{}
 	}
 	return nil
 }
@@ -154,17 +157,19 @@ func (step *Step) setMode(mode interface{}) error {
 	}
 	switch m {
 	case "HTTP":
-		step.Val = &executors.HttpVal{}
+		step.Val = &executors.HTTPVal{}
 	case "AMQP":
 		step.Val = &executors.AMQPVal{}
+	case "KAFKA":
+		step.Val = &executors.KafkaVal{}
 	default:
 		return fmt.Errorf("%s is an invalid Mode", mode)
 	}
 	return nil
 }
 
-func (step Step) getHttpVal() executors.HttpVal {
-	return step.Val.(executors.HttpVal)
+func (step Step) getHTTPVal() executors.HTTPVal {
+	return step.Val.(executors.HTTPVal)
 }
 
 func (step Step) getAMQPVal() *executors.AMQPVal {

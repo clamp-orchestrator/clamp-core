@@ -21,7 +21,7 @@ func Test(t *testing.T) {
 func TestShouldSetStepRequestToContext(t *testing.T) {
 	payload := map[string]interface{}{"k": "v"}
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","",nil, false}},
 	}
@@ -33,7 +33,7 @@ func TestShouldSetStepRequestToContext(t *testing.T) {
 func TestShouldGetStepRequestFromContext(t *testing.T) {
 	payload := map[string]interface{}{"k": "v"}
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
@@ -45,7 +45,7 @@ func TestShouldGetStepRequestFromContext(t *testing.T) {
 func TestShouldSetStepResponseToContext(t *testing.T) {
 	payload := map[string]interface{}{"k": "v"}
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
@@ -57,7 +57,7 @@ func TestShouldSetStepResponseToContext(t *testing.T) {
 func TestShouldGetStepResponseFromContext(t *testing.T) {
 	payload := map[string]interface{}{"k": "v"}
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
 	}
@@ -69,7 +69,7 @@ func TestShouldGetStepResponseFromContext(t *testing.T) {
 func TestShouldSetStepRequestHeadersToContext(t *testing.T) {
 	requestHeaders := "Content-Type:application/json"
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","",nil, false}},
 	}
@@ -81,7 +81,7 @@ func TestShouldSetStepRequestHeadersToContext(t *testing.T) {
 func TestShouldGetStepRequestHeadersToContext(t *testing.T) {
 	requestHeaders := "Content-Type:application/json"
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","",nil, false}},
 	}
@@ -93,7 +93,7 @@ func TestShouldGetStepRequestHeadersToContext(t *testing.T) {
 func TestShouldSetStepResponseHeadersToContext(t *testing.T) {
 	responseHeaders := "Content-Type:application/json"
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","Content-Type:application/json;",nil, false}},
 	}
@@ -105,7 +105,7 @@ func TestShouldSetStepResponseHeadersToContext(t *testing.T) {
 func TestShouldGetStepResponseHeadersToContext(t *testing.T) {
 	responseHeaders := "Content-Type:application/json;"
 	context := RequestContext{
-		ServiceRequestId: uuid.UUID{},
+		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
 		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","Content-Type:application/json;",nil, false}},
 	}

@@ -2,13 +2,13 @@ package models
 
 import "encoding/xml"
 
-type XmlStepRequest struct {
+type XMLStepRequest struct {
 	XMLName xml.Name `xml:"request"`
 	Text    string   `xml:",chardata"`
 	Body    struct {
 		Text             string `xml:",chardata"`
-		ServiceRequestId string `xml:"serviceRequestId"`
-		StepId           string `xml:"stepId"`
+		ServiceRequestID string `xml:"serviceRequestId"`
+		StepID           string `xml:"stepId"`
 		Payload          string `xml:"payload"`
 	} `xml:"body"`
 }

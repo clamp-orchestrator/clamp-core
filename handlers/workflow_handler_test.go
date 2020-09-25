@@ -34,9 +34,9 @@ func RandStringRunes(n int) string {
 
 func setUpWorkflowRequest() models.Workflow {
 	steps := make([]models.Step, 1)
-	httpVal := executors.HttpVal{
+	httpVal := executors.HTTPVal{
 		Method:  "GET",
-		Url:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+		URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		Headers: "",
 	}
 	steps[0] = models.Step{
@@ -59,8 +59,8 @@ func TestCreateNewWorkflowRequestRoute(t *testing.T) {
 	workflowReg := setUpWorkflowRequest()
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	workflowJsonReg, _ := json.Marshal(workflowReg)
-	requestReader := bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ := json.Marshal(workflowReg)
+	requestReader := bytes.NewReader(workflowJSONReg)
 
 	req, _ := http.NewRequest("POST", "/workflow", requestReader)
 	router.ServeHTTP(w, req)
@@ -82,8 +82,8 @@ func TestShouldThrowErrorIfNameFieldsIsNotPresent(t *testing.T) {
 	workflowReg.Name = ""
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	workflowJsonReg, _ := json.Marshal(workflowReg)
-	requestReader := bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ := json.Marshal(workflowReg)
+	requestReader := bytes.NewReader(workflowJSONReg)
 
 	req, _ := http.NewRequest("POST", "/workflow", requestReader)
 	router.ServeHTTP(w, req)
@@ -100,8 +100,8 @@ func TestShouldThrowErrorIfStepsAreNotPresent(t *testing.T) {
 	workflowReg.Steps = nil
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	workflowJsonReg, _ := json.Marshal(workflowReg)
-	requestReader := bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ := json.Marshal(workflowReg)
+	requestReader := bytes.NewReader(workflowJSONReg)
 
 	req, _ := http.NewRequest("POST", "/workflow", requestReader)
 	router.ServeHTTP(w, req)
@@ -116,8 +116,8 @@ func TestShouldThrowErrorIfStepsAreNotPresent(t *testing.T) {
 	workflowReg.Steps = []models.Step{}
 	router = setupRouter()
 	w = httptest.NewRecorder()
-	workflowJsonReg, _ = json.Marshal(workflowReg)
-	requestReader = bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ = json.Marshal(workflowReg)
+	requestReader = bytes.NewReader(workflowJSONReg)
 
 	req, _ = http.NewRequest("POST", "/workflow", requestReader)
 	router.ServeHTTP(w, req)
@@ -134,8 +134,8 @@ func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 	workflowReg.Steps[0].Mode = "HTTP"
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	workflowJsonReg, _ := json.Marshal(workflowReg)
-	requestReader := bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ := json.Marshal(workflowReg)
+	requestReader := bytes.NewReader(workflowJSONReg)
 
 	req, _ := http.NewRequest("POST", "/workflow", requestReader)
 	router.ServeHTTP(w, req)
@@ -188,17 +188,65 @@ func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *t
 	workflowReg.Name = workflowName
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	workflowJsonReg, _ := json.Marshal(workflowReg)
-	requestReader := bytes.NewReader(workflowJsonReg)
+	workflowJSONReg, _ := json.Marshal(workflowReg)
+	requestReader := bytes.NewReader(workflowJSONReg)
 
 	req, _ := http.NewRequest("POST", "/workflow", requestReader)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
-	var errorJsonResp models.ClampErrorResponse
-	json.Unmarshal([]byte(bodyStr), &errorJsonResp)
+	var errorJSONResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &errorJSONResp)
 	assert.Equal(t, 400, w.Code)
-	assert.NotNil(t, errorJsonResp.Code)
-	assert.NotNil(t, errorJsonResp.Message)
-	assert.Equal(t, "ERROR #23505 duplicate key value violates unique constraint \"workflow_name_index\"", errorJsonResp.Message)
+	assert.NotNil(t, errorJSONResp.Code)
+	assert.NotNil(t, errorJSONResp.Message)
+	assert.Equal(t, "ERROR #23505 duplicate key value violates unique constraint \"workflow_name_index\"", errorJSONResp.Message)
+}
+
+func TestShouldGetAllWorkflowsByPage(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.WorkflowsPageResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, 1, len(jsonResp.Workflows), fmt.Sprintf("The expected number of records was %d but we got %d", 1, len(jsonResp.Workflows)))
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=-1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
 }

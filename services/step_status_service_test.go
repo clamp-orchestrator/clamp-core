@@ -13,7 +13,7 @@ import (
 func prepareStepsStatus() models.StepsStatus {
 	stepsStatus := models.StepsStatus{
 		ID:               "1",
-		ServiceRequestId: uuid.New(),
+		ServiceRequestID: uuid.New(),
 		WorkflowName:     workflowName,
 		Status:           models.STATUS_COMPLETED,
 		CreatedAt:        time.Now(),
@@ -45,7 +45,7 @@ func TestSaveStepsStatus(t *testing.T) {
 
 func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	stepsStatusReq := prepareStepsStatus()
-	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 		step2Time := time.Date(2020, time.April, 07, 16, 32, 00, 20000000, time.UTC)
 
@@ -77,7 +77,7 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 		return statuses, err
 	}
 
-	stepsStatus, err := FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	stepsStatus, err := FindStepStatusByServiceRequestID(stepsStatusReq.ServiceRequestID)
 	workflow := models.Workflow{
 		Name:        stepsStatusReq.WorkflowName,
 		Description: "",
@@ -86,13 +86,13 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 		UpdatedAt:   time.Time{},
 		Steps:       make([]models.Step, 2),
 	}
-	resp := PrepareStepStatusResponse(stepsStatusReq.ServiceRequestId, workflow, stepsStatus)
+	resp := PrepareStepStatusResponse(stepsStatusReq.ServiceRequestID, workflow, stepsStatus)
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, resp.WorkflowName)
 	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
-	//assert.Equal(t, stepsStatusReq.ServiceRequestId, resp.ServiceRequestId)
+	//assert.Equal(t, stepsStatusReq.ServiceRequestID, resp.ServiceRequestID)
 	assert.Equal(t, int64(20), resp.TotalTimeInMs)
-	assert.NotNil(t, resp.ServiceRequestId)
+	assert.NotNil(t, resp.ServiceRequestID)
 	assert.NotNil(t, resp.Steps)
 	assert.Equal(t, models.STATUS_COMPLETED, resp.Steps[1].Status)
 	assert.Equal(t, stepsStatusReq.StepName, resp.Steps[0].Name)
@@ -101,15 +101,15 @@ func TestFindStepStatusByServiceRequestId(t *testing.T) {
 	assert.Equal(t, "step2", resp.Steps[2].Name)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, resp.Steps[2].TimeTaken)
 
-	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		return statuses, errors.New("select query failed")
 	}
-	_, err = FindStepStatusByServiceRequestId(stepsStatusReq.ServiceRequestId)
+	_, err = FindStepStatusByServiceRequestID(stepsStatusReq.ServiceRequestID)
 	assert.NotNil(t, err)
 }
 
 func TestShouldReturnStatusCompletedForAllStepsCompleted(t *testing.T) {
-	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 4)
@@ -143,7 +143,7 @@ func TestShouldReturnStatusCompletedForAllStepsCompleted(t *testing.T) {
 	}
 
 	serviceReqID := uuid.New()
-	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	stepsStatus, err := FindStepStatusByServiceRequestID(serviceReqID)
 	workflow := models.Workflow{
 		Name:        workflowName,
 		Description: "",
@@ -158,7 +158,7 @@ func TestShouldReturnStatusCompletedForAllStepsCompleted(t *testing.T) {
 }
 
 func TestShouldReturnStatusFailed(t *testing.T) {
-	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 4)
@@ -190,7 +190,7 @@ func TestShouldReturnStatusFailed(t *testing.T) {
 		return statuses, err
 	}
 	serviceReqID := uuid.New()
-	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	stepsStatus, err := FindStepStatusByServiceRequestID(serviceReqID)
 	workflow := models.Workflow{
 		Name:        workflowName,
 		Description: "",
@@ -205,7 +205,7 @@ func TestShouldReturnStatusFailed(t *testing.T) {
 }
 
 func TestShouldReturnStatusInprogress(t *testing.T) {
-	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 4)
@@ -232,7 +232,7 @@ func TestShouldReturnStatusInprogress(t *testing.T) {
 	}
 
 	serviceReqID := uuid.New()
-	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	stepsStatus, err := FindStepStatusByServiceRequestID(serviceReqID)
 	workflow := models.Workflow{
 		Name:        workflowName,
 		Description: "",
@@ -248,7 +248,7 @@ func TestShouldReturnStatusInprogress(t *testing.T) {
 
 func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testing.T) {
 	stepsStatusReq := prepareStepsStatus()
-	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 1)
@@ -261,27 +261,27 @@ func TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc(t *testin
 		return statuses, err
 	}
 
-	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	stepsStatuses, err := FindStepStatusByServiceRequestIDAndStatus(stepsStatusReq.ServiceRequestID, models.STATUS_STARTED)
 	stepsStatus := stepsStatuses[0]
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
 	assert.Equal(t, models.STATUS_STARTED, stepsStatus.Status)
 	assert.Equal(t, int64(10), stepsStatus.TotalTimeInMs)
-	assert.NotNil(t, stepsStatus.ServiceRequestId)
+	assert.NotNil(t, stepsStatus.ServiceRequestID)
 
 	assert.Equal(t, "step1", stepsStatus.StepName)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
 
-	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		return statuses, errors.New("select query failed")
 	}
-	_, err = FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	_, err = FindStepStatusByServiceRequestIDAndStatus(stepsStatusReq.ServiceRequestID, models.STATUS_STARTED)
 	assert.NotNil(t, err)
 }
 
 func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
 	stepsStatusReq := prepareStepsStatus()
-	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 1)
@@ -289,32 +289,32 @@ func TestFindStepStatusByServiceRequestIdAndStepIdAndStatus(t *testing.T) {
 		statuses[0].ID = "1"
 		statuses[0].Status = models.STATUS_STARTED
 		statuses[0].StepName = "step1"
-		statuses[0].StepId = 1
+		statuses[0].StepID = 1
 		statuses[0].TotalTimeInMs = 10
 		statuses[0].CreatedAt = step1Time
 		return statuses, err
 	}
 
-	stepsStatuses, err := FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	stepsStatuses, err := FindStepStatusByServiceRequestIDAndStatus(stepsStatusReq.ServiceRequestID, models.STATUS_STARTED)
 	stepsStatus := stepsStatuses[0]
 	assert.Nil(t, err)
 	assert.Equal(t, stepsStatusReq.WorkflowName, stepsStatus.WorkflowName)
 	assert.Equal(t, models.STATUS_STARTED, stepsStatus.Status)
 	assert.Equal(t, int64(10), stepsStatus.TotalTimeInMs)
-	assert.NotNil(t, stepsStatus.ServiceRequestId)
+	assert.NotNil(t, stepsStatus.ServiceRequestID)
 
 	assert.Equal(t, "step1", stepsStatus.StepName)
 	assert.Equal(t, stepsStatusReq.TotalTimeInMs, stepsStatus.TotalTimeInMs)
 
-	findStepStatusByServiceRequestIdAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) (statuses []models.StepsStatus, err error) {
 		return statuses, errors.New("select query failed")
 	}
-	_, err = FindStepStatusByServiceRequestIdAndStatus(stepsStatusReq.ServiceRequestId, models.STATUS_STARTED)
+	_, err = FindStepStatusByServiceRequestIDAndStatus(stepsStatusReq.ServiceRequestID, models.STATUS_STARTED)
 	assert.NotNil(t, err)
 }
 
 func TestShouldReturnStatusCompletedIfOneStepSkipped(t *testing.T) {
-	findStepStatusByServiceRequestIdMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
+	findStepStatusByServiceRequestIDMock = func(serviceRequestId uuid.UUID) (statuses []models.StepsStatus, err error) {
 		step1Time := time.Date(2020, time.April, 07, 16, 32, 00, 00, time.UTC)
 
 		statuses = make([]models.StepsStatus, 4)
@@ -346,7 +346,7 @@ func TestShouldReturnStatusCompletedIfOneStepSkipped(t *testing.T) {
 		return statuses, err
 	}
 	serviceReqID := uuid.New()
-	stepsStatus, err := FindStepStatusByServiceRequestId(serviceReqID)
+	stepsStatus, err := FindStepStatusByServiceRequestID(serviceReqID)
 	workflow := models.Workflow{
 		Name:        workflowName,
 		Description: "",

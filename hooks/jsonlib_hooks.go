@@ -11,7 +11,7 @@ func (d jsonLib) TransformRequest(m map[string]interface{}, s map[string]interfa
 func (d jsonLib) ShouldStepExecute(s string, m map[string]interface{}, s2 string) (bool, error) {
 	return true, nil
 }
-
-func GetJsonLib() Hook {
+// GetJSONLib : Getter for Json hook
+func GetJSONLib() Hook {
 	return jsonLib{}
 }

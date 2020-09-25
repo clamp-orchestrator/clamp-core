@@ -6,16 +6,16 @@ import (
 	"log"
 	"strings"
 )
-
+// ContextPrefix ... It will contain a prefix so that it will be applicable during condition check
 const ContextPrefix = "context."
-
+// ExprHook : Expression hook to validate the condition based branching
 type ExprHook struct {
 }
-
+// TransformRequest : Transformation will be applied to the given map
 func (e *ExprHook) TransformRequest(m map[string]interface{}, s map[string]interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
-
+// ShouldStepExecute : Check whether Step should execute or skipped
 func (e *ExprHook) ShouldStepExecute(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
 	log.Printf("%s Pre-step execution for step is in progress", prefix)
 
@@ -39,11 +39,10 @@ func (e *ExprHook) ShouldStepExecute(whenCondition string, stepRequest map[strin
 
 	if canStepExecute, ok := output.(bool); ok {
 		return canStepExecute, nil
-	} else {
-		return false, fmt.Errorf("invalid boolean expression : %s", whenCondition)
 	}
+	return false, fmt.Errorf("invalid boolean expression : %s", whenCondition)
 }
-
+// GetExprHook : Getter for Expression hook
 func GetExprHook() Hook {
 	return &ExprHook{}
 }

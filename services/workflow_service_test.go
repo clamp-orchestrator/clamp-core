@@ -17,7 +17,7 @@ func prepareWorkflow() models.Workflow {
 	}
 
 	workflow := models.Workflow{
-		Id:          "1",
+		ID:          "1",
 		Name:        "TEST_WF",
 		Description: "Test",
 		Enabled:     false,
@@ -34,7 +34,7 @@ func TestSaveWorkflow(t *testing.T) {
 	response, err := SaveWorkflow(workflow)
 	assert.NotNil(t, response)
 	assert.Nil(t, err)
-	assert.NotNil(t, response.Id)
+	assert.NotNil(t, response.ID)
 	assert.Equal(t, workflow.Description, response.Description, fmt.Sprintf("Expected workflow description to be %s but was %s", workflow.Description, response.Description))
 	assert.Equal(t, workflow.Name, response.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", workflow.Name, response.Name))
 	assert.Equal(t, workflow.Steps[0].Name, response.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", workflow.Steps[0].Name, response.Steps[0].Name))
@@ -61,4 +61,15 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 	}
 	_, err = FindWorkflowByName(workflow.Name)
 	assert.NotNil(t, err)
+}
+
+func TestGetWorkflows(t *testing.T) {
+	workflow := prepareWorkflow()
+
+	getWorkflowsMock = func(pageNumber int, pageSize int) ([]models.Workflow, error) {
+		return []models.Workflow{workflow}, nil
+	}
+	resp, err := GetWorkflows(0, 1)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(resp))
 }
