@@ -6,13 +6,14 @@ import (
 	"clamp-core/models"
 	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 const workflowDescription string = "Testing workflow service"
@@ -35,7 +36,7 @@ func setUpWorkflowRequest() models.Workflow {
 	steps := make([]models.Step, 1)
 	httpVal := executors.HTTPVal{
 		Method:  "GET",
-		URL:     "http: //54.190.25.178:3333/api/v1/user",
+		URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 		Headers: "",
 	}
 	steps[0] = models.Step{

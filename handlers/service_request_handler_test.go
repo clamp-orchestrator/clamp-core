@@ -8,13 +8,14 @@ import (
 	"clamp-core/transform"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 const workflowName string = "testWorkflow"
@@ -115,7 +116,7 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 		Enabled:   false,
 		Val: &executors.HTTPVal{
 			Method:  "POST",
-			URL:     "http://54.190.25.178:3333/api/v1/login",
+			URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 			Headers: "",
 		},
 	}
