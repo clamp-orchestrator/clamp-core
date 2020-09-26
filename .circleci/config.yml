@@ -11,6 +11,7 @@ jobs:
           POSTGRES_PASSWORD: cl@mpt3st
 
     steps:
+      - setup_remote_docker
       - checkout
 
       - run:
