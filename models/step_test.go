@@ -3,10 +3,11 @@ package models
 import (
 	"clamp-core/executors"
 	"clamp-core/transform"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func prepareStepRequestResponse() map[string]*StepContext {
@@ -60,7 +61,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: "SYNC",
 				Val: &executors.HTTPVal{
 					Method: "POST",
-					URL:    "http://54.190.25.178:3333/api/v1/orders",
+					URL:    "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				},
 				Transform: false,
 				Enabled:   true,
@@ -88,7 +89,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: "SYNC",
 				Val: &executors.HTTPVal{
 					Method: "POST",
-					URL:    "http://54.190.25.178:3333/api/v1/orders",
+					URL:    "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
 				},
 				Transform: false,
 				Enabled:   true,
