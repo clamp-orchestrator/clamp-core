@@ -6,14 +6,7 @@ jobs:
   build:
     docker:
       # specify the version
-      - image: cimg/go:1.13.15
-
-      - image: circleci/postgres:12.4-postgis-ram
-        environment:
-          POSTGRES_USER: clamptest
-          POSTGRES_DB: clamptest
-          POSTGRES_PASSWORD: cl@mpt3st
-
+      - image: circleci/golang:1.9
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -24,24 +17,10 @@ jobs:
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    #working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
     steps:
       - checkout
 
-      - run:
-          name: Waiting for Postgres to be ready
-          command: dockerize -wait tcp://localhost:5432 -timeout 1m
-
-      - run: 
-          name: run unit tests
-          environment:
-            CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
-          command: go test clamp-core/executors clamp-core/models clamp-core/services
-
-
-
-workflows:
-  version: 2
-  build_and_test:
-    jobs:
-      - build
+      # specify any bash command here prefixed with `run: `
+      - run: go get -v -t -d ./...
+      - run: go test -v ./...
