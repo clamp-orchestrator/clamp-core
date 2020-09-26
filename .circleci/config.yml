@@ -27,8 +27,8 @@ jobs:
           name: build and publish docker img
           command: |
             echo $GITHUB_CONTAINER_REGISTRY_TOKEN | docker login https://docker.pkg.github.com -u priyaaank --password-stdin
-            docker build -t docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CI_COMMIT_SHA .
-            docker push docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CI_COMMIT_SHA
+            docker build -t docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CIRCLE_SHA1 .
+            docker push docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CIRCLE_SHA1
             docker system prune -f -a
 
 workflows:
