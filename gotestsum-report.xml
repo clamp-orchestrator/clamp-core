@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite tests="10" failures="2" time="7.440000" name="clamp-core/executors">
+		<properties>
+			<property name="go.version" value="go1.15.2 darwin/amd64"></property>
+		</properties>
+		<testcase classname="clamp-core/executors" name="TestHttpVal_DoExecute/TestShouldThrowErrorForHTTPStep" time="0.000000">
+			<failure message="Failed" type="">=== RUN   TestHttpVal_DoExecute/TestShouldThrowErrorForHTTPStep&#xA;2020/09/27 00:11:35  HTTP Executor: Calling http GET:http://localhost:3333/api/v1/user body:map[k:v]&#xA;    http_executor_test.go:93: &#xA;        &#x9;Error Trace:&#x9;http_executor_test.go:93&#xA;        &#x9;Error:      &#x9;Error message not equal:&#xA;        &#x9;            &#x9;expected: &#34;Get http://localhost:3333/api/v1/user: dial tcp 127.0.0.1:3333: connect: connection refused&#34;&#xA;        &#x9;            &#x9;actual  : &#34;Get \&#34;http://localhost:3333/api/v1/user\&#34;: dial tcp [::1]:3333: connect: connection refused&#34;&#xA;        &#x9;Test:       &#x9;TestHttpVal_DoExecute/TestShouldThrowErrorForHTTPStep&#xA;    --- FAIL: TestHttpVal_DoExecute/TestShouldThrowErrorForHTTPStep (0.00s)&#xA;</failure>
+		</testcase>
+		<testcase classname="clamp-core/executors" name="TestHttpVal_DoExecute" time="1.600000">
+			<failure message="Failed" type="">=== RUN   TestHttpVal_DoExecute&#xA;--- FAIL: TestHttpVal_DoExecute (1.60s)&#xA;</failure>
+		</testcase>
+		<testcase classname="clamp-core/executors" name="TestAMQPVal_DoExecute/should_return_error_if_connection_fails" time="0.010000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestAMQPVal_DoExecute" time="0.010000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestHttpVal_DoExecute/TestShouldExecuteHTTPStep" time="1.270000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestHttpVal_DoExecute/TestShouldExecuteHTTPStepWithHeaders" time="0.170000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestHttpVal_DoExecute/TestShouldThrowErrorWhileExecutingStep" time="0.160000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestKafkaVal_DoExecute/should_return_error_if_connection_fails" time="0.870000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestKafkaVal_DoExecute/should_publish_message_to_kafka_topic" time="1.240000"></testcase>
+		<testcase classname="clamp-core/executors" name="TestKafkaVal_DoExecute" time="2.110000"></testcase>
+	</testsuite>
+	<testsuite tests="29" failures="0" time="1.580000" name="clamp-core/models">
+		<properties>
+			<property name="go.version" value="go1.15.2 darwin/amd64"></property>
+		</properties>
+		<testcase classname="clamp-core/models" name="Test" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldSetStepRequestToContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldGetStepRequestFromContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldSetStepResponseToContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldGetStepResponseFromContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldSetStepRequestHeadersToContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldGetStepRequestHeadersToContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldSetStepResponseHeadersToContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldGetStepResponseHeadersToContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldCreateANewServiceRequestWithUUID" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldCreateANewServiceRequestWithWorkflowName" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestThatGeneratedUUIDForServiceRequestAreDifferent" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldCreateANewServiceRequestWithDefaultStatus9" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldCreateANewStepStatus" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoExecute/ShouldExecuteStepIfWhenConditionSatisfied" time="0.790000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoExecute/ShouldNotExecuteStepIfWhenConditionNotSatisfied" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoExecute" time="0.790000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoTransform/ShouldTransformRequestWhenTransformIsEnabledAndJsonTransformation" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoTransform/ShouldTransformRequestWhenTransformIsEnabledAndXmlTransformation" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoTransform/ShouldNotTransformRequestWhenTransformIsDisabled" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoTransform/ShouldNotTransformRequestWhenTransformationFailsDueToSomeError" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestStep_DoTransform" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldCreateANewWorkflow" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldNotCreateWorkflowIfStepValIsNotPresent" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldThrowErrorIfInvalidModeIsUsed" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldThrowErrorIfGetHTTPValUrlIsEmpty" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefaultValueFromConfig" time="0.000000"></testcase>
+		<testcase classname="clamp-core/models" name="TestShouldCreateNewWorkflowWithOnFailureSteps" time="0.000000"></testcase>
+	</testsuite>
+	<testsuite tests="34" failures="0" time="60.000000" name="clamp-core/services">
+		<properties>
+			<property name="go.version" value="go1.15.2 darwin/amd64"></property>
+		</properties>
+		<testcase classname="clamp-core/services" name="TestShouldAddSuccessResponseFromAsyncStepResponseToChannel/Should_process_Async_Step_Response_request" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldAddSuccessResponseFromAsyncStepResponseToChannel" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldAddFailureResponseFromAsyncStepResponseToChannel/Should_process_Async_Step_Response_request" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldAddFailureResponseFromAsyncStepResponseToChannel" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestCreateRequestContext/ShouldCreateRequestContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestCreateRequestContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldEnhanceRequestContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestComputeRequestToCurrentStepInContext/ShouldComputeContextForFirstStep" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestComputeRequestToCurrentStepInContext/ShouldComputeContextForIntermediateStep2" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestComputeRequestToCurrentStepInContext/ShouldComputeContextForIntermediateStep3" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestComputeRequestToCurrentStepInContext" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestSaveServiceRequest" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldFailToSaveServiceRequestAndThrowError" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestFindByID" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestFindServiceRequestsByWorkflowName" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestAddServiceRequestToChannel/Should_process_service_request" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestAddServiceRequestToChannel" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflow/Should_process_service_request" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflow" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldSkipStepIfConditionDoesNotMatch/Should_skip_the_step_when_condition_does_not_match_with_service_request_payload" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldSkipStepIfConditionDoesNotMatch" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldResumeTheWorkflowExecutionFromNextStep/Should_continue_execution_from_next_step" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldResumeTheWorkflowExecutionFromNextStep" time="5.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestSaveStepsStatus" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestFindStepStatusByServiceRequestId" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldReturnStatusCompletedForAllStepsCompleted" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldReturnStatusFailed" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldReturnStatusInprogress" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestFindStepStatusByServiceRequestIdAndStatusOrderByCreatedAtDesc" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestFindStepStatusByServiceRequestIdAndStepIdAndStatus" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestShouldReturnStatusCompletedIfOneStepSkipped" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestSaveWorkflow" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestFindWorkflowByWorkflowName" time="0.000000"></testcase>
+		<testcase classname="clamp-core/services" name="TestGetWorkflows" time="0.000000"></testcase>
+	</testsuite>
+</testsuites>
