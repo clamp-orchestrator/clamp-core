@@ -23,4 +23,5 @@ require (
 	github.com/swaggo/swag v1.6.7
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/tools v0.0.0-20200917221617-d56e4e40bc9d // indirect
+	gotest.tools/gotestsum v0.5.3 // indirect
 )
