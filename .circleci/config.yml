@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test_and_package:
+  test_and_publish:
     docker:
       - image: cimg/go:1.13.15
 
