@@ -24,3 +24,6 @@ jobs:
       # specify any bash command here prefixed with `run: `
       - run: go get -v -t -d ./...
       - run: go test -v ./...
+      
+    environment: 
+      CLAMP_DB_CONNECTION_STR: host=localhost:5432 user=clamp dbname=clampdev password=clamppass
