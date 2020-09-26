@@ -1,3 +1,9 @@
+workflows:
+  version: 2
+  test_and_package:
+    jobs:
+      - test_and_publish
+
 version: 2
 jobs:
   test_and_publish:
@@ -9,6 +15,9 @@ jobs:
           POSTGRES_USER: clamptest
           POSTGRES_DB: clamptest
           POSTGRES_PASSWORD: cl@mpt3st
+
+    environment:
+      TEST_RESULTS: /tmp/test-results
 
     steps:          
       - setup_remote_docker
@@ -22,7 +31,11 @@ jobs:
           name: run unit tests
           environment:
             CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
-          command: go test clamp-core/executors clamp-core/models clamp-core/services
+          command: |
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml
+      
+      - store_test_results:
+          path: /tmp/test-results
 
       - run: 
           name: build and publish docker img
@@ -32,8 +45,3 @@ jobs:
             docker push docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CIRCLE_SHA1
             docker system prune -f -a
 
-workflows:
-  version: 2
-  test_and_package:
-    jobs:
-      - test_and_publish
