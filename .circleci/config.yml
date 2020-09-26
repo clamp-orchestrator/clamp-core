@@ -14,7 +14,7 @@ jobs:
       - checkout
 
       - run:
-          name: Waiting for Postgres to be ready
+          name: waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
 
       - run: 
@@ -22,6 +22,14 @@ jobs:
           environment:
             CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
           command: go test clamp-core/executors clamp-core/models clamp-core/services
+
+      - run: 
+          name: build and publish docker img
+          command: |
+            echo $GITHUB_CONTAINER_REGISTRY_TOKEN | docker login https://docker.pkg.github.com -u priyaaank --password-stdin
+            docker build -t docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CI_COMMIT_SHA .
+            docker push docker.pkg.github.com/clamp-orchestrator/clamp-core/clamp-core:$CI_COMMIT_SHA
+            docker system prune -f -a
 
 workflows:
   version: 2
