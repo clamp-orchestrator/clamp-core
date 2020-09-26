@@ -23,6 +23,8 @@ jobs:
       - setup_remote_docker
       - checkout
 
+      - run: mkdir -p $TEST_RESULTS
+
       - run:
           name: waiting for Postgres to be ready
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -32,7 +34,7 @@ jobs:
           environment:
             CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
           command: |
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services
       
       - store_test_results:
           path: /tmp/test-results
