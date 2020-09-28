@@ -26,7 +26,7 @@ jobs:
       TEST_RESULTS: /tmp/test-results
 
     steps:          
-      - setup_remote_docker
+      
       - checkout
 
       - run: mkdir -p $TEST_RESULTS
@@ -50,6 +50,8 @@ jobs:
       - image: cimg/go:1.13.15
 
     steps:
+      - setup_remote_docker
+      - checkout
       - run: 
           name: build and publish docker img
           command: |
