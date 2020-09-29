@@ -1,19 +1,20 @@
 package handlers
 
 import (
-	. "clamp-core/models"
+	"clamp-core/models"
 	"clamp-core/services"
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
@@ -57,17 +58,17 @@ func createServiceRequestHandler() gin.HandlerFunc {
 		_, err := services.FindWorkflowByName(workflowName)
 
 		if err != nil {
-			errorResponse := CreateErrorResponse(http.StatusBadRequest, "No record found with given workflow name : "+workflowName)
+			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, "No record found with given workflow name : "+workflowName)
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
 
 		requestPayload := readRequestPayload(c)
 		// Create new service request
-		serviceReq := NewServiceRequest(workflowName, requestPayload)
+		serviceReq := models.NewServiceRequest(workflowName, requestPayload)
 		serviceReq, err = services.SaveServiceRequest(serviceReq)
 		if err != nil {
-			errorResponse := CreateErrorResponse(http.StatusBadRequest, err.Error())
+			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 			c.JSON(http.StatusBadRequest, errorResponse)
 			return
 		}
@@ -93,8 +94,8 @@ func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string {
 	return serviceRequestHeaders
 }
 
-func prepareServiceRequestResponse(serviceReq ServiceRequest) ServiceRequestResponse {
-	response := ServiceRequestResponse{
+func prepareServiceRequestResponse(serviceReq models.ServiceRequest) models.ServiceRequestResponse {
+	response := models.ServiceRequestResponse{
 		URL:    "/serviceRequest/" + serviceReq.ID.String(),
 		Status: serviceReq.Status,
 		ID:     serviceReq.ID,
@@ -130,7 +131,7 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 
 		serviceRequest, err := services.FindServiceRequestByID(uuid.MustParse(serviceRequestID))
 		if err != nil {
-			c.JSON(http.StatusBadRequest, CreateErrorResponse(http.StatusBadRequest, err.Error()))
+			c.JSON(http.StatusBadRequest, models.CreateErrorResponse(http.StatusBadRequest, err.Error()))
 			return
 		}
 		serviceRequestByIDCounter.WithLabelValues(serviceRequestID).Inc()
@@ -170,8 +171,8 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 	}
 }
 
-func prepareServiceRequestsResponse(serviceRequests []ServiceRequest, pageNumber int, pageSize int) ServiceRequestPageResponse {
-	response := ServiceRequestPageResponse{
+func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
+	response := models.ServiceRequestPageResponse{
 		ServiceRequests: serviceRequests,
 		PageNumber:      pageNumber,
 		PageSize:        pageSize,
