@@ -6,10 +6,11 @@ import (
 	"clamp-core/services"
 	"encoding/json"
 	"fmt"
-	"github.com/Shopify/sarama"
-	"github.com/gin-gonic/gin/binding"
 	"log"
 	"strings"
+
+	"github.com/Shopify/sarama"
+	"github.com/gin-gonic/gin/binding"
 )
 
 type Consumer struct {
@@ -95,7 +96,7 @@ func consume(topic string, master sarama.Consumer) (chan *sarama.ConsumerMessage
 
 				case msg := <-consumer.Messages():
 					consumers <- msg
-					fmt.Println("" +
+					fmt.Println(""+
 						"Got message on topic ", topic, msg.Value)
 				}
 			}

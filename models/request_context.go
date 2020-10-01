@@ -3,11 +3,11 @@ package models
 import "github.com/google/uuid"
 
 type StepContext struct {
-	Request  map[string]interface{}
+	Request         map[string]interface{}
 	RequestHeaders  string
-	ResponseHeaders  string
-	Response map[string]interface{}
-	StepSkipped bool
+	ResponseHeaders string
+	Response        map[string]interface{}
+	StepSkipped     bool
 }
 
 type RequestContext struct {
@@ -45,7 +45,6 @@ func (ctx RequestContext) GetStepResponseHeadersFromContext(stepName string) str
 	stepContext := ctx.StepsContext[stepName]
 	return stepContext.ResponseHeaders
 }
-
 
 func (ctx RequestContext) GetStepRequestFromContext(stepName string) map[string]interface{} {
 	stepContext := ctx.StepsContext[stepName]

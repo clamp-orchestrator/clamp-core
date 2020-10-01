@@ -6,7 +6,7 @@ import (
 
 func setupStepRequest() map[string]interface{} {
 	stepRequestResponsePayload := make(map[string]interface{})
-	stepRequestResponsePayload["dummyStep"] = map[string]interface{}{"request": map[string]interface{}{"user_type": "admin"}, "response":map[string]interface{}{"user_type": "admin"}}
+	stepRequestResponsePayload["dummyStep"] = map[string]interface{}{"request": map[string]interface{}{"user_type": "admin"}, "response": map[string]interface{}{"user_type": "admin"}}
 	return stepRequestResponsePayload
 }
 
@@ -26,8 +26,8 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 			name: "shouldReturnTrueIfConditionSatisfies",
 			args: args{
 				whenCondition: "dummyStep.request.user_type == 'admin'",
-				stepRequest: setupStepRequest(),
-				prefix:      "",
+				stepRequest:   setupStepRequest(),
+				prefix:        "",
 			},
 			wantCanStepExecute: true,
 			wantErr:            false,
@@ -35,7 +35,7 @@ func TestExprHook_ShouldStepExecute(t *testing.T) {
 			name: "shouldReturnFalseIfConditionNotSatisfied",
 			args: args{
 				whenCondition: "dummyStep.request.user_type == 'user'",
-				stepRequest:  setupStepRequest(),
+				stepRequest:   setupStepRequest(),
 				prefix:        "",
 			},
 			wantCanStepExecute: false,
