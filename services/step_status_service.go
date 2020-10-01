@@ -4,11 +4,12 @@ import (
 	"clamp-core/models"
 	"clamp-core/repository"
 	"clamp-core/utils"
+	"log"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
-	"log"
-	"time"
 )
 
 var (
@@ -25,6 +26,7 @@ var (
 		Help: "total time taken histogram",
 	})
 )
+
 func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error) {
 	log.Printf("Saving step status : %v", stepStatusReq)
 	stepStatusReq, err := repository.GetDB().SaveStepStatus(stepStatusReq)

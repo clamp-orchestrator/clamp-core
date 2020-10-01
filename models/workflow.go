@@ -20,27 +20,27 @@ type Workflow struct {
 
 //Create a new work flow for a given service flow and return service flow details
 func CreateWorkflow(workflowRequest Workflow) Workflow {
-	stepCounter :=0
+	stepCounter := 0
 	for i := 0; i < len(workflowRequest.Steps); i++ {
 		stepCounter++
 		workflowRequest.Steps[i].ID = stepCounter
 		switch workflowRequest.Steps[i].Mode {
-			case "AMQP":
-				{
-					workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
-					workflowRequest.Steps[i].Type = utils.AsyncStepType
+		case "AMQP":
+			{
+				workflowRequest.Steps[i].Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
+				workflowRequest.Steps[i].Type = utils.AsyncStepType
+			}
+		case "HTTP":
+			{
+				if workflowRequest.Steps[i].Type == "" {
+					workflowRequest.Steps[i].Type = utils.SyncStepType
 				}
-			case "HTTP":
-				{
-					if workflowRequest.Steps[i].Type == "" {
-						workflowRequest.Steps[i].Type = utils.SyncStepType
-					}
-				}
-			case "KAFKA":
-				{
-					workflowRequest.Steps[i].Val.(*executors.KafkaVal).ReplyTo = config.ENV.KafkaConsumerTopicName
-					workflowRequest.Steps[i].Type = utils.AsyncStepType
-				}
+			}
+		case "KAFKA":
+			{
+				workflowRequest.Steps[i].Val.(*executors.KafkaVal).ReplyTo = config.ENV.KafkaConsumerTopicName
+				workflowRequest.Steps[i].Type = utils.AsyncStepType
+			}
 		}
 		UpdateStepCounterForEachOfSubSteps(workflowRequest, i, stepCounter)
 	}

@@ -2,10 +2,11 @@ package services
 
 import (
 	"clamp-core/models"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateRequestContext(t *testing.T) {
