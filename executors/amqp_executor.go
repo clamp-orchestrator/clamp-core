@@ -3,9 +3,11 @@ package executors
 import (
 	"encoding/json"
 	"errors"
-	"github.com/streadway/amqp"
 	"log"
+
+	"github.com/streadway/amqp"
 )
+
 // AMQPVal : Rabbitmq configuration details
 type AMQPVal struct {
 	ConnectionURL string `json:"connection_url" binding:"required"`
@@ -15,6 +17,7 @@ type AMQPVal struct {
 	ContentType   string `json:"content_type"`
 	ReplyTo       string `json:"reply_to"`
 }
+
 // DoExecute : Connection to Rabbitmq and sending message into Exchange
 func (val AMQPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s AMQP Executor: Executing amqp %s body:%v", prefix, val.getName(), requestBody)

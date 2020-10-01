@@ -5,9 +5,10 @@ import (
 	"clamp-core/models"
 	"clamp-core/services"
 	"encoding/json"
+	"log"
+
 	"github.com/gin-gonic/gin/binding"
 	"github.com/streadway/amqp"
-	"log"
 )
 
 type amqpListener struct {

@@ -10,5 +10,5 @@ type StepRequest struct {
 }
 
 func NewStepRequest(serviceRequestID uuid.UUID, stepID int, payload map[string]interface{}, headers string) *StepRequest {
-	return &StepRequest{ServiceRequestID: serviceRequestID, StepID: stepID, Payload: payload, Headers:headers}
+	return &StepRequest{ServiceRequestID: serviceRequestID, StepID: stepID, Payload: payload, Headers: headers}
 }
