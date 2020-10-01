@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"clamp-core/models"
 	"encoding/json"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRecordStepResponse(t *testing.T) {
@@ -47,4 +48,3 @@ func TestShouldReturnBadRequestWhenRequestContainsInvalidDataForRecordStepRespon
 	assert.Equal(t, 400, w.Code)
 	assert.Equal(t, "invalid request", jsonResp.Message)
 }
-

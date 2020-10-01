@@ -4,11 +4,12 @@ import (
 	"clamp-core/config"
 	"clamp-core/models"
 	"context"
-	"github.com/go-pg/pg/v9"
-	"github.com/google/uuid"
 	"log"
 	"strings"
 	"sync"
+
+	"github.com/go-pg/pg/v9"
+	"github.com/google/uuid"
 )
 
 const LogSQLQueries bool = true

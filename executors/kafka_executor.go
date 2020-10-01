@@ -2,9 +2,11 @@ package executors
 
 import (
 	"encoding/json"
-	"github.com/Shopify/sarama"
 	log "log"
+
+	"github.com/Shopify/sarama"
 )
+
 // KafkaVal : Kafka configurations details
 type KafkaVal struct {
 	ConnectionURL string `json:"connection_url" binding:"required"`
@@ -12,6 +14,7 @@ type KafkaVal struct {
 	ContentType   string `json:"content_type"`
 	ReplyTo       string `json:"reply_to"`
 }
+
 // DoExecute : Connecting to Kakfa URL and producing a message to Topic
 func (val KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s Kafka Executor: Executing kafka %s body:%v", prefix, val.TopicName, requestBody)

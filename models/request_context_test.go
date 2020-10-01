@@ -2,9 +2,10 @@ package models
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func Test(t *testing.T) {
@@ -23,7 +24,7 @@ func TestShouldSetStepRequestToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;", "", nil, false}},
 	}
 	context.SetStepRequestToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Request)
@@ -35,7 +36,7 @@ func TestShouldGetStepRequestFromContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "", "", nil, false}},
 	}
 	context.SetStepRequestToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Request)
@@ -47,7 +48,7 @@ func TestShouldSetStepResponseToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "", "", nil, false}},
 	}
 	context.SetStepResponseToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Response)
@@ -59,7 +60,7 @@ func TestShouldGetStepResponseFromContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "","",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "", "", nil, false}},
 	}
 	context.SetStepResponseToContext("step1", payload)
 	assert.NotNil(t, context.StepsContext["step1"].Response)
@@ -71,7 +72,7 @@ func TestShouldSetStepRequestHeadersToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;", "", nil, false}},
 	}
 	context.SetStepRequestHeadersToContext("step1", requestHeaders)
 	assert.NotNil(t, context.StepsContext["step1"].RequestHeaders)
@@ -83,7 +84,7 @@ func TestShouldGetStepRequestHeadersToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;", "", nil, false}},
 	}
 	context.SetStepRequestHeadersToContext("step1", requestHeaders)
 	assert.NotNil(t, context.StepsContext["step1"].RequestHeaders)
@@ -95,7 +96,7 @@ func TestShouldSetStepResponseHeadersToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","Content-Type:application/json;",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;", "Content-Type:application/json;", nil, false}},
 	}
 	context.SetStepResponseHeadersToContext("step1", responseHeaders)
 	assert.NotNil(t, context.StepsContext["step1"].ResponseHeaders)
@@ -107,10 +108,9 @@ func TestShouldGetStepResponseHeadersToContext(t *testing.T) {
 	context := RequestContext{
 		ServiceRequestID: uuid.UUID{},
 		WorkflowName:     "test_wf",
-		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;","Content-Type:application/json;",nil, false}},
+		StepsContext:     map[string]*StepContext{"step1": {nil, "Content-Type:application/json;", "Content-Type:application/json;", nil, false}},
 	}
 	context.SetStepRequestHeadersToContext("step1", responseHeaders)
 	assert.NotNil(t, context.StepsContext["step1"].ResponseHeaders)
 	assert.Equal(t, responseHeaders, context.GetStepResponseHeadersFromContext("step1"))
 }
-
