@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: clamp_local
+      POSTGRES_DB: clamp_local
+      POSTGRES_PASSWORD: cl@mpt3st
+  rabbitmq:
+    image: rabbitmq:3.8.9-management
+  zookeeper:
+    image: zookeeper:3.6.2
+  kafka:
+    image: wurstmeister/kafka:2.13-2.6.0
+  clamp:
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - postgres
+      - rabbitmq
+      - kafka
+    environment:
+      CLAMP_DB_CONNECTION_STR: "host=postgres:5432 user=clamp_local dbname=clamp_local password=cl@mpt3st"
