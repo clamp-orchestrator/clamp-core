@@ -1,24 +1,62 @@
 version: "3.8"
 services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "2181" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  kafka:
+    image: wurstmeister/kafka:2.13-2.6.0
+    restart: on-failure
+    depends_on:
+      - zookeeper
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9092" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+  rabbitmq:
+    image: rabbitmq:3.8.9-management
+    environment:
+      RABBITMQ_DEFAULT_USER: clamp
+      RABBITMQ_DEFAULT_PASS: clamp
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
   postgres:
     image: postgres
     environment:
       POSTGRES_USER: clamp_local
       POSTGRES_DB: clamp_local
       POSTGRES_PASSWORD: cl@mpt3st
-  rabbitmq:
-    image: rabbitmq:3.8.9-management
-  zookeeper:
-    image: zookeeper:3.6.2
-  kafka:
-    image: wurstmeister/kafka:2.13-2.6.0
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clamp_local"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
   clamp:
     build: .
     ports:
       - "8080:8080"
+    restart: on-failure
+    depends_on:
+      - postgres
+      - rabbitmq
+      - kafka
     links:
       - postgres
       - rabbitmq
       - kafka
     environment:
       CLAMP_DB_CONNECTION_STR: "host=postgres:5432 user=clamp_local dbname=clamp_local password=cl@mpt3st"
+      CLAMP_QUEUE_CONNECTION_STR: "amqp://clamp:clamp@rabbitmq:5672/"
+      CLAMP_KAFKA_CONNECTION_STR: "kafka:9092"
