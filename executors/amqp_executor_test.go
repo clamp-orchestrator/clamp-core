@@ -22,13 +22,13 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 		want    interface{}
 		wantErr bool
 	}{
-		/*{
+		{
 			name: "should send message to queue",
 			fields: fields{
-				ConnectionURL: "amqp:///",
+				ConnectionURL: "amqp://guest:guest@localhost:5672/",
 				QueueName:     "test_queue",
 				ExchangeName:  "",
-				RoutingKey:    "",
+				RoutingKey:    "test_queue",
 				ContentType:   "text/plain",
 			},
 			args: args{
@@ -39,7 +39,7 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 		}, {
 			name: "should send message to exchange",
 			fields: fields{
-				ConnectionURL: "amqp:///",
+				ConnectionURL: "amqp://guest:guest@localhost:5672/",
 				QueueName:     "",
 				ExchangeName:  "test_exchange",
 				RoutingKey:    "test_key",
@@ -50,10 +50,11 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: false,
-		},*/{
+		},
+		{
 			name: "should return error if connection fails",
 			fields: fields{
-				ConnectionURL: "amqp://test:test@localhost:5672/",
+				ConnectionURL: "amqp://test:test@localhost:5674/",
 				QueueName:     "",
 				ExchangeName:  "test_exchange",
 				RoutingKey:    "test_key",
