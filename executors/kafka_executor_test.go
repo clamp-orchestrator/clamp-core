@@ -25,7 +25,7 @@ func TestKafkaVal_DoExecute(t *testing.T) {
 		{
 			name: "should return error if connection fails",
 			fields: fields{
-				ConnectionURL: "54.190.25.178:19092/",
+				ConnectionURL: "localhost:19092/",
 				TopicName:     "topic_test",
 				ContentType:   "text/plain",
 			},
