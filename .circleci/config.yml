@@ -24,6 +24,14 @@ jobs:
 
       - image: rabbitmq:3.8.9-management
 
+      - image: zookeeper:3.6.2
+        name: zookeeper
+
+      - image: wurstmeister/kafka:2.13-2.6.0
+        environment:
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_HOST_NAME: localhost
+
     environment:
       TEST_RESULTS: /tmp/test-results
 
