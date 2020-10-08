@@ -6,14 +6,14 @@ import (
 )
 
 type JSONTransform struct {
-	Spec	map[string]interface{} `json:"spec"`
+	Spec map[string]interface{} `json:"spec"`
 }
 
-func (jsonTransform JSONTransform) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error){
+func (jsonTransform JSONTransform) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
 	log.Printf("%s Json Transformation : Transform keys %v and request body:%v", prefix, jsonTransform.Spec, requestBody)
 	transformedRequestBody := make(map[string]interface{})
 	transformedRequestBody, err := hooks.GetTransformHook().TransformRequest(requestBody, jsonTransform.Spec)
-	if err != nil  {
+	if err != nil {
 		log.Println("Transformation failed")
 		return nil, err
 	}

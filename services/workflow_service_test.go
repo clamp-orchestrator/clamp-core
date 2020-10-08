@@ -4,8 +4,9 @@ import (
 	"clamp-core/models"
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func prepareWorkflow() models.Workflow {

@@ -4,10 +4,11 @@ import (
 	"clamp-core/models"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func prepareStepsStatus() models.StepsStatus {

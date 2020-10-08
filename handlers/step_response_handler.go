@@ -3,12 +3,13 @@ package handlers
 import (
 	"clamp-core/models"
 	"clamp-core/services"
-	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 		Help: "The total number of async service requests resumed",
 	})
 )
+
 // Http Resume Service Request API for Async Step godoc
 // @Summary Http Resume Service Request API for Async Step
 // @Description Http Resume Service Request API for Async Step

@@ -28,7 +28,7 @@ type Step struct {
 	TransformFormat  string           `json:"transformFormat"`
 	RequestTransform RequestTransform `json:"requestTransform"`
 	canStepExecute   bool
-	OnFailure []Step `json:"onFailure"`
+	OnFailure        []Step `json:"onFailure"`
 	//shouldStepExecute func(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error)
 	//transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
 }
@@ -89,7 +89,7 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}
-	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestID, step.ID, request,  requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
+	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
 	//post Step execution
 	return res, err
 }

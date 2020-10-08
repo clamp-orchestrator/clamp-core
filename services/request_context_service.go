@@ -10,10 +10,10 @@ func CreateRequestContext(workflow models.Workflow, request models.ServiceReques
 	context.StepsContext = make(map[string]*models.StepContext)
 	for _, step := range workflow.Steps {
 		context.StepsContext[step.Name] = &models.StepContext{
-			Request:  nil,
-			Response: nil,
-			RequestHeaders: request.RequestHeaders,
-			ResponseHeaders:"",
+			Request:         nil,
+			Response:        nil,
+			RequestHeaders:  request.RequestHeaders,
+			ResponseHeaders: "",
 		}
 	}
 	return

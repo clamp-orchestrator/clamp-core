@@ -10,12 +10,14 @@ import (
 	"strings"
 	"time"
 )
+
 // HTTPVal : Http configuration details
 type HTTPVal struct {
 	Method  string `json:"method" binding:"required,oneof=GET POST PUT PATCH DELETE"`
 	URL     string `json:"url" binding:"required,url"`
 	Headers string `json:"headers"`
 }
+
 // DoExecute : Preparing to make a http call with request body
 func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.URL, requestBody)
@@ -48,7 +50,7 @@ func fetchAndLoadRequestWithHeadersIfDefined(httpVal HTTPVal, request *http.Requ
 		httpHeaders := strings.Split(httpVal.Headers, ";")
 		for _, header := range httpHeaders[:len(httpHeaders)-1] {
 			httpHeader := strings.Split(header, ":")
-			if httpHeader != nil && len(httpHeader) >1 {
+			if httpHeader != nil && len(httpHeader) > 1 {
 				request.Header.Add(httpHeader[0], httpHeader[1])
 			}
 		}
