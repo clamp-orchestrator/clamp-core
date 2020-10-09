@@ -43,8 +43,6 @@ var ENV = struct {
 	/**
 	System Defaults
 	*/
-	AsyncStepType string   `env:"ASYNC_STEP_TYPE" envDefault:"ASYNC"`
-	SyncStepType  string   `env:"SYNC_STEP_TYPE" envDefault:"SYNC"`
 	PORT          string   `env:"APP_PORT" envDefault:"8080"`
 	AllowOrigins  []string `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000,http://54.149.76.62"`
 }{}
