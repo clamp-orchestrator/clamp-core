@@ -53,6 +53,12 @@ jobs:
           name: waiting for Apache Kafka to be ready
           command: dockerize -wait tcp://localhost:9092 -timeout 1m
 
+      - run:
+          name: Setup Code Climate test-reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+
       - run: 
           name: run unit tests
           environment:
@@ -60,7 +66,14 @@ jobs:
             CLAMP_KAFKA_CONNECTION_STR: "localhost:9092"
             CLAMP_QUEUE_CONNECTION_STR: "amqp://guest:guest@localhost:5672/"
           command: |
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors
+            if [ $CIRCLE_BRANCH == 'master' ]; then
+              ./cc-test-reporter before-build
+            fi
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors -coverprofile=c.out
+            if [ $CIRCLE_BRANCH == 'master' ]; then
+              ./cc-test-reporter after-build --coverage-input-type gocov -p clamp-core --exit-code $?
+            fi
+            
       
       - store_test_results:
           path: /tmp/test-results
