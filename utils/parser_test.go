@@ -18,7 +18,7 @@ func TestParseFilter(t *testing.T) {
 	data, err := ParseFilters(filterString)
 	assert.Nil(t, err)
 	assert.Equal(t, "asc", data["id"])
-	assert.Equal(t, "desc", data["createdDate"])
+	assert.Equal(t, "desc", data["created_at"])
 	assert.Equal(t, "desc", data["name"])
 }
 
@@ -32,7 +32,7 @@ func TestParseFilterAssignBlankToMissing(t *testing.T) {
 	data, err := ParseFilters(filterString)
 	assert.Nil(t, err)
 	assert.Equal(t, "", data["id"])
-	assert.Equal(t, "desc", data["createdDate"])
+	assert.Equal(t, "desc", data["created_at"])
 	assert.Equal(t, "desc", data["name"])
 }
 
@@ -67,7 +67,7 @@ func TestParseFilterAllowEmptyJSON(t *testing.T) {
 	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.Equal(t, "", data["id"])
-	assert.Equal(t, "", data["createdDate"])
+	assert.Equal(t, "", data["created_at"])
 	assert.Equal(t, "", data["name"])
 }
 
@@ -77,6 +77,6 @@ func TestParseFilterAllowEmptyString(t *testing.T) {
 	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.Equal(t, "", data["id"])
-	assert.Equal(t, "", data["createdDate"])
+	assert.Equal(t, "", data["created_at"])
 	assert.Equal(t, "", data["name"])
 }

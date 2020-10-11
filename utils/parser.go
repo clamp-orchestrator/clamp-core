@@ -6,6 +6,9 @@ import (
 	"log"
 )
 
+//reference human readable keys to DB key values
+var keyReferences = map[string]string{"id": "id", "createdDate": "created_at", "name": "name"}
+
 //ParseFilters is used to parse filters form JSON string to a map of (string,string)
 //If any required key is missing, it is set as default
 //All unknown keys are ignored
@@ -34,7 +37,10 @@ func cleanFilters(filters map[string]string) (map[string]string, error) {
 		if value != "asc" && value != "desc" && value != "" {
 			return cleanedFilters, errors.New("Non supported filter argument")
 		}
-		cleanedFilters[key] = value
+		referenceKey, found := keyReferences[key]
+		if found {
+			cleanedFilters[referenceKey] = value
+		}
 	}
 	return cleanedFilters, nil
 }
