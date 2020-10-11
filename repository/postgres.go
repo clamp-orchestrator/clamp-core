@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
+//LogSQLQueries used to decide logging
 const LogSQLQueries bool = true
 
 var singletonOnce sync.Once
@@ -36,6 +37,7 @@ func connectDB() (db *pg.DB) {
 	return db
 }
 
+//GetPostgresOptions returns connection details for postgres DB
 func GetPostgresOptions() *pg.Options {
 	connStr := config.ENV.DBConnectionStr
 	connArr := strings.Split(connStr, " ")
@@ -160,8 +162,8 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 func (p *postgres) GetWorkflows(pageNumber int, pageSize int) ([]models.Workflow, error) {
 	var pgWorkflows []models.PGWorkflow
 	err := p.getDb().Model(&pgWorkflows).
+		Offset(pageSize * pageNumber).
 		Limit(pageSize).
-		Offset(pageNumber).
 		Select()
 	var workflows []models.Workflow
 	for _, pgWorkflow := range pgWorkflows {
