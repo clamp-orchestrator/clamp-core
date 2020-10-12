@@ -1,61 +1,10 @@
-# clamp-core
+# Overview - clamp-core
+ [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/clamp-orchestrator/clamp-core/blob/master/LICENSE)
+ [![Maintainability](https://api.codeclimate.com/v1/badges/7dae82e6001dcd176930/maintainability)](https://codeclimate.com/repos/5f721f2b64cdeb01a0007ceb/maintainability)
+ [![Test Coverage](https://api.codeclimate.com/v1/badges/7dae82e6001dcd176930/test_coverage)](https://codeclimate.com/repos/5f721f2b64cdeb01a0007ceb/test_coverage)
 
-The clamp core that can be deployed as a binary and does service orchestration
-
-## Installation & Configuration
-
-1. Install golang
-2. Set GOPATH
-3. Go to Application root path
-4. Run `go build main.go`
-5. `Postgres DB` and `RabbitMq` can be configured in `config/env.go` file
-6. Presently we are using common postgres 
-   ```
-   hostname : 54.70.48.149:5432 
-   user : clamp 
-   dbname : clampdev
-   password : clamppass
-   ```
-7. Instead recommend setup `Postgres locally` for development
-8. Once everything is configured migration can be run using below command
-   `./main migrate` if migration is not required then run `./main`
-9. Finally application will be running locally on 8080 port [Swagger Link](http://localhost:8080/swagger/index.html)
-
-
-## Docker Alternative
-
-Build a dev image
-
-```
-docker build -t clamp-docker .
-
-```
-
-Run an instance
-
-```
-docker run -d -p 9090:8080 clamp-docker
-```
-
-The command above will utilize port `8080` of your host.
-You can change it to any other port via `-p ANYOTHERPORT:8080`
-
-## Documentation
-
-- [Clamp Swagger Documentation](http://34.222.166.218:8080/swagger/index.html)
-
-## Monitoring & Metrics
-
-``
-Grafana Credentials: admin/Metrics@2468
-``
-
-- [Prometheus Dashboard](http://34.222.166.218:9090/graph)
-
-- [Grafana Clamp Dashboard](http://34.222.166.218:3000/d/ihhU4aZMz/clamp-metrics?orgId=1&refresh=5s)
-
-- [Grafana System Dashboard](http://34.222.166.218:3000/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=5s)
+Clamp is a workflow management and microservices orchestrator. It has been written in go-lang. The documentation on various aspects of the framework can be found [here](https://clamp-orchestrator.github.io/clamp-orchestrator/docs/about-docs). 
 
 ## Backlogs & Issues
 
-- [Trello Dashboard](https://trello.com/b/oFb5UxvS/clamp)
+- [Project dashboard](https://github.com/orgs/clamp-orchestrator/projects/1)
