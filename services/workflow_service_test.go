@@ -64,13 +64,26 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestGetWorkflows(t *testing.T) {
+func TestGetWorkflowsWithoutFilter(t *testing.T) {
 	workflow := prepareWorkflow()
-
-	getWorkflowsMock = func(pageNumber int, pageSize int) ([]models.Workflow, error) {
+	filters := make(map[string]string)
+	getWorkflowsMock = func(pageNumber int, pageSize int, filters map[string]string) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}
-	resp, err := GetWorkflows(0, 1)
+	resp, err := GetWorkflows(0, 1, filters)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(resp))
+}
+
+func TestGetWorkflowsWithFilter(t *testing.T) {
+	workflow := prepareWorkflow()
+	filters := map[string]string{
+		"id": "asc",
+	}
+	getWorkflowsMock = func(pageNumber int, pageSize int, filters map[string]string) ([]models.Workflow, error) {
+		return []models.Workflow{workflow}, nil
+	}
+	resp, err := GetWorkflows(0, 1, filters)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }

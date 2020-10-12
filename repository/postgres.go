@@ -159,12 +159,19 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
-func (p *postgres) GetWorkflows(pageNumber int, pageSize int) ([]models.Workflow, error) {
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int, filters map[string]string) ([]models.Workflow, error) {
 	var pgWorkflows []models.PGWorkflow
-	err := p.getDb().Model(&pgWorkflows).
-		Offset(pageSize * pageNumber).
-		Limit(pageSize).
-		Select()
+	query := p.getDb().Model(&pgWorkflows)
+	for key, value := range filters {
+		if value != "" {
+			query = query.Order(key + " " + value)
+		}
+	}
+	err := query.Offset(pageSize * pageNumber).
+		Limit(pageSize).Select()
+	if err != nil {
+		panic(err)
+	}
 	var workflows []models.Workflow
 	for _, pgWorkflow := range pgWorkflows {
 		workflows = append(workflows, pgWorkflow.ToWorkflow())

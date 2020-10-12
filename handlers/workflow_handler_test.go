@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -249,4 +250,27 @@ func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *test
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, jsonResp)
 	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfFiltersAreNotInTheRightFormat(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	filters := `
+	{	
+		"id","randomValue",
+		"createdDate": "desc",
+		"name": "desc"
+	}
+	`
+	urlEncodedFilters := url.QueryEscape(filters)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1&filters="+urlEncodedFilters, nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "Illegal filter syntax", jsonResp.Message)
 }
