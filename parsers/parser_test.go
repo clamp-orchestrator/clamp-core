@@ -18,7 +18,7 @@ func TestSortByParser(t *testing.T) {
 	data, err := SortByQueryParser(sortByString)
 	assert.Nil(t, err)
 	assert.Equal(t, "asc", data["id"])
-	assert.Equal(t, "desc", data["created_at"])
+	assert.Equal(t, "desc", data["createddate"])
 	assert.Equal(t, "desc", data["name"])
 }
 
@@ -34,7 +34,7 @@ func TestSortByParserIgnoreUnknownFields(t *testing.T) {
 	data, err := SortByQueryParser(sortByString)
 	assert.Nil(t, err)
 	assert.Equal(t, "asc", data["id"])
-	assert.Equal(t, "desc", data["created_at"])
+	assert.Equal(t, "desc", data["createddate"])
 	assert.Equal(t, "desc", data["name"])
 	assert.NotContains(t, data, "not_not")
 }
@@ -49,7 +49,7 @@ func TestSortByParserAssignBlankToMissing(t *testing.T) {
 	data, err := SortByQueryParser(sortByString)
 	assert.Nil(t, err)
 	assert.Equal(t, "", data["id"])
-	assert.Equal(t, "desc", data["created_at"])
+	assert.Equal(t, "desc", data["createddate"])
 	assert.Equal(t, "desc", data["name"])
 }
 
@@ -84,7 +84,7 @@ func TestSortByParserAllowEmptyJSON(t *testing.T) {
 	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.NotContains(t, "id", data)
-	assert.NotContains(t, "created_at", data)
+	assert.NotContains(t, "createddate", data)
 	assert.NotContains(t, "name", data)
 }
 
@@ -94,7 +94,7 @@ func TestSortByParserAllowEmptyString(t *testing.T) {
 	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.NotContains(t, "id", data)
-	assert.NotContains(t, "created_at", data)
+	assert.NotContains(t, "createddate", data)
 	assert.NotContains(t, "name", data)
 }
 
@@ -110,7 +110,7 @@ func TestSortByParserAllowAnyCaseString(t *testing.T) {
 	fmt.Println(err)
 	assert.Nil(t, err)
 	assert.Equal(t, "asc", data["id"])
-	assert.Equal(t, "desc", data["created_at"])
+	assert.Equal(t, "desc", data["createddate"])
 	assert.Equal(t, "desc", data["name"])
 }
 

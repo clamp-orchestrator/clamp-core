@@ -7,9 +7,6 @@ import (
 	"strings"
 )
 
-//reference human readable keys to DB key values
-var keyReferences = map[string]string{"id": "id", "createddate": "created_at", "name": "name"}
-
 //SortByQueryParser is used to parse sortBy query JSON string to a map of (string,string)
 //If any required key is missing, it is set as default
 //All unknown keys are ignored
@@ -43,9 +40,8 @@ func cleanSortByQuery(sortBy map[string]string) (map[string]string, error) {
 		if value != "asc" && value != "desc" {
 			return make(map[string]string), errors.New("Non supported argument for key " + key)
 		}
-		referenceKey, found := keyReferences[key]
 		if found {
-			cleanedSortByArgs[referenceKey] = value
+			cleanedSortByArgs[key] = value
 		}
 	}
 	return cleanedSortByArgs, nil

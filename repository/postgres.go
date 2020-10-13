@@ -4,6 +4,7 @@ import (
 	"clamp-core/config"
 	"clamp-core/models"
 	"context"
+	"errors"
 	"log"
 	"strings"
 	"sync"
@@ -11,6 +12,9 @@ import (
 	"github.com/go-pg/pg/v9"
 	"github.com/google/uuid"
 )
+
+//reference human readable keys to DB key values
+var keyReferences = map[string]string{"id": "id", "createddate": "created_at", "name": "name"}
 
 //LogSQLQueries used to decide logging
 const LogSQLQueries bool = true
@@ -163,14 +167,18 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortBy map[string]
 	var pgWorkflows []models.PGWorkflow
 	query := p.getDb().Model(&pgWorkflows)
 	for key, value := range sortBy {
+		reference, found := keyReferences[key]
+		if !found {
+			return []models.Workflow{}, errors.New("Undefined key reference used")
+		}
 		if value != "" {
-			query = query.Order(key + " " + value)
+			query = query.Order(reference + " " + value)
 		}
 	}
 	err := query.Offset(pageSize * pageNumber).
 		Limit(pageSize).Select()
 	if err != nil {
-		panic(err)
+		return []models.Workflow{}, err
 	}
 	var workflows []models.Workflow
 	for _, pgWorkflow := range pgWorkflows {
