@@ -69,7 +69,7 @@ jobs:
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter before-build
             fi
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors -coverprofile=c.out
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors clamp-core/parsers -coverprofile=c.out
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter after-build --coverage-input-type gocov -p clamp-core --exit-code $?
             fi
