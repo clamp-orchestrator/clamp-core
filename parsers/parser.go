@@ -36,8 +36,11 @@ func cleanSortByQuery(sortBy map[string]string) (map[string]string, error) {
 	supportedKeys := []string{"id", "createddate", "name"}
 	cleanedSortByArgs := make(map[string]string)
 	for _, key := range supportedKeys {
-		value := sortBy[key]
-		if value != "asc" && value != "desc" && value != "" {
+		value, found := sortBy[key]
+		if !found {
+			continue
+		}
+		if value != "asc" && value != "desc" {
 			return make(map[string]string), errors.New("Non supported argument for key " + key)
 		}
 		referenceKey, found := keyReferences[key]
