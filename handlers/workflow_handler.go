@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"clamp-core/models"
+	"clamp-core/parsers"
 	"clamp-core/services"
-	"clamp-core/utils"
 	"errors"
 	"fmt"
 	"log"
@@ -126,7 +126,7 @@ func getWorkflows() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		pageSizeStr := c.Query("pageSize")
 		pageNumberStr := c.Query("pageNumber")
-		filterString := c.Query("filters")
+		sortByQuery := c.Query("sortBy")
 		if pageSizeStr == "" || pageNumberStr == "" {
 			err := errors.New("page number or page size is not been defined")
 			prepareErrorResponse(err, c)
@@ -139,12 +139,12 @@ func getWorkflows() gin.HandlerFunc {
 			prepareErrorResponse(err, c)
 			return
 		}
-		filters, err := utils.ParseFilters(filterString)
+		sortBy, err := parsers.SortByQueryParser(sortByQuery)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return
 		}
-		workflows, err := services.GetWorkflows(pageNumber, pageSize, filters)
+		workflows, err := services.GetWorkflows(pageNumber, pageSize, sortBy)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return

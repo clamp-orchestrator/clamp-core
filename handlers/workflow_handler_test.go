@@ -252,18 +252,18 @@ func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *test
 	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
 }
 
-func TestShouldThrowErrorIfFiltersAreNotInTheRightFormat(t *testing.T) {
+func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	filters := `
+	sortByString := `
 	{	
 		"id","randomValue",
 		"createdDate": "desc",
 		"name": "desc"
 	}
 	`
-	urlEncodedFilters := url.QueryEscape(filters)
-	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1&filters="+urlEncodedFilters, nil)
+	urlEncodedSortValue := url.QueryEscape(sortByString)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1&sortBy="+urlEncodedSortValue, nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -272,5 +272,5 @@ func TestShouldThrowErrorIfFiltersAreNotInTheRightFormat(t *testing.T) {
 
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, jsonResp)
-	assert.Equal(t, "Illegal filter syntax", jsonResp.Message)
+	assert.Equal(t, "Unsupported format for sortBy Query", jsonResp.Message)
 }

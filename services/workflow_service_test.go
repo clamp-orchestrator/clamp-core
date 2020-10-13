@@ -64,26 +64,26 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestGetWorkflowsWithoutFilter(t *testing.T) {
+func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 	workflow := prepareWorkflow()
-	filters := make(map[string]string)
-	getWorkflowsMock = func(pageNumber int, pageSize int, filters map[string]string) ([]models.Workflow, error) {
+	sortBy := make(map[string]string)
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}
-	resp, err := GetWorkflows(0, 1, filters)
+	resp, err := GetWorkflows(0, 1, sortBy)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }
 
-func TestGetWorkflowsWithFilter(t *testing.T) {
+func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	workflow := prepareWorkflow()
-	filters := map[string]string{
+	sortBy := map[string]string{
 		"id": "asc",
 	}
-	getWorkflowsMock = func(pageNumber int, pageSize int, filters map[string]string) ([]models.Workflow, error) {
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}
-	resp, err := GetWorkflows(0, 1, filters)
+	resp, err := GetWorkflows(0, 1, sortBy)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }

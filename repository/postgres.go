@@ -159,10 +159,10 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
-func (p *postgres) GetWorkflows(pageNumber int, pageSize int, filters map[string]string) ([]models.Workflow, error) {
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
 	var pgWorkflows []models.PGWorkflow
 	query := p.getDb().Model(&pgWorkflows)
-	for key, value := range filters {
+	for key, value := range sortBy {
 		if value != "" {
 			query = query.Order(key + " " + value)
 		}
