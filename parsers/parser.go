@@ -1,48 +1,49 @@
 package parsers
 
 import (
-	"encoding/json"
 	"errors"
-	"log"
 	"strings"
 )
 
 //SortByQueryParser is used to parse sortBy query JSON string to a map of (string,string)
 //If any required key is missing, it is set as default
 //All unknown keys are ignored
-func SortByQueryParser(sortByQuery string) (map[string]string, error) {
-	if sortByQuery == "" {
-		sortByQuery = "{}"
+//Returns
+func SortByQueryParser(sortByQuery string) (map[string]string, []string, error) {
+	cleanedSortByArgs := make(map[string]string)
+	sortOrder := []string{}
+	length := len(sortByQuery)
+	if length == 0 {
+		return cleanedSortByArgs, sortOrder, nil
 	}
 	sortByQuery = strings.ToLower(sortByQuery)
-	sortBy := map[string]string{}
-	err := json.Unmarshal([]byte(sortByQuery), &sortBy)
-	var cleanedSortByArgs map[string]string
-	if err == nil {
-		cleanedSortByArgs, err = cleanSortByQuery(sortBy)
+	if sortByQuery[length-1] == ';' {
+		sortByQuery = sortByQuery[0 : length-1]
 	}
+	sortByArgs := strings.Split(sortByQuery, ";")
+	for _, value := range sortByArgs {
+		sortPair := strings.Split(value, ":")
 
-	if err != nil {
-		log.Println(err)
-		return make(map[string]string), errors.New("Unsupported format for sortBy Query")
+		if len(sortPair) != 2 || !verifySortValues(sortPair[0], sortPair[1]) {
+			return map[string]string{}, []string{}, errors.New("Unsupported value provided for sortBy")
+		}
+		key := sortPair[0]
+		value := sortPair[1]
+		cleanedSortByArgs[key] = value
+		sortOrder = append(sortOrder, key)
 	}
-	return cleanedSortByArgs, nil
+	return cleanedSortByArgs, sortOrder, nil
 }
 
-func cleanSortByQuery(sortBy map[string]string) (map[string]string, error) {
-	supportedKeys := []string{"id", "createddate", "name"}
-	cleanedSortByArgs := make(map[string]string)
-	for _, key := range supportedKeys {
-		value, found := sortBy[key]
-		if !found {
-			continue
-		}
-		if value != "asc" && value != "desc" {
-			return make(map[string]string), errors.New("Non supported argument for key " + key)
-		}
-		if found {
-			cleanedSortByArgs[key] = value
+func verifySortValues(key string, value string) bool {
+	if value != "desc" && value != "asc" {
+		return false
+	}
+	supportedKeys := []string{"id", "name", "createdate"}
+	for _, keyVal := range supportedKeys {
+		if key == keyVal {
+			return true
 		}
 	}
-	return cleanedSortByArgs, nil
+	return false
 }
