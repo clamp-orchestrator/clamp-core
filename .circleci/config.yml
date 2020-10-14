@@ -35,8 +35,8 @@ jobs:
     environment:
       TEST_RESULTS: /tmp/test-results
 
-    steps:          
-      
+    steps:
+
       - checkout
 
       - run: mkdir -p $TEST_RESULTS
@@ -59,7 +59,7 @@ jobs:
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
 
-      - run: 
+      - run:
           name: run unit tests
           environment:
             CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
@@ -69,12 +69,12 @@ jobs:
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter before-build
             fi
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors clamp-core/parsers -coverprofile=c.out
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors -coverprofile=c.out
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter after-build --coverage-input-type gocov -p clamp-core --exit-code $?
             fi
-            
-      
+
+
       - store_test_results:
           path: /tmp/test-results
 
@@ -85,7 +85,7 @@ jobs:
     steps:
       - setup_remote_docker
       - checkout
-      - run: 
+      - run:
           name: build and publish docker img
           command: |
             echo $GITHUB_CONTAINER_REGISTRY_TOKEN | docker login https://docker.pkg.github.com -u priyaaank --password-stdin
