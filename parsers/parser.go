@@ -25,7 +25,7 @@ func SortByQueryParser(sortByQuery string) (map[string]string, []string, error) 
 		sortPair := strings.Split(value, ":")
 
 		if len(sortPair) != 2 || !verifySortValues(sortPair[0], sortPair[1]) {
-			return map[string]string{}, []string{}, errors.New("Unsupported value provided for sortBy")
+			return map[string]string{}, []string{}, errors.New("Unsupported value provided for sortBy query")
 		}
 		key := sortPair[0]
 		value := sortPair[1]

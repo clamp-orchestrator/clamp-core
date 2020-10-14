@@ -24,14 +24,14 @@ func TestSortByParserFailsOnUnknownFieldName(t *testing.T) {
 	sortByString := "id:asc;createdate:desc;name:desc;invalid:desc"
 	_, _, err := SortByQueryParser(sortByString)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy", err.Error())
+	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
 }
 
 func TestSortByParserThrowErrorOnIllegalValue(t *testing.T) {
 	sortByString := `"id":"randomValue";"createddate": "desc";"name": "desc"`
 	_, _, err := SortByQueryParser(sortByString)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy", err.Error())
+	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
 }
 
 func TestSortByParserAllowEmptyString(t *testing.T) {
@@ -63,7 +63,7 @@ func TestSortByParserNotAllowEmptyValueForSoryByString(t *testing.T) {
 	sortByString := "id:;creaTeDate:dEsc;naMe:desc"
 	_, _, err := SortByQueryParser(sortByString)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy", err.Error())
+	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
 }
 
 func TestSortByParserAllowSemicolonAtTheEnd(t *testing.T) {
@@ -92,5 +92,5 @@ func TestSortByParserAllowEmptyKeyValue(t *testing.T) {
 	sortByString := "id:desc;creaTeDate:dEsc;naMe:desc;;"
 	_, _, err := SortByQueryParser(sortByString)
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy", err.Error())
+	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
 }
