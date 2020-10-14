@@ -26,9 +26,9 @@ func FindWorkflowByName(workflowName string) (models.Workflow, error) {
 	return workflow, err
 }
 
-func GetWorkflows(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
+func GetWorkflows(pageNumber int, pageSize int, sortBy map[string]string, sortOrder []string) ([]models.Workflow, error) {
 	log.Printf("Getting workflows for pageNumber: %d, pageSize: %d", pageNumber, pageSize)
-	workflows, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)
+	workflows, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy, sortOrder)
 	if err != nil {
 		log.Printf("Failed to fetch worflows for pageNumber: %d, pageSize: %d, sortBy %v", pageNumber, pageSize, sortBy)
 	}

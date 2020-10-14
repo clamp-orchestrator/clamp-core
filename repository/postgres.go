@@ -163,15 +163,16 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
-func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortBy map[string]string, sortOrder []string) ([]models.Workflow, error) {
 	var pgWorkflows []models.PGWorkflow
 	query := p.getDb().Model(&pgWorkflows)
-	for key, value := range sortBy {
+	for _, key := range sortOrder {
 		reference, found := keyReferences[key]
 		if !found {
 			return []models.Workflow{}, errors.New("Undefined key reference used")
 		}
-		if value != "" {
+		value, found := sortBy[key]
+		if found {
 			query = query.Order(reference + " " + value)
 		}
 	}

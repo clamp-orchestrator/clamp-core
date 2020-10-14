@@ -67,10 +67,11 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 	workflow := prepareWorkflow()
 	sortBy := make(map[string]string)
-	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
+	sortOrder := []string{}
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy map[string]string, sortOrder []string) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}
-	resp, err := GetWorkflows(0, 1, sortBy)
+	resp, err := GetWorkflows(0, 1, sortBy, sortOrder)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }
@@ -80,10 +81,11 @@ func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	sortBy := map[string]string{
 		"id": "asc",
 	}
-	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy map[string]string) ([]models.Workflow, error) {
+	sortOrder := []string{"id"}
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy map[string]string, sortOrder []string) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}
-	resp, err := GetWorkflows(0, 1, sortBy)
+	resp, err := GetWorkflows(0, 1, sortBy, sortOrder)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }
