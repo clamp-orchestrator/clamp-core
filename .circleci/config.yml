@@ -71,7 +71,7 @@ jobs:
             fi
             go build main.go
             ./main migrate --migrate-only=yes
-            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/executors clamp-core/handlers -coverprofile=c.out
+            gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- clamp-core/executors clamp-core/models clamp-core/services clamp-core/handlers -coverprofile=c.out
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter after-build --coverage-input-type gocov -p clamp-core --exit-code $?
             fi
