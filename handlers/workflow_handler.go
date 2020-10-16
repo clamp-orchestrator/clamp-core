@@ -34,6 +34,7 @@ var (
 	})
 )
 
+//CustomError is a customised error format for our library
 type CustomError struct {
 	StatusCode int
 	Err        error
@@ -43,6 +44,7 @@ func (r *CustomError) Error() string {
 	return fmt.Sprintf("status %d: err %v", r.StatusCode, r.Err)
 }
 
+//ErrorRequest sends base 503 error
 func ErrorRequest() error {
 	return &CustomError{
 		StatusCode: 503,
@@ -123,6 +125,7 @@ func getWorkflows() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		pageSizeStr := c.Query("pageSize")
 		pageNumberStr := c.Query("pageNumber")
+		sortByQuery := c.Query("sortBy")
 		if pageSizeStr == "" || pageNumberStr == "" {
 			err := errors.New("page number or page size is not been defined")
 			prepareErrorResponse(err, c)
@@ -135,7 +138,13 @@ func getWorkflows() gin.HandlerFunc {
 			prepareErrorResponse(err, c)
 			return
 		}
-		workflows, err := services.GetWorkflows(pageNumber, pageSize)
+
+		sortByFields, err := models.ParseFromQuery(sortByQuery)
+		if err != nil {
+			prepareErrorResponse(err, c)
+			return
+		}
+		workflows, err := services.GetWorkflows(pageNumber, pageSize, sortByFields)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return

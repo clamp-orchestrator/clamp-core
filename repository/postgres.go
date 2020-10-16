@@ -4,6 +4,7 @@ import (
 	"clamp-core/config"
 	"clamp-core/models"
 	"context"
+	"errors"
 	"log"
 	"strings"
 	"sync"
@@ -12,6 +13,10 @@ import (
 	"github.com/google/uuid"
 )
 
+//reference human readable keys to DB key values
+var keyReferences = map[string]string{"id": "id", "createdate": "created_at", "name": "name"}
+
+//LogSQLQueries used to decide logging
 const LogSQLQueries bool = true
 
 var singletonOnce sync.Once
@@ -36,6 +41,7 @@ func connectDB() (db *pg.DB) {
 	return db
 }
 
+//GetPostgresOptions returns connection details for postgres DB
 func GetPostgresOptions() *pg.Options {
 	connStr := config.ENV.DBConnectionStr
 	connArr := strings.Split(connStr, " ")
@@ -157,12 +163,24 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
-func (p *postgres) GetWorkflows(pageNumber int, pageSize int) ([]models.Workflow, error) {
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.Workflow, error) {
 	var pgWorkflows []models.PGWorkflow
-	err := p.getDb().Model(&pgWorkflows).
-		Limit(pageSize).
-		Offset(pageNumber).
-		Select()
+	query := p.getDb().Model(&pgWorkflows)
+	for _, sortField := range sortFields {
+		reference, found := keyReferences[sortField.Key]
+		if !found {
+			return []models.Workflow{}, errors.New("Undefined key reference used")
+		}
+		order := sortField.Order
+		if found {
+			query = query.Order(reference + " " + order)
+		}
+	}
+	err := query.Offset(pageSize * pageNumber).
+		Limit(pageSize).Select()
+	if err != nil {
+		return []models.Workflow{}, err
+	}
 	var workflows []models.Workflow
 	for _, pgWorkflow := range pgWorkflows {
 		workflows = append(workflows, pgWorkflow.ToWorkflow())

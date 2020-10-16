@@ -35,8 +35,8 @@ jobs:
     environment:
       TEST_RESULTS: /tmp/test-results
 
-    steps:          
-      
+    steps:
+
       - checkout
 
       - run: mkdir -p $TEST_RESULTS
@@ -59,7 +59,7 @@ jobs:
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
 
-      - run: 
+      - run:
           name: run unit tests
           environment:
             CLAMP_DB_CONNECTION_STR: "host=localhost:5432 user=clamptest dbname=clamptest"
@@ -75,7 +75,6 @@ jobs:
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter after-build --coverage-input-type gocov -p clamp-core --exit-code $?
             fi
-          
       - store_test_results:
           path: /tmp/test-results
 
@@ -86,7 +85,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-
       - run: 
           name: build and publish docker img
           command: |

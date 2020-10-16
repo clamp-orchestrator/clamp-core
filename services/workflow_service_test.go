@@ -64,13 +64,24 @@ func TestFindWorkflowByWorkflowName(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-func TestGetWorkflows(t *testing.T) {
+func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 	workflow := prepareWorkflow()
-
-	getWorkflowsMock = func(pageNumber int, pageSize int) ([]models.Workflow, error) {
+	var sortBy models.SortByFields
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}
-	resp, err := GetWorkflows(0, 1)
+	resp, err := GetWorkflows(0, 1, sortBy)
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(resp))
+}
+
+func TestGetWorkflowsWithSortByArgs(t *testing.T) {
+	workflow := prepareWorkflow()
+	sortBy := models.SortByFields{{Key: "id", Order: "asc"}}
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
+		return []models.Workflow{workflow}, nil
+	}
+	resp, err := GetWorkflows(0, 1, sortBy)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }
