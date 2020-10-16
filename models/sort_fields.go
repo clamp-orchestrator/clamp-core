@@ -10,9 +10,11 @@ import (
 //Used to store all sortBy key-value pairs
 type SortByFields []sortBy
 
+//SortBy contains a key and an order to be used to sort a DB query by
+//Order supported is asc/desc
 type sortBy struct {
-	key   string
-	order string
+	Key   string
+	Order string
 }
 
 //ParseFromQuery is used to parse sortBy query string to a custom SortByFields type
@@ -32,7 +34,7 @@ func (sortArr *SortByFields) ParseFromQuery(sortByString string) error {
 		}
 		key := sortPair[0]
 		value := sortPair[1]
-		sort := sortBy{key: key, order: value}
+		sort := sortBy{Key: key, Order: value}
 		*sortArr = append(*sortArr, sort)
 		fmt.Println(sortArr)
 	}
