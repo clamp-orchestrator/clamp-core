@@ -138,13 +138,13 @@ func getWorkflows() gin.HandlerFunc {
 			prepareErrorResponse(err, c)
 			return
 		}
-		var sortBy models.SortByFields
-		err := sortBy.ParseFromQuery(sortByQuery)
+
+		sortByFields, err := models.ParseFromQuery(sortByQuery)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return
 		}
-		workflows, err := services.GetWorkflows(pageNumber, pageSize, sortBy)
+		workflows, err := services.GetWorkflows(pageNumber, pageSize, sortByFields)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return

@@ -21,9 +21,10 @@ type sortBy struct {
 //It returns an ordered sortBy struct containing KEY VALUE pair
 //If an unknown key is used, an error is raised
 //Fields are seperated using a comma and key values are sepearted using a colon
-func (sortArr *SortByFields) ParseFromQuery(sortByString string) error {
+func ParseFromQuery(sortByString string) (SortByFields, error) {
+	var sortArr SortByFields = []sortBy{}
 	if len(sortByString) == 0 {
-		return nil
+		return sortArr, nil
 	}
 	sortByString = cleanUpQuery(sortByString)
 	sortByArgs := strings.Split(sortByString, ",")
@@ -31,15 +32,15 @@ func (sortArr *SortByFields) ParseFromQuery(sortByString string) error {
 		sortPair := strings.Split(value, ":")
 
 		if len(sortPair) != 2 || !verifySortValues(sortPair[0], sortPair[1]) {
-			return errors.New("Unsupported value provided for sortBy query")
+			return SortByFields{}, errors.New("Unsupported value provided for sortBy query")
 		}
 		key := sortPair[0]
 		value := sortPair[1]
 		sort := sortBy{Key: key, Order: value}
-		*sortArr = append(*sortArr, sort)
+		sortArr = append(sortArr, sort)
 		fmt.Println(sortArr)
 	}
-	return nil
+	return sortArr, nil
 }
 
 func cleanUpQuery(sortByQuery string) string {
