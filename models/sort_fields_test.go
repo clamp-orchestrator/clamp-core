@@ -12,12 +12,12 @@ func TestSortByParser(t *testing.T) {
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(sortUsing))
-	assert.Equal(t, "id", sortUsing[0].key)
-	assert.Equal(t, "asc", sortUsing[0].order)
-	assert.Equal(t, "createdate", sortUsing[1].key)
-	assert.Equal(t, "desc", sortUsing[1].order)
-	assert.Equal(t, "name", sortUsing[2].key)
-	assert.Equal(t, "desc", sortUsing[2].order)
+	assert.Equal(t, "id", sortUsing[0].Key)
+	assert.Equal(t, "asc", sortUsing[0].Order)
+	assert.Equal(t, "createdate", sortUsing[1].Key)
+	assert.Equal(t, "desc", sortUsing[1].Order)
+	assert.Equal(t, "name", sortUsing[2].Key)
+	assert.Equal(t, "desc", sortUsing[2].Order)
 }
 
 func TestSortByParserFailsOnUnknownFieldName(t *testing.T) {
@@ -50,12 +50,12 @@ func TestSortByParserAllowAnyCaseString(t *testing.T) {
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(sortUsing))
-	assert.Equal(t, "id", sortUsing[0].key)
-	assert.Equal(t, "asc", sortUsing[0].order)
-	assert.Equal(t, "createdate", sortUsing[1].key)
-	assert.Equal(t, "desc", sortUsing[1].order)
-	assert.Equal(t, "name", sortUsing[2].key)
-	assert.Equal(t, "desc", sortUsing[2].order)
+	assert.Equal(t, "id", sortUsing[0].Key)
+	assert.Equal(t, "asc", sortUsing[0].Order)
+	assert.Equal(t, "createdate", sortUsing[1].Key)
+	assert.Equal(t, "desc", sortUsing[1].Order)
+	assert.Equal(t, "name", sortUsing[2].Key)
+	assert.Equal(t, "desc", sortUsing[2].Order)
 }
 
 func TestSortByParserNotAllowEmptyValueForSoryByString(t *testing.T) {
@@ -72,12 +72,12 @@ func TestSortByParserAllowSemicolonAtTheEnd(t *testing.T) {
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(sortUsing))
-	assert.Equal(t, "id", sortUsing[0].key)
-	assert.Equal(t, "asc", sortUsing[0].order)
-	assert.Equal(t, "createdate", sortUsing[1].key)
-	assert.Equal(t, "desc", sortUsing[1].order)
-	assert.Equal(t, "name", sortUsing[2].key)
-	assert.Equal(t, "desc", sortUsing[2].order)
+	assert.Equal(t, "id", sortUsing[0].Key)
+	assert.Equal(t, "asc", sortUsing[0].Order)
+	assert.Equal(t, "createdate", sortUsing[1].Key)
+	assert.Equal(t, "desc", sortUsing[1].Order)
+	assert.Equal(t, "name", sortUsing[2].Key)
+	assert.Equal(t, "desc", sortUsing[2].Order)
 }
 
 func TestPreserveOrderOfSortKeys(t *testing.T) {
@@ -86,12 +86,12 @@ func TestPreserveOrderOfSortKeys(t *testing.T) {
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
 	assert.Equal(t, 3, len(sortUsing))
-	assert.Equal(t, "createdate", sortUsing[0].key)
-	assert.Equal(t, "desc", sortUsing[0].order)
-	assert.Equal(t, "id", sortUsing[1].key)
-	assert.Equal(t, "asc", sortUsing[1].order)
-	assert.Equal(t, "name", sortUsing[2].key)
-	assert.Equal(t, "desc", sortUsing[2].order)
+	assert.Equal(t, "createdate", sortUsing[0].Key)
+	assert.Equal(t, "desc", sortUsing[0].Order)
+	assert.Equal(t, "id", sortUsing[1].Key)
+	assert.Equal(t, "asc", sortUsing[1].Order)
+	assert.Equal(t, "name", sortUsing[2].Key)
+	assert.Equal(t, "desc", sortUsing[2].Order)
 }
 
 func TestSortByParserAllowEmptyKeyValue(t *testing.T) {
