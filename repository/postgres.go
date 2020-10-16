@@ -14,7 +14,7 @@ import (
 )
 
 //reference human readable keys to DB key values
-var keyReferences = map[string]string{"id": "id", "createddate": "created_at", "name": "name"}
+var keyReferences = map[string]string{"id": "id", "createdate": "created_at", "name": "name"}
 
 //LogSQLQueries used to decide logging
 const LogSQLQueries bool = true
@@ -163,17 +163,17 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
-func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortBy map[string]string, sortOrder []string) ([]models.Workflow, error) {
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.Workflow, error) {
 	var pgWorkflows []models.PGWorkflow
 	query := p.getDb().Model(&pgWorkflows)
-	for _, key := range sortOrder {
-		reference, found := keyReferences[key]
+	for _, sortField := range sortFields {
+		reference, found := keyReferences[sortField.Key]
 		if !found {
 			return []models.Workflow{}, errors.New("Undefined key reference used")
 		}
-		value, found := sortBy[key]
+		order := sortField.Order
 		if found {
-			query = query.Order(reference + " " + value)
+			query = query.Order(reference + " " + order)
 		}
 	}
 	err := query.Offset(pageSize * pageNumber).

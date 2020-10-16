@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"clamp-core/models"
-	"clamp-core/parsers"
 	"clamp-core/services"
 	"errors"
 	"fmt"
@@ -139,12 +138,13 @@ func getWorkflows() gin.HandlerFunc {
 			prepareErrorResponse(err, c)
 			return
 		}
-		sortBy, sortOrder, err := parsers.SortByQueryParser(sortByQuery)
+		var sortBy models.SortByFields
+		err := sortBy.ParseFromQuery(sortByQuery)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return
 		}
-		workflows, err := services.GetWorkflows(pageNumber, pageSize, sortBy, sortOrder)
+		workflows, err := services.GetWorkflows(pageNumber, pageSize, sortBy)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return
