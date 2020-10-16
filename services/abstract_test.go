@@ -14,7 +14,7 @@ func (m mockDB) FindServiceRequestsByWorkflowName(workflowName string, pageNumbe
 }
 
 func (m mockDB) GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
-	return getWorkflowsMock(pageNumber, pageSize, sortBy, sortOrder)
+	return getWorkflowsMock(pageNumber, pageSize, sortBy)
 }
 
 func (m mockDB) FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error) {

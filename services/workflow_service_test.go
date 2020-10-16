@@ -77,10 +77,7 @@ func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 
 func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	workflow := prepareWorkflow()
-	sortBy := map[string]string{
-		"id": "asc",
-	}
-	sortOrder := []string{"id"}
+	sortBy := models.SortByFields{{Key: "id", Order: "asc"}}
 	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
 		return []models.Workflow{workflow}, nil
 	}

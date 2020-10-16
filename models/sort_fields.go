@@ -20,12 +20,13 @@ type sortBy struct {
 //ParseFromQuery is used to parse sortBy query string to a custom SortByFields type
 //It returns an ordered sortBy struct containing KEY VALUE pair
 //If an unknown key is used, an error is raised
+//Fields are seperated using a comma and key values are sepearted using a colon
 func (sortArr *SortByFields) ParseFromQuery(sortByString string) error {
 	if len(sortByString) == 0 {
 		return nil
 	}
 	sortByString = cleanUpQuery(sortByString)
-	sortByArgs := strings.Split(sortByString, ";")
+	sortByArgs := strings.Split(sortByString, ",")
 	for _, value := range sortByArgs {
 		sortPair := strings.Split(value, ":")
 
@@ -44,7 +45,7 @@ func (sortArr *SortByFields) ParseFromQuery(sortByString string) error {
 func cleanUpQuery(sortByQuery string) string {
 	length := len(sortByQuery)
 	sortByQuery = strings.ToLower(sortByQuery)
-	if sortByQuery[length-1] == ';' {
+	if sortByQuery[length-1] == ',' {
 		sortByQuery = sortByQuery[0 : length-1]
 	}
 	return sortByQuery

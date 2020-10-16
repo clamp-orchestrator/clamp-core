@@ -7,7 +7,7 @@ import (
 )
 
 func TestSortByParser(t *testing.T) {
-	sortByQuery := `id:asc;createdate:desc;name:desc`
+	sortByQuery := `id:asc,createdate:desc,name:desc`
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
@@ -21,7 +21,7 @@ func TestSortByParser(t *testing.T) {
 }
 
 func TestSortByParserFailsOnUnknownFieldName(t *testing.T) {
-	sortByQuery := "id:asc;createdate:desc;name:desc;invalid:desc"
+	sortByQuery := "id:asc,createdate:desc,name:desc,invalid:desc"
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.NotNil(t, err)
@@ -29,7 +29,7 @@ func TestSortByParserFailsOnUnknownFieldName(t *testing.T) {
 }
 
 func TestSortByParserThrowErrorOnIllegalValue(t *testing.T) {
-	sortByQuery := `"id":"randomValue";"createddate": "desc";"name": "desc"`
+	sortByQuery := `"id":"randomValue","createddate": "desc","name": "desc"`
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.NotNil(t, err)
@@ -45,7 +45,7 @@ func TestSortByParserAllowEmptyString(t *testing.T) {
 }
 
 func TestSortByParserAllowAnyCaseString(t *testing.T) {
-	sortByQuery := `id:aSc;CReatedaTe:DeSc;NAME:desc`
+	sortByQuery := `id:aSc,CReatedaTe:DeSc,NAME:desc`
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
@@ -59,15 +59,15 @@ func TestSortByParserAllowAnyCaseString(t *testing.T) {
 }
 
 func TestSortByParserNotAllowEmptyValueForSoryByString(t *testing.T) {
-	sortByQuery := "id:;creaTeDate:dEsc;naMe:desc"
+	sortByQuery := "id:,creaTeDate:dEsc,naMe:desc"
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.NotNil(t, err)
 	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
 }
 
-func TestSortByParserAllowSemicolonAtTheEnd(t *testing.T) {
-	sortByQuery := `id:asc;createdate:desc;name:desc;`
+func TestSortByParserAllowCommaAtTheEnd(t *testing.T) {
+	sortByQuery := `id:asc,createdate:desc,name:desc,`
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
@@ -81,7 +81,7 @@ func TestSortByParserAllowSemicolonAtTheEnd(t *testing.T) {
 }
 
 func TestPreserveOrderOfSortKeys(t *testing.T) {
-	sortByQuery := `createdate:desc;id:asc;name:desc;`
+	sortByQuery := `createdate:desc,id:asc,name:desc,`
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.Nil(t, err)
@@ -95,7 +95,7 @@ func TestPreserveOrderOfSortKeys(t *testing.T) {
 }
 
 func TestSortByParserAllowEmptyKeyValue(t *testing.T) {
-	sortByQuery := "id:desc;creaTeDate:dEsc;naMe:desc;;"
+	sortByQuery := "id:desc,creaTeDate:dEsc,naMe:desc,,"
 	var sortUsing SortByFields
 	err := sortUsing.ParseFromQuery(sortByQuery)
 	assert.NotNil(t, err)

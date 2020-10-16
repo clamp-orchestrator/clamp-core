@@ -255,7 +255,7 @@ func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *test
 func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
-	sortByString := `id;`
+	sortByString := `id,`
 	urlEncodedSortValue := url.QueryEscape(sortByString)
 	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1&sortBy="+urlEncodedSortValue, nil)
 	router.ServeHTTP(w, req)
