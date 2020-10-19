@@ -3,7 +3,6 @@ definitions:
     properties:
       error:
         $ref: '#/definitions/models.ClampErrorResponse'
-        type: object
       requestHeaders:
         type: string
       response:
@@ -13,8 +12,6 @@ definitions:
         type: string
       stepId:
         type: integer
-      stepStatusRecorded:
-        type: boolean
     type: object
   models.ClampErrorResponse:
     properties:
@@ -69,8 +66,6 @@ definitions:
     type: object
   models.Step:
     properties:
-      canStepExecute:
-        type: boolean
       enabled:
         type: boolean
       id:
@@ -85,7 +80,6 @@ definitions:
         type: array
       requestTransform:
         $ref: '#/definitions/models.RequestTransform'
-        type: object
       transform:
         type: boolean
       transformFormat:
@@ -94,7 +88,6 @@ definitions:
         type: string
       val:
         $ref: '#/definitions/models.Val'
-        type: object
       when:
         type: string
     required:
@@ -110,7 +103,6 @@ definitions:
         type: string
       payload:
         $ref: '#/definitions/models.Payload'
-        type: object
       status:
         type: string
       time_taken:
@@ -140,14 +132,8 @@ definitions:
     - name
     - steps
     type: object
-host: localhost:8080
 info:
   contact: {}
-  description: An opinionated approach to microservices architecture and orchestration
-  license: {}
-  termsOfService: http://swagger.io/terms/
-  title: Clamp Swagger API
-  version: "1.0"
 paths:
   /serviceRequest/{serviceRequestId}:
     get:
@@ -155,7 +141,7 @@ paths:
       - application/json
       description: Get service request by service request id
       parameters:
-      - description: Service Request Id
+      - description: Service Request ID
         in: path
         name: serviceRequestId
         required: true

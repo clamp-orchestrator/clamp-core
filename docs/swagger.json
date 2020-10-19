@@ -1,15 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "An opinionated approach to microservices architecture and orchestration",
-        "title": "Clamp Swagger API",
-        "termsOfService": "http://swagger.io/terms/",
-        "contact": {},
-        "license": {},
-        "version": "1.0"
+        "contact": {}
     },
-    "host": "localhost:8080",
-    "basePath": "/",
     "paths": {
         "/serviceRequest/{serviceRequestId}": {
             "get": {
@@ -24,7 +17,7 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Service Request Id",
+                        "description": "Service Request ID",
                         "name": "serviceRequestId",
                         "in": "path",
                         "required": true
@@ -262,7 +255,6 @@
             "type": "object",
             "properties": {
                 "error": {
-                    "type": "object",
                     "$ref": "#/definitions/models.ClampErrorResponse"
                 },
                 "requestHeaders": {
@@ -277,9 +269,6 @@
                 },
                 "stepId": {
                     "type": "integer"
-                },
-                "stepStatusRecorded": {
-                    "type": "boolean"
                 }
             }
         },
@@ -369,9 +358,6 @@
                 "val"
             ],
             "properties": {
-                "canStepExecute": {
-                    "type": "boolean"
-                },
                 "enabled": {
                     "type": "boolean"
                 },
@@ -391,7 +377,6 @@
                     }
                 },
                 "requestTransform": {
-                    "type": "object",
                     "$ref": "#/definitions/models.RequestTransform"
                 },
                 "transform": {
@@ -404,7 +389,6 @@
                     "type": "string"
                 },
                 "val": {
-                    "type": "object",
                     "$ref": "#/definitions/models.Val"
                 },
                 "when": {
@@ -422,7 +406,6 @@
                     "type": "string"
                 },
                 "payload": {
-                    "type": "object",
                     "$ref": "#/definitions/models.Payload"
                 },
                 "status": {
