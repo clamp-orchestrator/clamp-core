@@ -75,8 +75,8 @@ func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNu
 	var pgServiceRequests []models.PGServiceRequest
 	err := p.getDb().Model(&pgServiceRequests).
 		Where("workflow_name = ?", workflowName).
+		Offset(pageSize * pageNumber).
 		Limit(pageSize).
-		Offset(pageNumber).
 		Select()
 	var workflows []models.ServiceRequest
 	for _, pgServiceRequest := range pgServiceRequests {
