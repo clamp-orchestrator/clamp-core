@@ -19,8 +19,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	listeners.AmqpStepResponseListener.Listen()
-	listeners.KafkaStepResponseListener.Listen()
+	if config.ENV.EnableKafkaIntegration {
+		listeners.AmqpStepResponseListener.Listen()
+	}
+	if config.ENV.EnableKafkaIntegration {
+		listeners.KafkaStepResponseListener.Listen()
+	}
 	handlers.LoadHTTPRoutes()
 	log.Println("Calling listener")
 }
