@@ -66,7 +66,7 @@ jobs:
             CLAMP_KAFKA_CONNECTION_STR: "localhost:9092"
             CLAMP_QUEUE_CONNECTION_STR: "amqp://guest:guest@localhost:5672/"
             ENABLE_KAFKA_INTEGRATION: true
-            EnableRabbitMQIntegration: true
+            ENABLE_AMQP_INTEGRATION: true
           command: |
             if [ $CIRCLE_BRANCH == 'master' ]; then
               ./cc-test-reporter before-build

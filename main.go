@@ -19,7 +19,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if config.ENV.EnableKafkaIntegration {
+	if config.ENV.EnableRabbitMQIntegration {
 		listeners.AmqpStepResponseListener.Listen()
 	}
 	if config.ENV.EnableKafkaIntegration {
