@@ -208,7 +208,7 @@ func TestShouldGetAllWorkflowsByPage(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1", nil)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=1", nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -224,7 +224,7 @@ func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T
 	router := setupRouter()
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0", nil)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1", nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -233,14 +233,46 @@ func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T
 
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, jsonResp)
-	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
+	assert.Equal(t, "page number or page size has not been defined", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfPageNumberIsLessThanOne(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfPageSizeIsLessThanOne(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=0", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
 }
 
 func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 
-	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=-1", nil)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=-1", nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
@@ -257,7 +289,7 @@ func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 	w := httptest.NewRecorder()
 	sortByString := `id,`
 	urlEncodedSortValue := url.QueryEscape(sortByString)
-	req, _ := http.NewRequest("GET", "/workflows?pageNumber=0&pageSize=1&sortBy="+urlEncodedSortValue, nil)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=1&sortBy="+urlEncodedSortValue, nil)
 	router.ServeHTTP(w, req)
 
 	bodyStr := w.Body.String()
