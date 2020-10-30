@@ -233,7 +233,7 @@ func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T
 
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, jsonResp)
-	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
+	assert.Equal(t, "page number or page size has not been defined", jsonResp.Message)
 }
 
 func TestShouldThrowErrorIfPageNumberIsLessThanOne(t *testing.T) {
