@@ -176,7 +176,7 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.
 			query = query.Order(reference + " " + order)
 		}
 	}
-	err := query.Offset(pageSize * pageNumber).
+	err := query.Offset(pageSize * (pageNumber - 1)).
 		Limit(pageSize).Select()
 	if err != nil {
 		return []models.Workflow{}, err

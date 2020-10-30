@@ -127,13 +127,13 @@ func getWorkflows() gin.HandlerFunc {
 		pageNumberStr := c.Query("pageNumber")
 		sortByQuery := c.Query("sortBy")
 		if pageSizeStr == "" || pageNumberStr == "" {
-			err := errors.New("page number or page size is not been defined")
+			err := errors.New("page number or page size has not been defined")
 			prepareErrorResponse(err, c)
 			return
 		}
 		pageNumber, pageNumberErr := strconv.Atoi(pageNumberStr)
 		pageSize, pageSizeErr := strconv.Atoi(pageSizeStr)
-		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 0 || pageNumber < 0 {
+		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 1 || pageNumber < 1 {
 			err := errors.New("page number or page size is not in proper format")
 			prepareErrorResponse(err, c)
 			return
