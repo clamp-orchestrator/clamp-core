@@ -8,7 +8,7 @@ import (
 
 func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
 	log.Printf("Saving worflow %v", workflowReq)
-	workflow, err := repository.DB.SaveWorkflow(workflowReq)
+	workflow, err := repository.GetDB().SaveWorkflow(workflowReq)
 	if err != nil {
 		log.Printf("Failed to save workflow: %v, error: %s\n", workflow, err.Error())
 	} else {

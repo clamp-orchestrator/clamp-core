@@ -7,7 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type dbInterface interface {
+// DBInterface provides a collection of method signatures that needs to be implemented for a specific database.
+type DBInterface interface {
 	SaveServiceRequest(models.ServiceRequest) (models.ServiceRequest, error)
 	FindServiceRequestByID(uuid.UUID) (models.ServiceRequest, error)
 	SaveWorkflow(models.Workflow) (models.Workflow, error)
@@ -21,19 +22,22 @@ type dbInterface interface {
 	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error)
 }
 
-var DB dbInterface
+var db DBInterface
 
 func init() {
 	switch config.ENV.DBDriver {
 	case "postgres":
-		DB = &postgres{}
+		db = &postgres{}
 	}
 }
 
-func GetDB() dbInterface {
-	return DB
+// GetDB returns the initialized database implementations. Currently only postgres is implemented.
+func GetDB() DBInterface {
+	return db
 }
 
-func SetDb(dbImpl dbInterface) {
-	DB = dbImpl
+// SetDb is used to update the db object with custom implementations.
+// It is used in tests to override the actual db implementations with mock implementations
+func SetDb(dbImpl DBInterface) {
+	db = dbImpl
 }
