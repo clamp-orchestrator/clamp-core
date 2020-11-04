@@ -43,11 +43,13 @@ var ENV = struct {
 	/**
 	System Defaults
 	*/
-	PORT          string   `env:"APP_PORT" envDefault:"8080"`
-	AllowOrigins  []string `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000,http://54.149.76.62"`
+	PORT         string   `env:"APP_PORT" envDefault:"8080"`
+	AllowOrigins []string `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000,http://54.149.76.62"`
 
 	EnableKafkaIntegration    bool `env:"ENABLE_KAFKA_INTEGRATION" envDefault:false`
 	EnableRabbitMQIntegration bool `env:"ENABLE_AMQP_INTEGRATION" envDefault:false`
+
+	EnableSQLQueriesLog bool `env:"ENABLE_SQL_QUERIES_LOG" envDefault:"false"`
 }{}
 
 func init() {

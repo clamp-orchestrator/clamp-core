@@ -16,9 +16,6 @@ import (
 //reference human readable keys to DB key values
 var keyReferences = map[string]string{"id": "id", "createdate": "created_at", "name": "name"}
 
-//LogSQLQueries used to decide logging
-const LogSQLQueries bool = true
-
 var singletonOnce sync.Once
 
 type dbLogger struct{}
@@ -35,7 +32,7 @@ func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
 
 func connectDB() (db *pg.DB) {
 	db = pg.Connect(GetPostgresOptions())
-	if LogSQLQueries {
+	if config.ENV.EnableSQLQueriesLog {
 		db.AddQueryHook(dbLogger{})
 	}
 	return db
