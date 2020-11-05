@@ -70,20 +70,21 @@ func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 	var receivedSortByArgs models.SortByFields
 	var pgNumberReceived int
 	var pgSizeReceived int
-	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
 		receivedSortByArgs = sortBy
 		pgNumberReceived = pageNumber
 		pgSizeReceived = pageSize
-		return []models.Workflow{workflow}, nil
+		return []models.Workflow{workflow}, 1, nil
 
 	}
 	pageSize := 1
 	pageNumber := 1
-	resp, err := GetWorkflows(pageNumber, pageSize, sortBy)
+	resp, totalWorkflows, err := GetWorkflows(pageNumber, pageSize, sortBy)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 	assert.Equal(t, pageSize, pgSizeReceived)
+	assert.Equal(t, 1, totalWorkflows)
 	assert.Equal(t, pageNumber, pgNumberReceived)
 	assert.Equal(t, receivedSortByArgs, sortBy)
 }
@@ -94,20 +95,21 @@ func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	var receivedSortByArgs models.SortByFields
 	var pgNumberReceived int
 	var pgSizeReceived int
-	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
 		receivedSortByArgs = sortBy
 		pgNumberReceived = pageNumber
 		pgSizeReceived = pageSize
-		return []models.Workflow{workflow}, nil
+		return []models.Workflow{workflow}, 1, nil
 
 	}
 	pageSize := 1
 	pageNumber := 1
-	resp, err := GetWorkflows(pageNumber, pageSize, sortBy)
+	resp, totalWorkflows, err := GetWorkflows(pageNumber, pageSize, sortBy)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 	assert.Equal(t, pageSize, pgSizeReceived)
+	assert.Equal(t, 1, totalWorkflows)
 	assert.Equal(t, pageNumber, pgNumberReceived)
 	assert.Equal(t, receivedSortByArgs, sortBy)
 }

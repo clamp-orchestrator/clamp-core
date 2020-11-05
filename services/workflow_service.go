@@ -29,11 +29,11 @@ func FindWorkflowByName(workflowName string) (models.Workflow, error) {
 //GetWorkflows is used to fetch all the workflows for the GET call API
 //Implements a pagination approach
 //Also supports filters
-func GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
+func GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
 	log.Printf("Getting workflows for pageNumber: %d, pageSize: %d", pageNumber, pageSize)
-	workflows, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)
+	workflows, totalWorkflows, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)
 	if err != nil {
 		log.Printf("Failed to fetch worflows for pageNumber: %d, pageSize: %d, sortBy %v", pageNumber, pageSize, sortBy)
 	}
-	return workflows, err
+	return workflows, totalWorkflows, err
 }

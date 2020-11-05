@@ -163,29 +163,29 @@ func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.
 	return pgServReq.ToServiceRequest(), err
 }
 
-func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.Workflow, error) {
+func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.Workflow, int, error) {
 	var pgWorkflows []models.PGWorkflow
 	query := p.getDb().Model(&pgWorkflows)
 	for _, sortField := range sortFields {
 		reference, found := keyReferences[sortField.Key]
 		if !found {
-			return []models.Workflow{}, errors.New("Undefined key reference used")
+			return []models.Workflow{}, 0, errors.New("Undefined key reference used")
 		}
 		order := sortField.Order
 		if found {
 			query = query.Order(reference + " " + order)
 		}
 	}
-	err := query.Offset(pageSize * (pageNumber - 1)).
-		Limit(pageSize).Select()
+	totalWorkflows, err := query.Offset(pageSize * (pageNumber - 1)).
+		Limit(pageSize).SelectAndCount()
 	if err != nil {
-		return []models.Workflow{}, err
+		return []models.Workflow{}, 0, err
 	}
 	var workflows []models.Workflow
 	for _, pgWorkflow := range pgWorkflows {
 		workflows = append(workflows, pgWorkflow.ToWorkflow())
 	}
-	return workflows, err
+	return workflows, totalWorkflows, err
 }
 
 func (p *postgres) getDb() *pg.DB {

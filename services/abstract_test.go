@@ -13,7 +13,7 @@ func (m mockDB) FindServiceRequestsByWorkflowName(workflowName string, pageNumbe
 	return findServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize)
 }
 
-func (m mockDB) GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error) {
+func (m mockDB) GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
 	return getWorkflowsMock(pageNumber, pageSize, sortBy)
 }
 
@@ -36,7 +36,7 @@ var findStepStatusByServiceRequestIDAndStatusMock func(serviceRequestID uuid.UUI
 var findAllStepStatusByServiceRequestIDAndStepIDMock func(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error)
 var findStepStatusByServiceRequestIDAndStepNameAndStatusMock func(serviceRequestID uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error)
 var findStepStatusByServiceRequestIDAndStepIDAndStatusMock func(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error)
-var getWorkflowsMock func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error)
+var getWorkflowsMock func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error)
 
 func (m mockDB) SaveServiceRequest(serReq models.ServiceRequest) (models.ServiceRequest, error) {
 	return saveServiceRequestMock(serReq)
