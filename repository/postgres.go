@@ -143,6 +143,11 @@ func (p *postgres) FindWorkflowByName(workflowName string) (models.Workflow, err
 	return (*pgWorkflow).ToWorkflow(), err
 }
 
+func (p *postgres) DeleteWorkflowByName(workflowName string) error {
+	_, err := p.getDb().Model((*models.PGWorkflow)(nil)).Where("name = ?", workflowName).Delete()
+	return err
+}
+
 func (p *postgres) SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
 	pgWorkflow := workflowReq.ToPGWorkflow()
 	log.Printf("pgworfklow: %v", pgWorkflow)
