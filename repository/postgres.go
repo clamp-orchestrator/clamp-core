@@ -14,7 +14,7 @@ import (
 )
 
 //reference human readable keys to DB key values
-var keyReferences = map[string]string{"id": "id", "createdate": "created_at", "name": "name"}
+var keyReferences = map[string]string{"id": "id", "created_at": "created_at", "name": "name"}
 
 //LogSQLQueries used to decide logging
 const LogSQLQueries bool = true
