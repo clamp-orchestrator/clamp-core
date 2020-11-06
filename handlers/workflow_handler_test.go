@@ -301,3 +301,20 @@ func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 	assert.NotNil(t, jsonResp)
 	assert.Equal(t, "Unsupported value provided for sortBy query", jsonResp.Message)
 }
+
+func TestShouldThrowErrorIfSortContainsInvalidFields(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	sortByString := `updatedate:ASC`
+	urlEncodedSortValue := url.QueryEscape(sortByString)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=1&sortBy="+urlEncodedSortValue, nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "Unsupported value provided for sortBy query", jsonResp.Message)
+}
