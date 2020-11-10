@@ -218,6 +218,7 @@ func TestShouldGetAllWorkflowsByPage(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	assert.NotNil(t, jsonResp)
 	assert.Equal(t, 1, len(jsonResp.Workflows), fmt.Sprintf("The expected number of records was %d but we got %d", 1, len(jsonResp.Workflows)))
+	assert.True(t, jsonResp.TotalWorkflowsCount > 0, fmt.Sprintf("The total workflow count is less than 0"))
 }
 
 func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T) {
@@ -288,6 +289,23 @@ func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	sortByString := `id,`
+	urlEncodedSortValue := url.QueryEscape(sortByString)
+	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=1&sortBy="+urlEncodedSortValue, nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ClampErrorResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 400, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "Unsupported value provided for sortBy query", jsonResp.Message)
+}
+
+func TestShouldThrowErrorIfSortContainsInvalidFields(t *testing.T) {
+	router := setupRouter()
+	w := httptest.NewRecorder()
+	sortByString := `updatedate:ASC`
 	urlEncodedSortValue := url.QueryEscape(sortByString)
 	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=1&sortBy="+urlEncodedSortValue, nil)
 	router.ServeHTTP(w, req)
