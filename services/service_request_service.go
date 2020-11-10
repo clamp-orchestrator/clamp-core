@@ -29,9 +29,9 @@ func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest
 }
 
 //FindServiceRequestByWorkflowName fetches all ServiceRequests that are associated to a workflow type
-func FindServiceRequestByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+func FindServiceRequestByWorkflowName(workflowName string, pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.ServiceRequest, error) {
 	log.Printf("Getting service request by workflow name: %s", workflowName)
-	serviceRequests, err := repository.GetDB().FindServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize)
+	serviceRequests, err := repository.GetDB().FindServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize, sortBy)
 	if err != nil {
 		log.Printf("Failed to fetch service requests by workflow nam: %s for pageNumber: %d, pageSize: %d", workflowName, pageNumber, pageSize)
 	}

@@ -19,7 +19,7 @@ type DBInterface interface {
 	FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error)
 	FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error)
 	GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, error)
-	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error)
+	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.ServiceRequest, error)
 	DeleteWorkflowByName(string) error
 }
 

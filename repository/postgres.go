@@ -68,13 +68,16 @@ type postgres struct {
 	db *pg.DB
 }
 
-func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.ServiceRequest, error) {
 	var pgServiceRequests []models.PGServiceRequest
-	err := p.getDb().Model(&pgServiceRequests).
-		Where("workflow_name = ?", workflowName).
-		Limit(pageSize).
-		Offset(pageNumber).
-		Select()
+	query := p.getDb().Model(&pgServiceRequests)
+	for _, sortField := range sortFields {
+		reference := sortField.Key
+		order := sortField.Order
+		query = query.Order(reference + " " + order)
+	}
+	err := query.Offset(pageSize * (pageNumber - 1)).
+		Limit(pageSize).Select()
 	var workflows []models.ServiceRequest
 	if err == nil {
 		for _, pgServiceRequest := range pgServiceRequests {

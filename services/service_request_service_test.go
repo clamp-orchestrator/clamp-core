@@ -77,10 +77,11 @@ func TestFindServiceRequestsByWorkflowName(t *testing.T) {
 	serviceReq := models.ServiceRequest{
 		ID: uuid.UUID{},
 	}
-	findServiceRequestsByWorkflowName = func(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+	findServiceRequestsByWorkflowName = func(workflowName string, pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.ServiceRequest, error) {
 		return []models.ServiceRequest{serviceReq}, nil
 	}
-	resp, err := findServiceRequestsByWorkflowName("test", 1, 1)
+	sortFields := models.SortByFields{{Key: "id", Order: "asc"}}
+	resp, err := findServiceRequestsByWorkflowName("test", 1, 1, sortFields)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 }
