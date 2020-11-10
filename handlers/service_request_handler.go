@@ -176,20 +176,21 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 			prepareErrorResponse(err, c)
 			return
 		}
-		serviceRequests, err := services.FindServiceRequestByWorkflowName(workflowName, pageNumber, pageSize, sortByFields)
+		serviceRequests, totalServiceRequests, err := services.FindServiceRequestByWorkflowName(workflowName, pageNumber, pageSize, sortByFields)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return
 		}
-		c.JSON(http.StatusOK, prepareServiceRequestsResponse(serviceRequests, pageNumber, pageSize))
+		c.JSON(http.StatusOK, prepareServiceRequestsResponse(serviceRequests, pageNumber, pageSize, totalServiceRequests))
 	}
 }
 
-func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
+func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int, totalServiceRequests int) models.ServiceRequestPageResponse {
 	response := models.ServiceRequestPageResponse{
-		ServiceRequests: serviceRequests,
-		PageNumber:      pageNumber,
-		PageSize:        pageSize,
+		ServiceRequests:      serviceRequests,
+		PageNumber:           pageNumber,
+		PageSize:             pageSize,
+		TotalServiceRequests: totalServiceRequests,
 	}
 	return response
 }

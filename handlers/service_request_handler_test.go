@@ -280,3 +280,19 @@ func TestShouldFailGetServiceRequestsByWorkflowNameWithInvalidSortQuery(t *testi
 	assert.Equal(t, 400, w.Code)
 	assert.Nil(t, jsonResp.ServiceRequests)
 }
+
+func TestShouldGetServiceRequestsByWorkflowNameWithTotalServiceRequests(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+	router := setupRouter()
+	w := httptest.NewRecorder()
+
+	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=1&pageSize=1&sortBy=id:desc", nil)
+	router.ServeHTTP(w, req)
+
+	bodyStr := w.Body.String()
+	var jsonResp models.ServiceRequestPageResponse
+	json.Unmarshal([]byte(bodyStr), &jsonResp)
+
+	assert.Equal(t, 200, w.Code)
+	assert.NotNil(t, jsonResp.TotalServiceRequests)
+}
