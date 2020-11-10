@@ -56,7 +56,7 @@ func verifySortValues(key string, value string) bool {
 	if value != "desc" && value != "asc" {
 		return false
 	}
-	supportedKeys := []string{"id", "name", "createdate"}
+	supportedKeys := []string{"id", "name", "created_at"}
 	for _, keyVal := range supportedKeys {
 		if key == keyVal {
 			return true
