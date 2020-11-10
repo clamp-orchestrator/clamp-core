@@ -184,7 +184,7 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.
 			query = query.Order(reference + " " + order)
 		}
 	}
-	totalWorkflows, err := query.Offset(pageSize * (pageNumber - 1)).
+	totalWorkflowsCount, err := query.Offset(pageSize * (pageNumber - 1)).
 		Limit(pageSize).SelectAndCount()
 	if err != nil {
 		return []models.Workflow{}, 0, err
@@ -193,7 +193,7 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.
 	for _, pgWorkflow := range pgWorkflows {
 		workflows = append(workflows, pgWorkflow.ToWorkflow())
 	}
-	return workflows, totalWorkflows, err
+	return workflows, totalWorkflowsCount, err
 }
 
 func (p *postgres) getDb() *pg.DB {

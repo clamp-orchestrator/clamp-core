@@ -42,9 +42,9 @@ func DeleteWorkflowByName(workflowName string) error {
 //Also supports filters
 func GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
 	log.Printf("Getting workflows for pageNumber: %d, pageSize: %d", pageNumber, pageSize)
-	workflows, totalWorkflows, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)
+	workflows, totalWorkflowsCount, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)
 	if err != nil {
 		log.Printf("Failed to fetch worflows for pageNumber: %d, pageSize: %d, sortBy %v", pageNumber, pageSize, sortBy)
 	}
-	return workflows, totalWorkflows, err
+	return workflows, totalWorkflowsCount, err
 }

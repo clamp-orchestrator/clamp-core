@@ -79,12 +79,12 @@ func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 	}
 	pageSize := 1
 	pageNumber := 1
-	resp, totalWorkflows, err := GetWorkflows(pageNumber, pageSize, sortBy)
+	resp, totalWorkflowsCount, err := GetWorkflows(pageNumber, pageSize, sortBy)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 	assert.Equal(t, pageSize, pgSizeReceived)
-	assert.Equal(t, 1, totalWorkflows)
+	assert.Equal(t, 1, totalWorkflowsCount)
 	assert.Equal(t, pageNumber, pgNumberReceived)
 	assert.Equal(t, receivedSortByArgs, sortBy)
 }
@@ -104,12 +104,12 @@ func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	}
 	pageSize := 1
 	pageNumber := 1
-	resp, totalWorkflows, err := GetWorkflows(pageNumber, pageSize, sortBy)
+	resp, totalWorkflowsCount, err := GetWorkflows(pageNumber, pageSize, sortBy)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
 	assert.Equal(t, pageSize, pgSizeReceived)
-	assert.Equal(t, 1, totalWorkflows)
+	assert.Equal(t, 1, totalWorkflowsCount)
 	assert.Equal(t, pageNumber, pgNumberReceived)
 	assert.Equal(t, receivedSortByArgs, sortBy)
 }
