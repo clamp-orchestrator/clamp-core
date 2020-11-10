@@ -70,7 +70,7 @@ type postgres struct {
 
 func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.ServiceRequest, int, error) {
 	var pgServiceRequests []models.PGServiceRequest
-	query := p.getDb().Model(&pgServiceRequests)
+	query := p.getDb().Model(&pgServiceRequests).Where("workflow_name = ?", workflowName)
 	for _, sortField := range sortFields {
 		reference := sortField.Key
 		order := sortField.Order
