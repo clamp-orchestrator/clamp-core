@@ -113,3 +113,18 @@ func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	assert.Equal(t, pageNumber, pgNumberReceived)
 	assert.Equal(t, receivedSortByArgs, sortBy)
 }
+
+func TestDeleteWorkflowByWorkflowName(t *testing.T) {
+	workflow := prepareWorkflow()
+
+	deleteWorkflowByNameMock = func(workflowName string) error {
+		return nil
+	}
+	err := DeleteWorkflowByName(workflow.Name)
+	assert.Nil(t, err)
+	deleteWorkflowByNameMock = func(workflowName string) error {
+		return errors.New("pg: no rows in result set")
+	}
+	err = DeleteWorkflowByName(workflow.Name)
+	assert.NotNil(t, err)
+}

@@ -8,7 +8,7 @@ import (
 
 func SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
 	log.Printf("Saving worflow %v", workflowReq)
-	workflow, err := repository.DB.SaveWorkflow(workflowReq)
+	workflow, err := repository.GetDB().SaveWorkflow(workflowReq)
 	if err != nil {
 		log.Printf("Failed to save workflow: %v, error: %s\n", workflow, err.Error())
 	} else {
@@ -24,6 +24,17 @@ func FindWorkflowByName(workflowName string) (models.Workflow, error) {
 		log.Printf("No record found with given workflow name %s, error: %s\n", workflowName, err.Error())
 	}
 	return workflow, err
+}
+
+//DeleteWorkflow will delete the existing workflow by name
+//This method is not exposed an an API. It is implemented for running a test scenario.
+func DeleteWorkflowByName(workflowName string) error {
+	log.Printf("Deleting workflow by name : %s", workflowName)
+	err := repository.GetDB().DeleteWorkflowByName(workflowName)
+	if err != nil {
+		log.Printf("No record found with given workflow name %s, error: %s\n", workflowName, err.Error())
+	}
+	return err
 }
 
 //GetWorkflows is used to fetch all the workflows for the GET call API

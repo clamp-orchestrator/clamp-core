@@ -16,9 +16,6 @@ import (
 //reference human readable keys to DB key values
 var keyReferences = map[string]string{"id": "id", "created_at": "created_at", "name": "name"}
 
-//LogSQLQueries used to decide logging
-const LogSQLQueries bool = true
-
 var singletonOnce sync.Once
 
 type dbLogger struct{}
@@ -35,7 +32,7 @@ func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
 
 func connectDB() (db *pg.DB) {
 	db = pg.Connect(GetPostgresOptions())
-	if LogSQLQueries {
+	if config.ENV.EnableSQLQueriesLog {
 		db.AddQueryHook(dbLogger{})
 	}
 	return db
@@ -79,8 +76,10 @@ func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNu
 		Offset(pageNumber).
 		Select()
 	var workflows []models.ServiceRequest
-	for _, pgServiceRequest := range pgServiceRequests {
-		workflows = append(workflows, pgServiceRequest.ToServiceRequest())
+	if err == nil {
+		for _, pgServiceRequest := range pgServiceRequests {
+			workflows = append(workflows, pgServiceRequest.ToServiceRequest())
+		}
 	}
 	return workflows, err
 }
@@ -89,8 +88,10 @@ func (p *postgres) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID
 	var pgStepStatus []models.PGStepStatus
 	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ?", serviceRequestID, stepID).Select()
 	var stepStatuses []models.StepsStatus
-	for _, status := range pgStepStatus {
-		stepStatuses = append(stepStatuses, status.ToStepStatus())
+	if err == nil {
+		for _, status := range pgStepStatus {
+			stepStatuses = append(stepStatuses, status.ToStepStatus())
+		}
 	}
 	return stepStatuses, err
 }
@@ -122,8 +123,10 @@ func (p *postgres) FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) 
 	var pgStepStatus []models.PGStepStatus
 	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestID).Order("created_at ASC").Select()
 	var stepStatuses []models.StepsStatus
-	for _, status := range pgStepStatus {
-		stepStatuses = append(stepStatuses, status.ToStepStatus())
+	if err == nil {
+		for _, status := range pgStepStatus {
+			stepStatuses = append(stepStatuses, status.ToStepStatus())
+		}
 	}
 	return stepStatuses, err
 }
@@ -138,6 +141,11 @@ func (p *postgres) FindWorkflowByName(workflowName string) (models.Workflow, err
 	pgWorkflow := new(models.PGWorkflow)
 	err := p.getDb().Model(pgWorkflow).Where("name = ?", workflowName).Select()
 	return (*pgWorkflow).ToWorkflow(), err
+}
+
+func (p *postgres) DeleteWorkflowByName(workflowName string) error {
+	_, err := p.getDb().Model((*models.PGWorkflow)(nil)).Where("name = ?", workflowName).Delete()
+	return err
 }
 
 func (p *postgres) SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {

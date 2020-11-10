@@ -9,6 +9,10 @@ import (
 
 type mockDB struct{}
 
+func (m mockDB) DeleteWorkflowByName(workflowName string) error {
+	return deleteWorkflowByNameMock(workflowName)
+}
+
 func (m mockDB) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
 	return findServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize)
 }
@@ -37,6 +41,7 @@ var findAllStepStatusByServiceRequestIDAndStepIDMock func(serviceRequestID uuid.
 var findStepStatusByServiceRequestIDAndStepNameAndStatusMock func(serviceRequestID uuid.UUID, stepName string, status models.Status) (models.StepsStatus, error)
 var findStepStatusByServiceRequestIDAndStepIDAndStatusMock func(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error)
 var getWorkflowsMock func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error)
+var deleteWorkflowByNameMock func(workflowName string) error
 
 func (m mockDB) SaveServiceRequest(serReq models.ServiceRequest) (models.ServiceRequest, error) {
 	return saveServiceRequestMock(serReq)

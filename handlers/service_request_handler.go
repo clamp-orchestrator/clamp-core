@@ -135,8 +135,16 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 			return
 		}
 		serviceRequestByIDCounter.WithLabelValues(serviceRequestID).Inc()
-		workflow, _ := services.FindWorkflowByName(serviceRequest.WorkflowName)
-		stepsStatues, _ := services.FindStepStatusByServiceRequestID(uuid.MustParse(serviceRequestID))
+		workflow, err := services.FindWorkflowByName(serviceRequest.WorkflowName)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.CreateErrorResponse(http.StatusInternalServerError, err.Error()))
+			return
+		}
+		stepsStatues, err := services.FindStepStatusByServiceRequestID(uuid.MustParse(serviceRequestID))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.CreateErrorResponse(http.StatusInternalServerError, err.Error()))
+			return
+		}
 		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestID), workflow, stepsStatues)
 		//TODO - handle error scenario. Currently it is always 200 ok
 		serviceRequestByIDHistogram.Observe(time.Since(startTime).Seconds())

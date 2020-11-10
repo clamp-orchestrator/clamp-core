@@ -84,6 +84,20 @@ func TestShouldGetServiceRequestStatus(t *testing.T) {
 	assert.Equal(t, 2, len(response.Steps))
 }
 
+func TestShouldGetWorkflowNotExistsWhenGetServiceRequestStatusCalled(t *testing.T) {
+	CreateWorkflowIfItsAlreadyDoesNotExists()
+	_, bodyStr := callCreateServiceRequest(workflowName)
+	var serviceReq models.ServiceRequestResponse
+	json.Unmarshal([]byte(bodyStr), &serviceReq)
+	time.Sleep(time.Second * 5)
+	DeleteWorkflowIfExists()
+	status, body := callGetServiceRequestStatus(serviceReq.ID)
+	var response models.ClampErrorResponse
+	json.Unmarshal([]byte(body), &response)
+	assert.Equal(t, 500, status.Code)
+	assert.Equal(t, "pg: no rows in result set", response.Message)
+}
+
 func callCreateServiceRequest(wfName string) (*httptest.ResponseRecorder, string) {
 	router := setupRouter()
 	w := httptest.NewRecorder()
@@ -130,6 +144,11 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 	if err != nil {
 		services.SaveWorkflow(workflow)
 	}
+}
+
+func DeleteWorkflowIfExists() {
+	err := services.DeleteWorkflowByName(workflowName)
+	log.Println(err)
 }
 
 func prepareServiceRequestPayload() map[string]interface{} {
