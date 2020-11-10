@@ -81,8 +81,8 @@ func TestFindServiceRequestsByWorkflowName(t *testing.T) {
 		return []models.ServiceRequest{serviceReq}, 0, nil
 	}
 	sortFields := models.SortByFields{{Key: "id", Order: "asc"}}
-	resp, totalServiceRequests, err := findServiceRequestsByWorkflowName("test", 1, 1, sortFields)
+	resp, totalServiceRequestsCount, err := findServiceRequestsByWorkflowName("test", 1, 1, sortFields)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(resp))
-	assert.NotNil(t, totalServiceRequests)
+	assert.NotNil(t, totalServiceRequestsCount)
 }

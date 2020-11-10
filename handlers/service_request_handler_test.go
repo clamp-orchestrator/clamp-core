@@ -294,5 +294,5 @@ func TestShouldGetServiceRequestsByWorkflowNameWithTotalServiceRequests(t *testi
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
-	assert.NotNil(t, jsonResp.TotalServiceRequests)
+	assert.NotNil(t, jsonResp.TotalServiceRequestsCount)
 }

@@ -76,8 +76,8 @@ func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNu
 		order := sortField.Order
 		query = query.Order(reference + " " + order)
 	}
-	totalServiceRequests := 0
-	totalServiceRequests, err := query.Offset(pageSize * (pageNumber - 1)).
+	totalServiceRequestsCount := 0
+	totalServiceRequestsCount, err := query.Offset(pageSize * (pageNumber - 1)).
 		Limit(pageSize).SelectAndCount()
 	var workflows []models.ServiceRequest
 	if err == nil {
@@ -85,7 +85,7 @@ func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNu
 			workflows = append(workflows, pgServiceRequest.ToServiceRequest())
 		}
 	}
-	return workflows, totalServiceRequests, err
+	return workflows, totalServiceRequestsCount, err
 }
 
 func (p *postgres) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error) {
