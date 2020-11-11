@@ -110,3 +110,18 @@ func TestParseFromQueryReturnErrForInvalidField(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
 }
+
+func TestShouldParse(t *testing.T) {
+	sortByQuery := `created_at:desc,id:asc,name:desc,`
+
+	sortUsing, err := ParseFromQuery(sortByQuery)
+
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(sortUsing))
+	assert.Equal(t, "created_at", sortUsing[0].Key)
+	assert.Equal(t, "desc", sortUsing[0].Order)
+	assert.Equal(t, "id", sortUsing[1].Key)
+	assert.Equal(t, "asc", sortUsing[1].Order)
+	assert.Equal(t, "name", sortUsing[2].Key)
+	assert.Equal(t, "desc", sortUsing[2].Order)
+}
