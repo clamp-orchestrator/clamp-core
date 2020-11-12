@@ -3,6 +3,7 @@ package handlers
 import (
 	"clamp-core/models"
 	"clamp-core/services"
+	"clamp-core/utils"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -165,7 +166,7 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 		}
 		pageNumber, pageNumberErr := strconv.Atoi(pageNumberStr)
 		pageSize, pageSizeErr := strconv.Atoi(pageSizeStr)
-		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 1 || pageNumber < 1 {
+		if pageNumberErr != nil || pageSizeErr != nil || pageSize < utils.MinPageSize || pageNumber < utils.MinPageNumber {
 			err := errors.New("page number or page size is not in proper format")
 			prepareErrorResponse(err, c)
 			return
