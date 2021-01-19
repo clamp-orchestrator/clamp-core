@@ -8,3 +8,17 @@ Clamp is a workflow management and microservices orchestrator. It has been writt
 ## Backlogs & Issues
 
 - [Project dashboard](https://github.com/orgs/clamp-orchestrator/projects/1)
+
+## Docker Compose
+
+Clamp Core and its dependencies can be run through Docker Compose with the following command
+
+```bash
+$ docker-compose up
+```
+
+Optionally, you can run the following command if you want to inspect Clamp Core metrics through Prometheus annd Grafana.
+
+```bash
+$ docker-compose -f docker-compose.yml -f prometheus-grafana.yml u
+```
