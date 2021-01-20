@@ -14,7 +14,7 @@ type ServiceRequest struct {
 	CreatedAt    time.Time              `json:"created_at"`
 	Payload      map[string]interface{} `json:"payload"`
 	//TODO: rename to last step id executed
-	CurrentStepID  int `json:"current_step_id", binding:"omitempty"`
+	CurrentStepID  int `json:"current_step_id" binding:"omitempty"`
 	RequestContext RequestContext
 	RequestHeaders string
 }
