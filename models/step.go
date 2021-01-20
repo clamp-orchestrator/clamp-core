@@ -10,12 +10,15 @@ import (
 	"strings"
 )
 
+// Val represents a value of a workflow step
 type Val interface {
 }
 
+// RequestTransform represents the specification of request transformation
 type RequestTransform interface {
 }
 
+// Step represents a workflow step
 type Step struct {
 	ID               int              `json:"id"`
 	Name             string           `json:"name" binding:"required"`
@@ -33,10 +36,12 @@ type Step struct {
 	//transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
 }
 
+// DidStepExecute returns true if the step can be executed
 func (step *Step) DidStepExecute() bool {
 	return step.canStepExecute
 }
 
+// PreStepExecution prepares the step for execution with the given info
 func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefix string) (err error) {
 	step.canStepExecute = true
 	stepRequestResponsePayload := make(map[string]interface{})
@@ -67,6 +72,7 @@ func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interf
 	panic("Invalid mode specified")
 }
 
+// UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders updates request headers based on request and step headers
 func (step *Step) UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody *StepRequest) {
 	headers := step.Val.(*executors.HTTPVal).Headers
 	requestHeaders := requestBody.Headers
@@ -78,6 +84,7 @@ func (step *Step) UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(reques
 	step.Val.(*executors.HTTPVal).Headers = headers
 }
 
+// DoExecute executes the step
 func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ interface{}, _ error) {
 	err := step.PreStepExecution(requestContext.StepsContext, prefix)
 	if err != nil {
@@ -94,6 +101,7 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	return res, err
 }
 
+// DoTransform transforms the request
 func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map[string]interface{}, error) {
 	stepRequestResponsePayload := make(map[string]interface{})
 	for s, stepRequestResponse := range requestContext.StepsContext {
@@ -112,6 +120,7 @@ func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map
 	return stepRequestResponsePayload, nil
 }
 
+// UnmarshalJSON unmarshals step from JSON
 func (step *Step) UnmarshalJSON(data []byte) error {
 	var v map[string]interface{}
 	if err := json.Unmarshal(data, &v); err != nil {

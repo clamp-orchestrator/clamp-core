@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// A Payload represents payload of a step
 type Payload struct {
 	Request  map[string]interface{} `json:"request"`
 	Response map[string]interface{} `json:"response"`
@@ -26,6 +27,7 @@ type StepsStatus struct {
 	StepID           int       `json:"step_id"`
 }
 
+// NewStepsStatus returns a new step status with given info
 func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
 	return StepsStatus{ID: stepStatus.ID, ServiceRequestID: stepStatus.ServiceRequestID, WorkflowName: stepStatus.WorkflowName,
 		Status: STATUS_STARTED, CreatedAt: time.Now(), TotalTimeInMs: stepStatus.TotalTimeInMs, StepName: stepStatus.StepName, Reason: stepStatus.Reason}
@@ -36,6 +38,7 @@ func CreateStepsStatus(stepStatus StepsStatus) StepsStatus {
 	return NewStepsStatus(stepStatus)
 }
 
+// A PGStepStatus represents a step status that can be persisted through pg-go
 type PGStepStatus struct {
 	tableName        struct{} `pg:"steps_status"`
 	ID               string
@@ -50,6 +53,7 @@ type PGStepStatus struct {
 	StepID           int
 }
 
+// ToPgStepStatus returns PGStepStatus constructed from calling StepsStatus
 func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 	return PGStepStatus{
 		ID:               stepStatus.ID,
@@ -65,6 +69,7 @@ func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 	}
 }
 
+// ToStepStatus returnsStepStatus constructed from calling PGStepsStatus
 func (pgStepStatus PGStepStatus) ToStepStatus() StepsStatus {
 	return StepsStatus{
 		ID:               pgStepStatus.ID,

@@ -2,6 +2,7 @@ package models
 
 import "encoding/xml"
 
+// XMLStepRequest represents step request that can be serialized in XML
 type XMLStepRequest struct {
 	XMLName xml.Name `xml:"request"`
 	Text    string   `xml:",chardata"`
