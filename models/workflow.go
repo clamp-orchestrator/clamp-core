@@ -109,8 +109,7 @@ func updateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCou
 }
 
 func updateSubStepsIds(workflowRequest Workflow, i int, stepCount int) int {
-	var subSteps []Step
-	subSteps = workflowRequest.Steps[i].OnFailure
+	subSteps := workflowRequest.Steps[i].OnFailure
 	for subStepID := range subSteps {
 		stepCount++
 		subSteps[subStepID].ID = stepCount
