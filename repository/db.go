@@ -21,6 +21,7 @@ type DBInterface interface {
 	GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error)
 	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error)
 	DeleteWorkflowByName(string) error
+	Ping() error
 }
 
 var db DBInterface
