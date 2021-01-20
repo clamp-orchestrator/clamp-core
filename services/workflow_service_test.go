@@ -10,7 +10,7 @@ import (
 )
 
 func prepareWorkflow() models.Workflow {
-	steps := []models.Step{models.Step{}}
+	steps := []models.Step{}
 
 	steps[0] = models.Step{
 		Name:    "firstStep",
