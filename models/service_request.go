@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-//ServiceRequest is a structure to store the service request details
+// ServiceRequest is a structure to store the service request details
 type ServiceRequest struct {
 	ID           uuid.UUID              `json:"id"`
 	WorkflowName string                 `json:"workflow_name"`
@@ -27,7 +27,7 @@ func NewServiceRequest(workflowName string, payload map[string]interface{}) Serv
 
 // A PGServiceRequest represents service request that can be persisted through go-pg
 type PGServiceRequest struct {
-	tableName    struct{} `pg:"service_requests"`
+	tableName    struct{} `pg:"service_requests"` //nolint:structcheck,unused
 	ID           uuid.UUID
 	WorkflowName string
 	Status       Status

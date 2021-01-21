@@ -80,7 +80,6 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				AddServiceRequestToChannel(serviceRequest)
 			}
 		}
-
 	}
 }
 

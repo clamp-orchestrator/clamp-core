@@ -32,8 +32,8 @@ type Step struct {
 	RequestTransform RequestTransform `json:"requestTransform"`
 	canStepExecute   bool
 	OnFailure        []Step `json:"onFailure"`
-	//shouldStepExecute func(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error)
-	//transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
+	// shouldStepExecute func(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error)
+	// transformRequest  func(stepRequest map[string]interface{}, prefix string) (map[string]interface{}, error)
 }
 
 // DidStepExecute returns true if the step can be executed
@@ -48,7 +48,10 @@ func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefi
 
 	if step.When != "" {
 		for s, stepRequestResponse := range contextPayload {
-			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{
+				"request":  stepRequestResponse.Request,
+				"response": stepRequestResponse.Response,
+			}
 		}
 		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, stepRequestResponsePayload, prefix)
 	}
@@ -93,11 +96,13 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	request := requestContext.GetStepRequestFromContext(step.Name)
 	if !step.canStepExecute {
 		requestContext.StepsContext[step.Name].StepSkipped = true
-		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
+		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ",
+			prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}
-	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
-	//post Step execution
+	res, err := step.stepExecution(NewStepRequest(
+		requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
+	// post Step execution
 	return res, err
 }
 
@@ -105,7 +110,10 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map[string]interface{}, error) {
 	stepRequestResponsePayload := make(map[string]interface{})
 	for s, stepRequestResponse := range requestContext.StepsContext {
-		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{
+			"request":  stepRequestResponse.Request,
+			"response": stepRequestResponse.Response,
+		}
 	}
 	if step.Transform {
 		switch step.TransformFormat {
@@ -127,7 +135,7 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	mode := v["mode"]
-	//TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
+	// TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
 	requestTransform := v["transformFormat"]
 
 	if requestTransform != nil {

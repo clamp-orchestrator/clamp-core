@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-//reference human readable keys to DB key values
+// reference human readable keys to DB key values
 var keyReferences = map[string]string{"id": "id", "created_at": "created_at", "name": "name"}
 
 var singletonOnce sync.Once
@@ -38,7 +38,7 @@ func connectDB() (db *pg.DB) {
 	return db
 }
 
-//GetPostgresOptions returns connection details for postgres DB
+// GetPostgresOptions returns connection details for postgres DB
 func GetPostgresOptions() *pg.Options {
 	connStr := config.ENV.DBConnectionStr
 	connArr := strings.Split(connStr, " ")
@@ -96,20 +96,24 @@ func (p *postgres) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID
 	return stepStatuses, err
 }
 
-func (p *postgres) FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error) {
+func (p *postgres) FindStepStatusByServiceRequestIDAndStepIDAndStatus(
+	serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error) {
 	var pgStepStatus models.PGStepStatus
 	var stepStatuses models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and step_id = ? and status = ?", serviceRequestID, stepID, status).Select()
+	err := p.getDb().Model(&pgStepStatus).Where(
+		"service_request_id = ? and step_id = ? and status = ?", serviceRequestID, stepID, status).Select()
 	if err != nil {
 		return stepStatuses, err
 	}
 	return pgStepStatus.ToStepStatus(), err
 }
 
-func (p *postgres) FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
+func (p *postgres) FindStepStatusByServiceRequestIDAndStatus(
+	serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	var stepStatuses []models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestID, status).Order("created_at ASC").Select()
+	err := p.getDb().Model(&pgStepStatus).Where(
+		"service_request_id = ? and status = ?", serviceRequestID, status).Order("created_at ASC").Select()
 	if err != nil {
 		return stepStatuses, err
 	}
@@ -140,7 +144,7 @@ func (p *postgres) SaveStepStatus(stepStatus models.StepsStatus) (models.StepsSt
 func (p *postgres) FindWorkflowByName(workflowName string) (models.Workflow, error) {
 	pgWorkflow := new(models.PGWorkflow)
 	err := p.getDb().Model(pgWorkflow).Where("name = ?", workflowName).Select()
-	return (*pgWorkflow).ToWorkflow(), err
+	return pgWorkflow.ToWorkflow(), err
 }
 
 func (p *postgres) DeleteWorkflowByName(workflowName string) error {
@@ -161,7 +165,7 @@ func (p *postgres) FindServiceRequestByID(serviceRequestID uuid.UUID) (models.Se
 	if err != nil {
 		panic(err)
 	}
-	return (*pgServiceRequest).ToServiceRequest(), err
+	return pgServiceRequest.ToServiceRequest(), err
 }
 
 func (p *postgres) SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest, error) {
@@ -177,7 +181,7 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.
 	for _, sortField := range sortFields {
 		reference, found := keyReferences[sortField.Key]
 		if !found {
-			return []models.Workflow{}, 0, errors.New("Undefined key reference used")
+			return []models.Workflow{}, 0, errors.New("undefined key reference used")
 		}
 		order := sortField.Order
 		if found {
@@ -204,6 +208,7 @@ func (p *postgres) getDb() *pg.DB {
 	return p.db
 }
 
+//nolint:unused
 func (p *postgres) closeDB() {
 	if p.db != nil {
 		log.Println("Disconnecting from DB")

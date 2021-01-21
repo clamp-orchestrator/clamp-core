@@ -30,7 +30,8 @@ type StepsStatus struct {
 // NewStepsStatus returns a new step status with given info
 func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
 	return StepsStatus{ID: stepStatus.ID, ServiceRequestID: stepStatus.ServiceRequestID, WorkflowName: stepStatus.WorkflowName,
-		Status: STATUS_STARTED, CreatedAt: time.Now(), TotalTimeInMs: stepStatus.TotalTimeInMs, StepName: stepStatus.StepName, Reason: stepStatus.Reason}
+		Status: STATUS_STARTED, CreatedAt: time.Now(), TotalTimeInMs: stepStatus.TotalTimeInMs, StepName: stepStatus.StepName,
+		Reason: stepStatus.Reason}
 }
 
 // CreateStepsStatus : Entry for a given service request id and return step status details
@@ -40,7 +41,7 @@ func CreateStepsStatus(stepStatus StepsStatus) StepsStatus {
 
 // A PGStepStatus represents a step status that can be persisted through pg-go
 type PGStepStatus struct {
-	tableName        struct{} `pg:"steps_status"`
+	tableName        struct{} `pg:"steps_status"` //nolint:structcheck,unused
 	ID               string
 	ServiceRequestID uuid.UUID
 	WorkflowName     string
