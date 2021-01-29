@@ -1,6 +1,5 @@
 package models
 
-// WorkflowsPageResponse represents workflow page response
 type WorkflowsPageResponse struct {
 	Workflows           []Workflow `json:"workflows"`
 	PageNumber          int        `json:"pageNumber"`

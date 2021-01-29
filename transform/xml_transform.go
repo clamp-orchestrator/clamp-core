@@ -1,7 +1,7 @@
 package transform
 
 type XMLTransform struct {
-	// TODO Capture additional details which is required for transformation
+	//TODO Capture additional details which is required for transformation
 	Keys map[string]interface{} `json:"keys"`
 }
 

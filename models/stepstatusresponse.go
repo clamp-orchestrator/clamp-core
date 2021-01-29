@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// ServiceRequestStatusResponse is a structure to display status of Service request id to the users
+//Step Status Response is a structure to display status of Service request id to the users
 type ServiceRequestStatusResponse struct {
 	ServiceRequestID uuid.UUID            `json:"service_request_id"`
 	WorkflowName     string               `json:"workflow_name"`
@@ -14,7 +14,6 @@ type ServiceRequestStatusResponse struct {
 	Reason           string               `json:"reason"`
 }
 
-// StepStatusResponse represents step response status
 type StepStatusResponse struct {
 	ID        int     `json:"id"`
 	Name      string  `json:"name"`

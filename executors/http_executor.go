@@ -34,12 +34,9 @@ func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interf
 	if err != nil {
 		return nil, err
 	}
-
-	defer resp.Body.Close()
-
 	if resp.StatusCode != 200 && resp.StatusCode != 201 {
 		data, _ := ioutil.ReadAll(resp.Body)
-		err = errors.New(string(data))
+		err := errors.New(string(data))
 		log.Println("Unable to execute \t", httpVal.URL, " with error message", err)
 		return nil, err
 	}
@@ -53,7 +50,7 @@ func fetchAndLoadRequestWithHeadersIfDefined(httpVal HTTPVal, request *http.Requ
 		httpHeaders := strings.Split(httpVal.Headers, ";")
 		for _, header := range httpHeaders[:len(httpHeaders)-1] {
 			httpHeader := strings.Split(header, ":")
-			if len(httpHeader) > 1 {
+			if httpHeader != nil && len(httpHeader) > 1 {
 				request.Header.Add(httpHeader[0], httpHeader[1])
 			}
 		}

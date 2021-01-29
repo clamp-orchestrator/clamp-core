@@ -78,6 +78,7 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
 		}
 	}
+
 }
 
 func catchErrors(prefix string, requestID uuid.UUID) {
@@ -109,7 +110,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 			return models.STATUS_FAILED
 		}
 		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.AsyncStepType {
-			log.Printf("%s : Pushed to sleep mode until response for step - %s is received", prefix, step.Name)
+			log.Printf("%s : Pushed to sleep mode until response for step - %s is recieved", prefix, step.Name)
 			return models.STATUS_PAUSED
 		}
 	}
@@ -163,7 +164,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	} else if step.DidStepExecute() && resp != nil && step.Type == "SYNC" {
 		log.Printf("%s Step response received: %s", prefix, resp.(string))
 		var responsePayload map[string]interface{}
-		_ = json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		json.Unmarshal([]byte(resp.(string)), &responsePayload)
 		stepStatus.Payload.Response = responsePayload
 		recordStepCompletionStatus(stepStatus, stepStartTime)
 		requestContext.SetStepResponseToContext(step.Name, responsePayload)
@@ -190,7 +191,6 @@ func recordStepSkippedStatus(stepStatus models.StepsStatus, stepStartTime time.T
 	SaveStepStatus(stepStatus)
 }
 
-//nolint:deadcode,unused
 func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.STATUS_PAUSED
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
