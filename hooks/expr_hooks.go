@@ -21,8 +21,7 @@ func (e *ExprHook) TransformRequest(m map[string]interface{}, s map[string]inter
 }
 
 // ShouldStepExecute : Check whether Step should execute or skipped
-func (e *ExprHook) ShouldStepExecute(
-	whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
+func (e *ExprHook) ShouldStepExecute(whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
 	log.Printf("%s Pre-step execution for step is in progress", prefix)
 
 	if !strings.HasPrefix(whenCondition, ContextPrefix) {

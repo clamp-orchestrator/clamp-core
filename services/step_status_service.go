@@ -33,10 +33,8 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 	if err != nil {
 		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
-	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName,
-		string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
-	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName,
-		string(stepStatusReq.Status)).Inc()
+	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
+	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Inc()
 	serviceRequestStepNameTimeExecutorHistogram.Observe(float64(stepStatusReq.TotalTimeInMs))
 	return stepStatusReq, err
 }

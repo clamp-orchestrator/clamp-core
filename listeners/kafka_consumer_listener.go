@@ -31,7 +31,7 @@ func (c *Consumer) Listen() {
 		}
 
 		defer func() {
-			if err = master.Close(); err != nil {
+			if err := master.Close(); err != nil {
 				panic(err)
 			}
 		}()
@@ -53,11 +53,11 @@ func (c *Consumer) Listen() {
 					var res models.AsyncStepResponse
 					err = json.Unmarshal(msg.Value, &res)
 					if err != nil {
-						log.Printf("[AMQP Consumer] : Message received is not in proper format %s: %s", msg.Value, err.Error())
+						log.Printf("[AMQP Consumer] : Message recieved is not in proper format %s: %s", msg.Value, err.Error())
 					} else {
 						err := binding.Validator.ValidateStruct(res)
 						if err != nil {
-							log.Printf("[AMQP Consumer] : Message received is not in proper format %s: %s", msg.Value, err.Error())
+							log.Printf("[AMQP Consumer] : Message recieved is not in proper format %s: %s", msg.Value, err.Error())
 						}
 						log.Printf("[AMQP Consumer] : Received step completed response: %v", res)
 						log.Printf("[AMQP Consumer] : Pushing step completed response to channel")
@@ -65,10 +65,11 @@ func (c *Consumer) Listen() {
 					}
 				case consumerError := <-errors:
 					msgCount++
-					fmt.Println("Received consumerError ", consumerError.Topic, consumerError.Partition, consumerError.Err)
+					fmt.Println("Received consumerError ", string(consumerError.Topic), string(consumerError.Partition), consumerError.Err)
 					doneCh <- struct{}{}
 				}
 			}
+			fmt.Println("Processed", msgCount, "messages")
 		}()
 		<-doneCh
 	}()
@@ -81,7 +82,7 @@ func consume(topic string, master sarama.Consumer) (chan *sarama.ConsumerMessage
 	partitions, _ := master.Partitions(topic)
 	for _, partition := range partitions {
 		consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetNewest)
-		if err != nil {
+		if nil != err {
 			fmt.Printf("Topic %v Partitions: %v", topic, partition)
 			panic(err)
 		}

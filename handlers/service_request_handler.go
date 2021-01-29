@@ -50,6 +50,7 @@ var (
 // @Router /serviceRequest/{workflowname} [post]
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		startTime := time.Now()
 		log.Println("Create service request handler")
 		workflowName := c.Param("workflowName")
@@ -106,7 +107,7 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 	var payload map[string]interface{}
 	if c.Request.Body != nil {
 		data, _ := ioutil.ReadAll(c.Request.Body)
-		_ = json.Unmarshal(data, &payload)
+		json.Unmarshal(data, &payload)
 		log.Println("Request Body", payload)
 	}
 	return payload
@@ -178,8 +179,7 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 	}
 }
 
-func prepareServiceRequestsResponse(
-	serviceRequests []models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
+func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
 	response := models.ServiceRequestPageResponse{
 		ServiceRequests: serviceRequests,
 		PageNumber:      pageNumber,
