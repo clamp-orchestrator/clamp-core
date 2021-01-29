@@ -200,6 +200,11 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.
 	return workflows, totalWorkflowsCount, err
 }
 
+func (p *postgres) Ping() error {
+	_, err := p.getDb().Exec("SELECT 1")
+	return err
+}
+
 func (p *postgres) getDb() *pg.DB {
 	singletonOnce.Do(func() {
 		log.Println("Connecting to DB")

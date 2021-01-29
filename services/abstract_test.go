@@ -75,6 +75,10 @@ func (m mockDB) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uu
 	return findAllStepStatusByServiceRequestIDAndStepIDMock(serviceRequestID, stepID)
 }
 
+func (m mockDB) Ping() error {
+	return nil
+}
+
 func init() {
 	repository.SetDb(&mockDB{})
 }
