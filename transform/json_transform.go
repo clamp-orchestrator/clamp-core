@@ -11,7 +11,6 @@ type JSONTransform struct {
 
 func (jsonTransform JSONTransform) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
 	log.Printf("%s Json Transformation : Transform keys %v and request body:%v", prefix, jsonTransform.Spec, requestBody)
-	transformedRequestBody := make(map[string]interface{})
 	transformedRequestBody, err := hooks.GetTransformHook().TransformRequest(requestBody, jsonTransform.Spec)
 	if err != nil {
 		log.Println("Transformation failed")

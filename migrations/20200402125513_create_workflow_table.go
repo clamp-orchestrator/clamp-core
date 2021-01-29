@@ -7,8 +7,15 @@ import (
 
 func init() {
 	up := func(db orm.DB) error {
-		_, err := db.Exec("CREATE TABLE WORKFLOWS (ID SERIAL NOT NULL, NAME VARCHAR(20) NOT NULL, ENABLED BOOLEAN DEFAULT TRUE, DESCRIPTION VARCHAR(100), " +
-			"CREATED_AT timestamp DEFAULT NOW(), UPDATED_AT timestamp, STEPS JSONB, PRIMARY KEY(ID));")
+		_, err := db.Exec("CREATE TABLE WORKFLOWS (" +
+			"ID SERIAL NOT NULL, " +
+			"NAME VARCHAR(20) NOT NULL, " +
+			"ENABLED BOOLEAN DEFAULT TRUE, " +
+			"DESCRIPTION VARCHAR(100), " +
+			"CREATED_AT timestamp DEFAULT NOW(), " +
+			"UPDATED_AT timestamp, " +
+			"STEPS JSONB, " +
+			"PRIMARY KEY(ID));")
 		return err
 	}
 

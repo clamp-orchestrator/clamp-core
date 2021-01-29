@@ -67,8 +67,8 @@ func sendMessageToQueue(ch *amqp.Channel, val AMQPVal, body interface{}, prefix 
 }
 
 func sendMessageToExchange(ch *amqp.Channel, val AMQPVal, body interface{}, prefix string) (interface{}, error) {
-	bytes, err := json.Marshal(body)
-	err = ch.Publish(
+	bytes, _ := json.Marshal(body)
+	err := ch.Publish(
 		val.ExchangeName,
 		val.RoutingKey,
 		false,
