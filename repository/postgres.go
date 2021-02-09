@@ -68,20 +68,24 @@ type postgres struct {
 	db *pg.DB
 }
 
-func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+func (p *postgres) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int, sortFields models.SortByFields) ([]models.ServiceRequest, int, error) {
 	var pgServiceRequests []models.PGServiceRequest
-	err := p.getDb().Model(&pgServiceRequests).
-		Where("workflow_name = ?", workflowName).
-		Limit(pageSize).
-		Offset(pageNumber).
-		Select()
+	query := p.getDb().Model(&pgServiceRequests).Where("workflow_name = ?", workflowName)
+	for _, sortField := range sortFields {
+		reference := sortField.Key
+		order := sortField.Order
+		query = query.Order(reference + " " + order)
+	}
+	totalServiceRequestsCount := 0
+	totalServiceRequestsCount, err := query.Offset(pageSize * (pageNumber - 1)).
+		Limit(pageSize).SelectAndCount()
 	var workflows []models.ServiceRequest
 	if err == nil {
 		for _, pgServiceRequest := range pgServiceRequests {
 			workflows = append(workflows, pgServiceRequest.ToServiceRequest())
 		}
 	}
-	return workflows, err
+	return workflows, totalServiceRequestsCount, err
 }
 
 func (p *postgres) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error) {

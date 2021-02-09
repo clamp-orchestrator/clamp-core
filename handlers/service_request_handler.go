@@ -3,6 +3,7 @@ package handlers
 import (
 	"clamp-core/models"
 	"clamp-core/services"
+	"clamp-core/utils"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -157,6 +158,7 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 		log.Println("Get service request by workflow name handler")
 		pageSizeStr := c.Query("pageSize")
 		pageNumberStr := c.Query("pageNumber")
+		sortByQuery := c.Query("sortBy")
 		if pageSizeStr == "" || pageNumberStr == "" {
 			err := errors.New("page number or page size is not been defined")
 			prepareErrorResponse(err, c)
@@ -164,26 +166,32 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 		}
 		pageNumber, pageNumberErr := strconv.Atoi(pageNumberStr)
 		pageSize, pageSizeErr := strconv.Atoi(pageSizeStr)
-		if pageNumberErr != nil || pageSizeErr != nil || pageSize < 0 || pageNumber < 0 {
+		if pageNumberErr != nil || pageSizeErr != nil || pageSize < utils.MinPageSize || pageNumber < utils.MinPageNumber {
 			err := errors.New("page number or page size is not in proper format")
 			prepareErrorResponse(err, c)
 			return
 		}
 		workflowName := c.Param("workflowName")
-		serviceRequests, err := services.FindServiceRequestByWorkflowName(workflowName, pageNumber, pageSize)
+		sortByFields, err := models.ParseFromQuery(sortByQuery)
 		if err != nil {
 			prepareErrorResponse(err, c)
 			return
 		}
-		c.JSON(http.StatusOK, prepareServiceRequestsResponse(serviceRequests, pageNumber, pageSize))
+		serviceRequests, totalServiceRequestsCount, err := services.FindServiceRequestByWorkflowName(workflowName, pageNumber, pageSize, sortByFields)
+		if err != nil {
+			prepareErrorResponse(err, c)
+			return
+		}
+		c.JSON(http.StatusOK, prepareServiceRequestsResponse(serviceRequests, pageNumber, pageSize, totalServiceRequestsCount))
 	}
 }
 
-func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
+func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int, totalServiceRequestsCount int) models.ServiceRequestPageResponse {
 	response := models.ServiceRequestPageResponse{
-		ServiceRequests: serviceRequests,
-		PageNumber:      pageNumber,
-		PageSize:        pageSize,
+		ServiceRequests:           serviceRequests,
+		PageNumber:                pageNumber,
+		PageSize:                  pageSize,
+		TotalServiceRequestsCount: totalServiceRequestsCount,
 	}
 	return response
 }
