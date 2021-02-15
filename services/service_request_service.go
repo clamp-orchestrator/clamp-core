@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-//FindServiceRequestByID is used to fetch service requests by their ID values
+// FindServiceRequestByID is used to fetch service requests by their ID values
 func FindServiceRequestByID(serviceRequestID uuid.UUID) (models.ServiceRequest, error) {
 	log.Printf("Find service Request request by id: %s", serviceRequestID)
 	serviceRequest, err := repository.GetDB().FindServiceRequestByID(serviceRequestID)
@@ -18,7 +18,7 @@ func FindServiceRequestByID(serviceRequestID uuid.UUID) (models.ServiceRequest, 
 	return serviceRequest, err
 }
 
-//SaveServiceRequest is used to save the created service requests to DB
+// SaveServiceRequest is used to save the created service requests to DB
 func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest, error) {
 	log.Printf("Saving service request: %v", serviceReq)
 	serviceRequest, err := repository.GetDB().SaveServiceRequest(serviceReq)
@@ -28,7 +28,7 @@ func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest
 	return serviceRequest, err
 }
 
-//FindServiceRequestByWorkflowName fetches all ServiceRequests that are associated to a workflow type
+// FindServiceRequestByWorkflowName fetches all ServiceRequests that are associated to a workflow type
 func FindServiceRequestByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
 	log.Printf("Getting service request by workflow name: %s", workflowName)
 	serviceRequests, err := repository.GetDB().FindServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize)

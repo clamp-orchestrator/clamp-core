@@ -78,7 +78,6 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
 		}
 	}
-
 }
 
 func catchErrors(prefix string, requestID uuid.UUID) {
@@ -97,7 +96,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		log.Printf("%s Skipping steps till  step id %d\n", prefix, executeStepsFromIndex)
 	}
 	requestContext := CreateRequestContext(workflow, serviceRequest)
-	//prepare request context for async steps
+	// prepare request context for async steps
 
 	if executeStepsFromIndex > 0 {
 		EnhanceRequestContextWithExecutedSteps(&requestContext)
@@ -110,14 +109,14 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 			return models.STATUS_FAILED
 		}
 		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.AsyncStepType {
-			log.Printf("%s : Pushed to sleep mode until response for step - %s is recieved", prefix, step.Name)
+			log.Printf("%s : Pushed to sleep mode until response for step - %s is received", prefix, step.Name)
 			return models.STATUS_PAUSED
 		}
 	}
 	return models.STATUS_COMPLETED
 }
 
-//TODO: replace prefix with other standard way like MDC
+// TODO: replace prefix with other standard way like MDC
 func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
 	serviceRequestID := requestContext.ServiceRequestID
 	workflowName := requestContext.WorkflowName
@@ -139,7 +138,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		StepID: step.ID,
 	}
 
-	//TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
+	// TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
 	if step.Transform {
 		transform, transformErrors := step.DoTransform(requestContext, prefix)
 		if transformErrors != nil {
@@ -170,8 +169,8 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		requestContext.SetStepResponseToContext(step.Name, responsePayload)
 		return models.EmptyErrorResponse()
 	} else if !step.DidStepExecute() {
-		//record step skipped
-		//setting response of skipped step with same as request for future validations use
+		// record step skipped
+		// setting response of skipped step with same as request for future validations use
 		requestContext.SetStepResponseToContext(step.Name, requestContext.GetStepRequestFromContext(step.Name))
 		recordStepSkippedStatus(stepStatus, stepStartTime)
 		return models.EmptyErrorResponse()

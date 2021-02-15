@@ -60,8 +60,8 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				currentStepStatus.ID = ""
 				resumeStepStartTime := currentStepStatus.CreatedAt
 				currentStepStatus.CreatedAt = time.Time{}
-				//TODO Setting ID empty and also errors validations
-				//TODO subtracting -5.30 since time is stored in GMT in PSql
+				// TODO Setting ID empty and also errors validations
+				// TODO subtracting -5.30 since time is stored in GMT in PSql
 				if !stepResponse.Error.IsNil() {
 					recordStepFailedStatus(currentStepStatus, stepResponse.Error, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 					continue
@@ -72,7 +72,7 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 			}
 			serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestID)
 			if err != nil {
-				//TODO
+				// TODO
 			} else {
 				serviceRequest.Payload = stepResponse.Response
 				serviceRequest.CurrentStepID = stepResponse.StepID
@@ -80,7 +80,6 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				AddServiceRequestToChannel(serviceRequest)
 			}
 		}
-
 	}
 }
 
