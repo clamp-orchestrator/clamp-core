@@ -93,7 +93,7 @@ func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string {
 	return serviceRequestHeaders
 }
 
-func prepareServiceRequestResponse(serviceReq models.ServiceRequest) models.ServiceRequestResponse {
+func prepareServiceRequestResponse(serviceReq *models.ServiceRequest) models.ServiceRequestResponse {
 	response := models.ServiceRequestResponse{
 		URL:    "/serviceRequest/" + serviceReq.ID.String(),
 		Status: serviceReq.Status,
@@ -178,7 +178,7 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 	}
 }
 
-func prepareServiceRequestsResponse(serviceRequests []models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
+func prepareServiceRequestsResponse(serviceRequests []*models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
 	response := models.ServiceRequestPageResponse{
 		ServiceRequests: serviceRequests,
 		PageNumber:      pageNumber,

@@ -87,7 +87,7 @@ func catchErrors(prefix string, requestID uuid.UUID) {
 	}
 }
 
-func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) models.Status {
+func executeWorkflowSteps(workflow *models.Workflow, prefix string, serviceRequest models.ServiceRequest) models.Status {
 	stepRequestPayload := serviceRequest.Payload
 	lastStepExecuted := serviceRequest.CurrentStepID
 	executeStepsFromIndex := 0
@@ -127,7 +127,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	requestContext.SetStepRequestToContext(step.Name, stepRequest)
 
 	stepStartTime := time.Now()
-	stepStatus := models.StepsStatus{
+	stepStatus := &models.StepsStatus{
 		ServiceRequestID: serviceRequestID,
 		WorkflowName:     workflowName,
 		StepName:         step.Name,
@@ -178,31 +178,31 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	return models.EmptyErrorResponse()
 }
 
-func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepCompletionStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusCompleted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepSkippedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepSkippedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusSkipped
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepPausedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusPaused
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepStartedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusStarted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
+func recordStepFailedStatus(stepStatus *models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusFailed
 	marshal, err := json.Marshal(clampErrorResponse)
 	if err != nil {
@@ -231,7 +231,7 @@ func getServiceRequestChannel() chan models.ServiceRequest {
 	return serviceRequestChannel
 }
 
-func AddServiceRequestToChannel(serviceReq models.ServiceRequest) {
+func AddServiceRequestToChannel(serviceReq *models.ServiceRequest) {
 	channel := getServiceRequestChannel()
-	channel <- serviceReq
+	channel <- *serviceReq
 }

@@ -63,8 +63,8 @@ type PGWorkflow struct {
 
 // ToPGWorkflow converts a Workflow object into a Postgres specific workflow structure that is used for persisting
 // to postgres specifically
-func (workflow Workflow) ToPGWorkflow() PGWorkflow {
-	return PGWorkflow{
+func (workflow *Workflow) ToPGWorkflow() *PGWorkflow {
+	return &PGWorkflow{
 		ID:          workflow.ID,
 		Name:        workflow.Name,
 		Description: workflow.Description,
@@ -77,8 +77,8 @@ func (workflow Workflow) ToPGWorkflow() PGWorkflow {
 
 // ToWorkflow converts a PGWorkflow struct to a Workflow structure that is used in the application to pass around
 // a workflow definition.
-func (pgWorkflow PGWorkflow) ToWorkflow() Workflow {
-	return Workflow{
+func (pgWorkflow *PGWorkflow) ToWorkflow() *Workflow {
+	return &Workflow{
 		ID:          pgWorkflow.ID,
 		Name:        pgWorkflow.Name,
 		Description: pgWorkflow.Description,
@@ -93,7 +93,7 @@ func (pgWorkflow PGWorkflow) ToWorkflow() Workflow {
 // and can be triggered. Once a workflow has been created it is not possible to change/edit it currently. During creation
 // each step is assigned an id, which is unique to the workflow, a type and a reply to queue name for Kafka and AMQP
 // to ensure that for async channels a reply channel is set during workflow creation.
-func CreateWorkflow(workflowRequest Workflow) Workflow {
+func CreateWorkflow(workflowRequest Workflow) *Workflow {
 	stepCount := 0
 	for i := 0; i < len(workflowRequest.Steps); i++ {
 		stepCount++
@@ -101,7 +101,7 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 		workflowRequest.Steps[i] = stepEnrichmentMap[stepTypeName](workflowRequest.Steps[i], stepCount)
 		updateStepCounterForEachOfSubSteps(workflowRequest, i, stepCount)
 	}
-	return newServiceFlow(workflowRequest)
+	return newServiceFlow(&workflowRequest)
 }
 
 func updateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCount int) {
@@ -119,8 +119,8 @@ func updateSubStepsIds(workflowRequest Workflow, i int, stepCount int) int {
 	return stepCount
 }
 
-func newServiceFlow(workflow Workflow) Workflow {
-	return Workflow{
+func newServiceFlow(workflow *Workflow) *Workflow {
+	return &Workflow{
 		ID:          workflow.ID,
 		Name:        workflow.Name,
 		Description: workflow.Description,

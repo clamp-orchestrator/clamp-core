@@ -16,7 +16,8 @@ const workflowName string = "testWF"
 
 func TestAddServiceRequestToChannel(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
+	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "1",
@@ -34,8 +35,9 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
+	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
+		status = &models.StepsStatus{}
 		return status, nil
 	}
 	type args struct {
@@ -59,7 +61,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AddServiceRequestToChannel(tt.args.serviceReq)
+			AddServiceRequestToChannel(&tt.args.serviceReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
@@ -69,7 +71,8 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 
 func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflow(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
+	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "1",
@@ -90,8 +93,9 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
+	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
+		status = &models.StepsStatus{}
 		return status, nil
 	}
 	type args struct {
@@ -115,7 +119,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AddServiceRequestToChannel(tt.args.serviceReq)
+			AddServiceRequestToChannel(&tt.args.serviceReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
@@ -125,7 +129,8 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 
 func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
+	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "skipStep",
@@ -144,8 +149,9 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
+	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
+		status = &models.StepsStatus{}
 		return status, nil
 	}
 	type args struct {
@@ -170,7 +176,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AddServiceRequestToChannel(tt.args.serviceReq)
+			AddServiceRequestToChannel(&tt.args.serviceReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
@@ -180,7 +186,8 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 
 func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow models.Workflow, err error) {
+	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "firstStep",
@@ -212,13 +219,15 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus models.StepsStatus) (status models.StepsStatus, err error) {
+	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
+		status = &models.StepsStatus{}
 		return status, nil
 	}
-	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStatus")
-		stepsStatus := make([]models.StepsStatus, 1)
+		stepsStatus := make([]*models.StepsStatus, 1)
+		stepsStatus[0] = &models.StepsStatus{}
 		stepsStatus[0].StepName = "firstStep"
 		stepsStatus[0].Payload.Request = map[string]interface{}{"k": "v"}
 		stepsStatus[0].Payload.Response = map[string]interface{}{"k": "v"}
@@ -247,7 +256,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AddServiceRequestToChannel(tt.args.serviceReq)
+			AddServiceRequestToChannel(&tt.args.serviceReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 4, len(functionCalledStack))

@@ -9,18 +9,18 @@ import (
 
 // DBInterface provides a collection of method signatures that needs to be implemented for a specific database.
 type DBInterface interface {
-	SaveServiceRequest(models.ServiceRequest) (models.ServiceRequest, error)
-	FindServiceRequestByID(uuid.UUID) (models.ServiceRequest, error)
-	SaveWorkflow(models.Workflow) (models.Workflow, error)
-	FindWorkflowByName(string) (models.Workflow, error)
-	SaveStepStatus(models.StepsStatus) (models.StepsStatus, error)
-	FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]models.StepsStatus, error)
-	FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error)
+	SaveServiceRequest(*models.ServiceRequest) (*models.ServiceRequest, error)
+	FindServiceRequestByID(uuid.UUID) (*models.ServiceRequest, error)
+	SaveWorkflow(*models.Workflow) (*models.Workflow, error)
+	FindWorkflowByName(string) (*models.Workflow, error)
+	SaveStepStatus(*models.StepsStatus) (*models.StepsStatus, error)
+	FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]*models.StepsStatus, error)
+	FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]*models.StepsStatus, error)
 	FindStepStatusByServiceRequestIDAndStepIDAndStatus(
-		serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error)
-	FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error)
-	GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error)
-	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error)
+		serviceRequestID uuid.UUID, stepID int, status models.Status) (*models.StepsStatus, error)
+	FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]*models.StepsStatus, error)
+	GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error)
+	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]*models.ServiceRequest, error)
 	DeleteWorkflowByName(string) error
 	Ping() error
 }

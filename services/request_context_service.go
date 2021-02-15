@@ -2,7 +2,7 @@ package services
 
 import "clamp-core/models"
 
-func CreateRequestContext(workflow models.Workflow, request models.ServiceRequest) (context models.RequestContext) {
+func CreateRequestContext(workflow *models.Workflow, request models.ServiceRequest) (context models.RequestContext) {
 	context = models.RequestContext{
 		ServiceRequestID: request.ID,
 		WorkflowName:     workflow.Name,
@@ -31,7 +31,7 @@ func EnhanceRequestContextWithExecutedSteps(context *models.RequestContext) {
 	}
 }
 
-func ComputeRequestToCurrentStepInContext(workflow models.Workflow, currentStepExecuting models.Step, requestContext *models.RequestContext, stepIndex int, stepRequestPayload map[string]interface{}) {
+func ComputeRequestToCurrentStepInContext(workflow *models.Workflow, currentStepExecuting models.Step, requestContext *models.RequestContext, stepIndex int, stepRequestPayload map[string]interface{}) {
 	if requestContext.GetStepRequestFromContext(currentStepExecuting.Name) == nil {
 		if stepIndex == 0 {
 			// for first step in execution

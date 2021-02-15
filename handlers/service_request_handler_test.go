@@ -143,7 +143,7 @@ func CreateWorkflowIfItsAlreadyDoesNotExists() {
 	resp, err := services.FindWorkflowByName(workflowName)
 	log.Println(resp)
 	if err != nil {
-		services.SaveWorkflow(workflow)
+		services.SaveWorkflow(&workflow)
 	}
 }
 
@@ -182,7 +182,7 @@ func createWorkflowWithTransformationEnabledInOneStep() {
 	resp, err := services.FindWorkflowByName(transformationWorkflowName)
 	log.Println(resp)
 	if err != nil {
-		services.SaveWorkflow(workflow)
+		services.SaveWorkflow(&workflow)
 	}
 }
 

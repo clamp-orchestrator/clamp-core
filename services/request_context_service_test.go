@@ -43,7 +43,7 @@ func TestCreateRequestContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotContext := CreateRequestContext(tt.args.workflow, tt.args.request); !reflect.DeepEqual(gotContext, tt.wantContext) {
+			if gotContext := CreateRequestContext(&tt.args.workflow, tt.args.request); !reflect.DeepEqual(gotContext, tt.wantContext) {
 				t.Errorf("CreateRequestContext() = %v, want %v", gotContext, tt.wantContext)
 			}
 		})
@@ -51,7 +51,7 @@ func TestCreateRequestContext(t *testing.T) {
 }
 
 func TestShouldEnhanceRequestContext(t *testing.T) {
-	context := CreateRequestContext(models.Workflow{
+	context := CreateRequestContext(&models.Workflow{
 		Name: "TEST_WF",
 		Steps: []models.Step{{
 			Name: "step1",
@@ -61,11 +61,13 @@ func TestShouldEnhanceRequestContext(t *testing.T) {
 	}, models.ServiceRequest{
 		ID: uuid.New(),
 	})
-	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
-		stepsStatus := make([]models.StepsStatus, 2)
+	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
+		stepsStatus := make([]*models.StepsStatus, 2)
+		stepsStatus[0] = &models.StepsStatus{}
 		stepsStatus[0].StepName = "step1"
 		stepsStatus[0].Payload.Request = map[string]interface{}{"k": "v"}
 		stepsStatus[0].Payload.Response = map[string]interface{}{"k": "v"}
+		stepsStatus[1] = &models.StepsStatus{}
 		stepsStatus[1].StepName = "step2"
 		stepsStatus[1].Payload.Request = map[string]interface{}{"k": "v"}
 		stepsStatus[1].Payload.Response = map[string]interface{}{"k": "v"}
@@ -97,7 +99,7 @@ func TestComputeRequestToCurrentStepInContext(t *testing.T) {
 			Name: "step3",
 		}},
 	}
-	context := CreateRequestContext(workflow, models.ServiceRequest{
+	context := CreateRequestContext(&workflow, models.ServiceRequest{
 		ID: uuid.New(),
 	})
 
@@ -151,7 +153,7 @@ func TestComputeRequestToCurrentStepInContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ComputeRequestToCurrentStepInContext(tt.args.workflow, tt.args.currentStepExecuting, tt.args.requestContext, tt.args.stepIndex, tt.args.stepRequestPayload)
+			ComputeRequestToCurrentStepInContext(&tt.args.workflow, tt.args.currentStepExecuting, tt.args.requestContext, tt.args.stepIndex, tt.args.stepRequestPayload)
 			tt.args.requestContext.SetStepResponseToContext(tt.args.currentStepExecuting.Name, map[string]interface{}{"response": "value"})
 			assert.NotNil(t, tt.args.requestContext.GetStepRequestFromContext(tt.args.currentStepExecuting.Name))
 		})

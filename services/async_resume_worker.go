@@ -44,7 +44,7 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestID)
 		log.Debugf("%s : Received step response : %v", prefix, stepResponse)
 		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
-		var currentStepStatus models.StepsStatus
+		var currentStepStatus *models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
 			if stepStatus.Status == models.StatusStarted {
 				currentStepStatus = stepStatus
