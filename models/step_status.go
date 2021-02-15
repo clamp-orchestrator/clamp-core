@@ -37,7 +37,7 @@ func CreateStepsStatus(stepStatus StepsStatus) StepsStatus {
 }
 
 type PGStepStatus struct {
-	tableName        struct{} `pg:"steps_status"`
+	tableName        struct{} `pg:"steps_status"` //nolint:structcheck,unused
 	ID               string
 	ServiceRequestID uuid.UUID
 	WorkflowName     string

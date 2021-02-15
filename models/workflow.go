@@ -51,7 +51,7 @@ type Workflow struct {
 //PGWorkflow is a struct which represents the structure of workflow record in the postgres data store. The Workflow struct
 //is converted to PGWorkflow while saving and vice versa during retrieval.
 type PGWorkflow struct {
-	tableName   struct{} `pg:"workflows"`
+	tableName   struct{} `pg:"workflows"` //nolint:structcheck,unused
 	ID          string
 	Name        string
 	Description string
@@ -104,13 +104,12 @@ func CreateWorkflow(workflowRequest Workflow) Workflow {
 
 func updateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCount int) {
 	if workflowRequest.Steps[i].OnFailure != nil {
-		stepCount = updateSubStepsIds(workflowRequest, i, stepCount)
+		updateSubStepsIds(workflowRequest, i, stepCount)
 	}
 }
 
 func updateSubStepsIds(workflowRequest Workflow, i int, stepCount int) int {
-	var subSteps []Step
-	subSteps = workflowRequest.Steps[i].OnFailure
+	subSteps := workflowRequest.Steps[i].OnFailure
 	for subStepID := range subSteps {
 		stepCount++
 		subSteps[subStepID].ID = stepCount

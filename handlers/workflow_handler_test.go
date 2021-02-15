@@ -218,7 +218,7 @@ func TestShouldGetAllWorkflowsByPage(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	assert.NotNil(t, jsonResp)
 	assert.Equal(t, 1, len(jsonResp.Workflows), fmt.Sprintf("The expected number of records was %d but we got %d", 1, len(jsonResp.Workflows)))
-	assert.True(t, jsonResp.TotalWorkflowsCount > 0, fmt.Sprintf("The total workflow count is less than 0"))
+	assert.True(t, jsonResp.TotalWorkflowsCount > 0, "The total workflow count is less than 0")
 }
 
 func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T) {

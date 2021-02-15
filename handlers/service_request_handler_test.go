@@ -26,7 +26,7 @@ func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
 
 	w, bodyStr := callCreateServiceRequest(workflowName)
 	var jsonResp models.ServiceRequest
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
+	_ = json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
@@ -39,7 +39,7 @@ func TestShouldNotCreateNewServiceRequestRouteWithTransformationStep(t *testing.
 
 	w, bodyStr := callCreateServiceRequest(transformationWorkflowName)
 	var jsonResp models.ServiceRequest
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
+	_ = json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
@@ -53,7 +53,7 @@ func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidD
 
 	w, bodyStr := callCreateServiceRequest(workflowName)
 	var jsonResp models.ServiceRequest
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
+	_ = json.Unmarshal([]byte(bodyStr), &jsonResp)
 
 	assert.Equal(t, 200, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
@@ -65,7 +65,7 @@ func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
 	CreateWorkflowIfItsAlreadyDoesNotExists()
 	_, bodyStr := callCreateServiceRequest("InvalidWF")
 	var jsonResp models.ClampErrorResponse
-	json.Unmarshal([]byte(bodyStr), &jsonResp)
+	_ = json.Unmarshal([]byte(bodyStr), &jsonResp)
 	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
 	assert.Equal(t, "No record found with given workflow name : InvalidWF", jsonResp.Message)
 }
@@ -74,11 +74,11 @@ func TestShouldGetServiceRequestStatus(t *testing.T) {
 	CreateWorkflowIfItsAlreadyDoesNotExists()
 	_, bodyStr := callCreateServiceRequest(workflowName)
 	var serviceReq models.ServiceRequestResponse
-	json.Unmarshal([]byte(bodyStr), &serviceReq)
+	_ = json.Unmarshal([]byte(bodyStr), &serviceReq)
 	time.Sleep(time.Second * 5)
 	status, body := callGetServiceRequestStatus(serviceReq.ID)
 	var response models.ServiceRequestStatusResponse
-	json.Unmarshal([]byte(body), &response)
+	_ = json.Unmarshal([]byte(body), &response)
 	assert.Equal(t, 200, status.Code)
 	assert.Equal(t, models.STATUS_COMPLETED, response.Status)
 	assert.Equal(t, 2, len(response.Steps))
@@ -88,12 +88,12 @@ func TestShouldGetWorkflowNotExistsWhenGetServiceRequestStatusCalled(t *testing.
 	CreateWorkflowIfItsAlreadyDoesNotExists()
 	_, bodyStr := callCreateServiceRequest(workflowName)
 	var serviceReq models.ServiceRequestResponse
-	json.Unmarshal([]byte(bodyStr), &serviceReq)
+	_ = json.Unmarshal([]byte(bodyStr), &serviceReq)
 	time.Sleep(time.Second * 5)
 	DeleteWorkflowIfExists()
 	status, body := callGetServiceRequestStatus(serviceReq.ID)
 	var response models.ClampErrorResponse
-	json.Unmarshal([]byte(body), &response)
+	_ = json.Unmarshal([]byte(body), &response)
 	assert.Equal(t, 500, status.Code)
 	assert.Equal(t, "pg: no rows in result set", response.Message)
 }

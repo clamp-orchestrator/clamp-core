@@ -69,7 +69,6 @@ func (c *Consumer) Listen() {
 					doneCh <- struct{}{}
 				}
 			}
-			fmt.Println("Processed", msgCount, "messages")
 		}()
 		<-doneCh
 	}()

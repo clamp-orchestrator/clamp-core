@@ -33,6 +33,9 @@ func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{},
 	}
 	//Actual transformation happens here
 	bytes, err := transform.Transform(marshal)
+	if err != nil {
+		return nil, err
+	}
 
 	_ = json.Unmarshal(bytes, &transformedRequestBody)
 	log.Println("Evaluted value ", transformedRequestBody)
@@ -47,7 +50,7 @@ func prepareSpecStringAsPerKazaamContract(transformedStructure map[string]interf
 		"spec":      transformedStructure,
 	}
 	spec[0] = specInterface
-	specString, err := json.Marshal(spec)
+	specString, _ := json.Marshal(spec)
 	return specString
 }
 

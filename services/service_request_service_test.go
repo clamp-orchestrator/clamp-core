@@ -28,7 +28,7 @@ func TestSaveServiceRequest(t *testing.T) {
 		return serReq, errors.New("insertion failed")
 	}
 	serviceReq.WorkflowName = ""
-	request, err = SaveServiceRequest(serviceReq)
+	_, err = SaveServiceRequest(serviceReq)
 	assert.NotNil(t, err)
 	assert.Equal(t, "insertion failed", err.Error())
 }
