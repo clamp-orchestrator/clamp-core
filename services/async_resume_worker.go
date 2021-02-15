@@ -90,11 +90,11 @@ func getResumeStepResponseChannel() chan models.AsyncStepResponse {
 	return resumeStepsChannel
 }
 
-func AddStepResponseToResumeChannel(response models.AsyncStepResponse) {
+func AddStepResponseToResumeChannel(response *models.AsyncStepResponse) {
 	if response.ServiceRequestID == uuid.Nil || response.StepID == 0 || (response.Response == nil && response.Error.Code == 0) {
 		log.Errorf("Invalid step resume request received %v", response)
 		return
 	}
 	channel := getResumeStepResponseChannel()
-	channel <- response
+	channel <- *response
 }

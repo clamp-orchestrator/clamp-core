@@ -49,7 +49,7 @@ func createStepResponseHandler() gin.HandlerFunc {
 		res.RequestHeaders = resumeServiceRequestHeaders
 		log.Debugf("[HTTP Consumer] : Received step completed response: %v", res)
 		log.Debug("[HTTP Consumer] : Pushing step completed response to channel")
-		services.AddStepResponseToResumeChannel(res)
+		services.AddStepResponseToResumeChannel(&res)
 		resumeAsyncServiceRequestHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, models.CreateSuccessResponse(http.StatusOK, "success"))
 	}

@@ -61,7 +61,7 @@ func (c *Consumer) Listen() {
 						}
 						log.Debugf("[Kafka Consumer] : Received step completed response: %v", res)
 						log.Debug("[Kafka Consumer] : Pushing step completed response to channel")
-						services.AddStepResponseToResumeChannel(res)
+						services.AddStepResponseToResumeChannel(&res)
 					}
 				case consumerError := <-errors:
 					msgCount++

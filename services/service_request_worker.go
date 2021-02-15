@@ -54,11 +54,11 @@ func worker(workerID int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Infof("%s : Started listening to service request channel", prefix)
 	for serviceReq := range serviceReqChan {
-		executeWorkflow(serviceReq, prefix)
+		executeWorkflow(&serviceReq, prefix)
 	}
 }
 
-func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
+func executeWorkflow(serviceReq *models.ServiceRequest, prefix string) {
 	prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, serviceReq.ID)
 	log.Debugf("%s Started processing service request id %s", prefix, serviceReq.ID)
 	start := time.Now()
@@ -87,7 +87,7 @@ func catchErrors(prefix string, requestID uuid.UUID) {
 	}
 }
 
-func executeWorkflowSteps(workflow *models.Workflow, prefix string, serviceRequest models.ServiceRequest) models.Status {
+func executeWorkflowSteps(workflow *models.Workflow, prefix string, serviceRequest *models.ServiceRequest) models.Status {
 	stepRequestPayload := serviceRequest.Payload
 	lastStepExecuted := serviceRequest.CurrentStepID
 	executeStepsFromIndex := 0
@@ -102,7 +102,8 @@ func executeWorkflowSteps(workflow *models.Workflow, prefix string, serviceReque
 		EnhanceRequestContextWithExecutedSteps(&requestContext)
 	}
 
-	for i, step := range workflow.Steps[executeStepsFromIndex:] {
+	for i := range workflow.Steps[executeStepsFromIndex:] {
+		step := &workflow.Steps[i]
 		ComputeRequestToCurrentStepInContext(workflow, step, &requestContext, executeStepsFromIndex+i, stepRequestPayload)
 		err := ExecuteWorkflowStep(step, requestContext, prefix)
 		if !err.IsNil() {
@@ -117,7 +118,7 @@ func executeWorkflowSteps(workflow *models.Workflow, prefix string, serviceReque
 }
 
 // TODO: replace prefix with other standard way like MDC
-func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
+func ExecuteWorkflowStep(step *models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
 	serviceRequestID := requestContext.ServiceRequestID
 	workflowName := requestContext.WorkflowName
 	stepRequest := requestContext.StepsContext[step.Name].Request
@@ -153,7 +154,8 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	resp, err := step.DoExecute(requestContext, prefix)
 	if err != nil {
 		if step.OnFailure != nil {
-			for _, stepOnFailure := range step.OnFailure {
+			for i := range step.OnFailure {
+				stepOnFailure := &step.OnFailure[i]
 				ExecuteWorkflowStep(stepOnFailure, requestContext, prefix)
 			}
 		}
