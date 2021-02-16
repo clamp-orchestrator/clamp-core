@@ -43,7 +43,7 @@ func TestCreateRequestContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotContext := CreateRequestContext(&tt.args.workflow, tt.args.request); !reflect.DeepEqual(gotContext, tt.wantContext) {
+			if gotContext := CreateRequestContext(&tt.args.workflow, &tt.args.request); !reflect.DeepEqual(gotContext, tt.wantContext) {
 				t.Errorf("CreateRequestContext() = %v, want %v", gotContext, tt.wantContext)
 			}
 		})
@@ -58,7 +58,7 @@ func TestShouldEnhanceRequestContext(t *testing.T) {
 		}, {
 			Name: "step2",
 		}},
-	}, models.ServiceRequest{
+	}, &models.ServiceRequest{
 		ID: uuid.New(),
 	})
 	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
@@ -99,7 +99,7 @@ func TestComputeRequestToCurrentStepInContext(t *testing.T) {
 			Name: "step3",
 		}},
 	}
-	context := CreateRequestContext(&workflow, models.ServiceRequest{
+	context := CreateRequestContext(&workflow, &models.ServiceRequest{
 		ID: uuid.New(),
 	})
 
@@ -153,7 +153,7 @@ func TestComputeRequestToCurrentStepInContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ComputeRequestToCurrentStepInContext(&tt.args.workflow, tt.args.currentStepExecuting, tt.args.requestContext, tt.args.stepIndex, tt.args.stepRequestPayload)
+			ComputeRequestToCurrentStepInContext(&tt.args.workflow, &tt.args.currentStepExecuting, tt.args.requestContext, tt.args.stepIndex, tt.args.stepRequestPayload)
 			tt.args.requestContext.SetStepResponseToContext(tt.args.currentStepExecuting.Name, map[string]interface{}{"response": "value"})
 			assert.NotNil(t, tt.args.requestContext.GetStepRequestFromContext(tt.args.currentStepExecuting.Name))
 		})

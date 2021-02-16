@@ -113,7 +113,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AddStepResponseToResumeChannel(tt.args.asyncStepResponseReq)
+			AddStepResponseToResumeChannel(&tt.args.asyncStepResponseReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 4, len(functionCalledStack))
@@ -195,7 +195,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			AddStepResponseToResumeChannel(tt.args.asyncStepResponseReq)
+			AddStepResponseToResumeChannel(&tt.args.asyncStepResponseReq)
 			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 2, len(functionCalledStack))
