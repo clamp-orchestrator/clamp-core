@@ -107,7 +107,7 @@ func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map
 	}
 	if step.Transform {
 		switch step.TransformFormat {
-		case "XML":
+		case utils.TransformFormatXML:
 			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(stepRequestResponsePayload, prefix)
 			return res, err
 		default:
@@ -148,7 +148,7 @@ func (step *Step) setRequestTransform(requestTransform interface{}) error {
 		return fmt.Errorf("%s is an invalid Mode", requestTransform)
 	}
 	switch m {
-	case "XML":
+	case utils.TransformFormatXML:
 		step.RequestTransform = &transform.XMLTransform{}
 	default:
 		step.RequestTransform = &transform.JSONTransform{}

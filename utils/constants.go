@@ -18,3 +18,8 @@ const (
 	StepModeKafka = "KAFKA"
 	StepModeAMQP  = "AMQP"
 )
+
+const (
+	TransformFormatXML  = "XML"
+	TransformFormatJSON = "JSON"
+)
