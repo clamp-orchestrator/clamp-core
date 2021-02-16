@@ -24,14 +24,14 @@ func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{},
 
 	specString := prepareSpecStringAsPerKazaamContract(transformedStructure, err)
 
-	//Main kazaam transformation object
+	// Main kazaam transformation object
 	transform, kazaamErr := kazaam.NewKazaam(string(specString))
 	if kazaamErr != nil {
-		//TODO If transformation fails what to do, Need to handle that scenario
+		// TODO If transformation fails what to do, Need to handle that scenario
 		log.Println("Something went wrong")
 		return nil, kazaamErr
 	}
-	//Actual transformation happens here
+	// Actual transformation happens here
 	bytes, err := transform.Transform(marshal)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{},
 }
 
 func prepareSpecStringAsPerKazaamContract(transformedStructure map[string]interface{}, err error) []byte {
-	//Operation is set to Shift mode of Kazaam
+	// Operation is set to Shift mode of Kazaam
 	spec := make([]map[string]interface{}, 1)
 	specInterface := map[string]interface{}{
 		"operation": "shift",

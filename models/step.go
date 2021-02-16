@@ -43,7 +43,8 @@ func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefi
 
 	if step.When != "" {
 		for s, stepRequestResponse := range contextPayload {
-			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] =
+				map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
 		}
 		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, stepRequestResponsePayload, prefix)
 	}
@@ -86,10 +87,13 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	request := requestContext.GetStepRequestFromContext(step.Name)
 	if !step.canStepExecute {
 		requestContext.StepsContext[step.Name].StepSkipped = true
-		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
+		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ",
+			prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}
-	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
+	res, err := step.stepExecution(
+		NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)),
+		prefix)
 	//post Step execution
 	return res, err
 }
@@ -97,7 +101,8 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map[string]interface{}, error) {
 	stepRequestResponsePayload := make(map[string]interface{})
 	for s, stepRequestResponse := range requestContext.StepsContext {
-		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] =
+			map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
 	}
 	if step.Transform {
 		switch step.TransformFormat {

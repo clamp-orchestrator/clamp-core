@@ -299,7 +299,7 @@ func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, jsonResp)
-	assert.Equal(t, "Unsupported value provided for sortBy query", jsonResp.Message)
+	assert.Equal(t, "unsupported value provided for sortBy query", jsonResp.Message)
 }
 
 func TestShouldThrowErrorIfSortContainsInvalidFields(t *testing.T) {
@@ -316,5 +316,5 @@ func TestShouldThrowErrorIfSortContainsInvalidFields(t *testing.T) {
 
 	assert.Equal(t, 400, w.Code)
 	assert.NotNil(t, jsonResp)
-	assert.Equal(t, "Unsupported value provided for sortBy query", jsonResp.Message)
+	assert.Equal(t, "unsupported value provided for sortBy query", jsonResp.Message)
 }

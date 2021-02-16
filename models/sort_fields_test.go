@@ -25,7 +25,7 @@ func TestSortByParserFailsOnUnknownFieldName(t *testing.T) {
 	_, err := ParseFromQuery(sortByQuery)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
+	assert.Equal(t, "unsupported value provided for sortBy query", err.Error())
 }
 
 func TestSortByParserThrowErrorOnIllegalValue(t *testing.T) {
@@ -33,7 +33,7 @@ func TestSortByParserThrowErrorOnIllegalValue(t *testing.T) {
 	_, err := ParseFromQuery(sortByQuery)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
+	assert.Equal(t, "unsupported value provided for sortBy query", err.Error())
 }
 
 func TestSortByParserAllowEmptyString(t *testing.T) {
@@ -63,7 +63,7 @@ func TestSortByParserNotAllowEmptyValueForSoryByString(t *testing.T) {
 	_, err := ParseFromQuery(sortByQuery)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
+	assert.Equal(t, "unsupported value provided for sortBy query", err.Error())
 }
 
 func TestSortByParserAllowCommaAtTheEnd(t *testing.T) {
@@ -100,7 +100,7 @@ func TestSortByParserAllowEmptyKeyValue(t *testing.T) {
 	_, err := ParseFromQuery(sortByQuery)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
+	assert.Equal(t, "unsupported value provided for sortBy query", err.Error())
 }
 
 func TestParseFromQueryReturnErrForInvalidField(t *testing.T) {
@@ -108,5 +108,5 @@ func TestParseFromQueryReturnErrForInvalidField(t *testing.T) {
 	_, err := ParseFromQuery(sortByQuery)
 
 	assert.NotNil(t, err)
-	assert.Equal(t, "Unsupported value provided for sortBy query", err.Error())
+	assert.Equal(t, "unsupported value provided for sortBy query", err.Error())
 }
