@@ -17,7 +17,8 @@ func (e *TransformHook) ShouldStepExecute(string, map[string]interface{}, string
 }
 
 // TransformRequest : Implementation method where request will be transformed based on transformed structure
-func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{}, transformedStructure map[string]interface{}) (map[string]interface{}, error) {
+func (e *TransformHook) TransformRequest(
+	stepRequestBody map[string]interface{}, transformedStructure map[string]interface{}) (map[string]interface{}, error) {
 	var transformedRequestBody map[string]interface{}
 
 	marshal, err := json.Marshal(stepRequestBody)
@@ -42,7 +43,7 @@ func (e *TransformHook) TransformRequest(stepRequestBody map[string]interface{},
 	return transformedRequestBody, nil
 }
 
-func prepareSpecStringAsPerKazaamContract(transformedStructure map[string]interface{}, err error) []byte {
+func prepareSpecStringAsPerKazaamContract(transformedStructure map[string]interface{}, _ error) []byte {
 	// Operation is set to Shift mode of Kazaam
 	spec := make([]map[string]interface{}, 1)
 	specInterface := map[string]interface{}{

@@ -32,7 +32,7 @@ func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
 	assert.Equal(t, 200, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
 	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
-	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+	assert.Equal(t, models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
 func TestShouldNotCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) {
@@ -45,7 +45,7 @@ func TestShouldNotCreateNewServiceRequestRouteWithTransformationStep(t *testing.
 	assert.Equal(t, 200, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
 	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
-	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+	assert.Equal(t, models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
 //TODO
@@ -59,7 +59,7 @@ func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidD
 	assert.Equal(t, 200, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
 	assert.Equal(t, 16, len(jsonResp.ID), fmt.Sprintf("The expected length was 16 but the value was %s with length %d", jsonResp.ID, len(jsonResp.ID)))
-	assert.Equal(t, models.STATUS_NEW, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+	assert.Equal(t, models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
 func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
@@ -81,7 +81,7 @@ func TestShouldGetServiceRequestStatus(t *testing.T) {
 	var response models.ServiceRequestStatusResponse
 	_ = json.Unmarshal([]byte(body), &response)
 	assert.Equal(t, 200, status.Code)
-	assert.Equal(t, models.STATUS_COMPLETED, response.Status)
+	assert.Equal(t, models.StatusCompleted, response.Status)
 	assert.Equal(t, 2, len(response.Steps))
 }
 

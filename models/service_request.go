@@ -21,7 +21,7 @@ type ServiceRequest struct {
 
 func NewServiceRequest(workflowName string, payload map[string]interface{}) ServiceRequest {
 	currentTime := time.Now()
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: STATUS_NEW, CreatedAt: currentTime, Payload: payload}
+	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: StatusNew, CreatedAt: currentTime, Payload: payload}
 }
 
 type PGServiceRequest struct {

@@ -50,7 +50,6 @@ var (
 // @Router /serviceRequest/{workflowname} [post]
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		startTime := time.Now()
 		log.Println("Create service request handler")
 		workflowName := c.Param("workflowName")

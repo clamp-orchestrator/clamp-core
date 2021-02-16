@@ -28,7 +28,7 @@ func main() {
 	}
 
 	if config.ENV.EnableRabbitMQIntegration {
-		listeners.AmqpStepResponseListener.Listen()
+		listeners.AMQPStepResponseListener.Listen()
 	}
 	if config.ENV.EnableKafkaIntegration {
 		listeners.KafkaStepResponseListener.Listen()

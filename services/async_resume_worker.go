@@ -46,10 +46,10 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
 		var currentStepStatus models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
-			if stepStatus.Status == models.STATUS_STARTED {
+			if stepStatus.Status == models.StatusStarted {
 				currentStepStatus = stepStatus
 			}
-			if stepStatus.Status == models.STATUS_COMPLETED || stepStatus.Status == models.STATUS_FAILED {
+			if stepStatus.Status == models.StatusCompleted || stepStatus.Status == models.StatusFailed {
 				log.Printf("%s : [DUPLICATE_STEP_RESPONSE] Received step is already completed : %v \n", prefix, stepResponse)
 				duplicateStepResponse = true
 				break

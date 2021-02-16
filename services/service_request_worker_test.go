@@ -51,7 +51,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 				serviceReq: models.ServiceRequest{
 					ID:           uuid.New(),
 					WorkflowName: workflowName,
-					Status:       models.STATUS_NEW,
+					Status:       models.StatusNew,
 				},
 			},
 		},
@@ -107,7 +107,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 				serviceReq: models.ServiceRequest{
 					ID:           uuid.New(),
 					WorkflowName: workflowName,
-					Status:       models.STATUS_NEW,
+					Status:       models.StatusNew,
 				},
 			},
 		},
@@ -161,7 +161,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 				serviceReq: models.ServiceRequest{
 					ID:           uuid.New(),
 					WorkflowName: workflowName,
-					Status:       models.STATUS_NEW,
+					Status:       models.StatusNew,
 					Payload:      prepareRequestPayload(),
 				},
 			},
@@ -237,7 +237,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 				serviceReq: models.ServiceRequest{
 					ID:            uuid.New(),
 					WorkflowName:  workflowName,
-					Status:        models.STATUS_NEW,
+					Status:        models.StatusNew,
 					Payload:       prepareRequestPayload(),
 					CurrentStepID: 1,
 				},

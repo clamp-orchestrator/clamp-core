@@ -80,5 +80,5 @@ func (m mockDB) Ping() error {
 }
 
 func init() {
-	repository.SetDb(&mockDB{})
+	repository.SetDB(&mockDB{})
 }

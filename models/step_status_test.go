@@ -15,7 +15,7 @@ func TestShouldCreateANewStepStatus(t *testing.T) {
 		ID:               "1",
 		ServiceRequestID: uuid.New(),
 		WorkflowName:     "testWF",
-		Status:           STATUS_STARTED,
+		Status:           StatusStarted,
 		CreatedAt:        time.Now(),
 		TotalTimeInMs:    0,
 		StepName:         "firstStep",

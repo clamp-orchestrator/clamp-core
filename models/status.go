@@ -3,12 +3,12 @@ package models
 type Status string
 
 const (
-	STATUS_NEW        Status = "NEW"
-	STATUS_STARTED    Status = "STARTED"
-	STATUS_RESUMED    Status = "RESUMED"
-	STATUS_PAUSED     Status = "PAUSED"
-	STATUS_COMPLETED  Status = "COMPLETED"
-	STATUS_FAILED     Status = "FAILED"
-	STATUS_INPROGRESS Status = "IN_PROGRESS"
-	STATUS_SKIPPED    Status = "SKIPPED"
+	StatusNew        Status = "NEW"
+	StatusStarted    Status = "STARTED"
+	StatusResumed    Status = "RESUMED"
+	StatusPaused     Status = "PAUSED"
+	StatusCompleted  Status = "COMPLETED"
+	StatusFailed     Status = "FAILED"
+	StatusInprogress Status = "IN_PROGRESS"
+	StatusSkipped    Status = "SKIPPED"
 )

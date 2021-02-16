@@ -47,6 +47,6 @@ func TestShouldCreateANewServiceRequestWithDefaultStatus9(t *testing.T) {
 	payload := prepareRequestPayload()
 	servRequest := NewServiceRequest("CreateOrder", payload)
 
-	expectedStatus := STATUS_NEW
+	expectedStatus := StatusNew
 	assert.Equal(t, expectedStatus, servRequest.Status, fmt.Sprintf("Expected service request status to be equal but were %s and %s", expectedStatus, servRequest.Status))
 }

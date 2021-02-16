@@ -16,7 +16,8 @@ type DBInterface interface {
 	SaveStepStatus(models.StepsStatus) (models.StepsStatus, error)
 	FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]models.StepsStatus, error)
 	FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error)
-	FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error)
+	FindStepStatusByServiceRequestIDAndStepIDAndStatus(
+		serviceRequestID uuid.UUID, stepID int, status models.Status) (models.StepsStatus, error)
 	FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error)
 	GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error)
 	FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error)
@@ -38,8 +39,8 @@ func GetDB() DBInterface {
 	return db
 }
 
-// SetDb is used to update the db object with custom implementations.
+// SetDB is used to update the db object with custom implementations.
 // It is used in tests to override the actual db implementations with mock implementations
-func SetDb(dbImpl DBInterface) {
+func SetDB(dbImpl DBInterface) {
 	db = dbImpl
 }

@@ -20,7 +20,7 @@ func CreateRequestContext(workflow models.Workflow, request models.ServiceReques
 }
 
 func EnhanceRequestContextWithExecutedSteps(context *models.RequestContext) {
-	stepsStatuses, err := FindStepStatusByServiceRequestIDAndStatus(context.ServiceRequestID, models.STATUS_COMPLETED)
+	stepsStatuses, err := FindStepStatusByServiceRequestIDAndStatus(context.ServiceRequestID, models.StatusCompleted)
 	if err == nil {
 		for _, stepsStatus := range stepsStatuses {
 			context.StepsContext[stepsStatus.StepName] = &models.StepContext{

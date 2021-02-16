@@ -95,7 +95,7 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	res, err := step.stepExecution(
 		NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)),
 		prefix)
-	//post Step execution
+	// post Step execution
 	return res, err
 }
 
@@ -124,7 +124,7 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	mode := v["mode"]
-	//TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
+	// TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
 	requestTransform := v["transformFormat"]
 
 	if requestTransform != nil {

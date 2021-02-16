@@ -209,7 +209,7 @@ func TestStep_DoTransform(t *testing.T) {
 				RequestTransform: &transform.XMLTransform{
 					Keys: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
-				TransformFormat: "XML",
+				TransformFormat: utils.TransformFormatXML,
 				Val: &executors.HTTPVal{
 					Method:  "POST",
 					URL:     "https://reqres.in/api/users",
