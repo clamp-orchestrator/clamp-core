@@ -74,7 +74,8 @@ func FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, st
 	return stepsStatuses, err
 }
 
-func PrepareStepStatusResponse(srvReqID uuid.UUID, workflow *models.Workflow, stepsStatusArr []*models.StepsStatus) *models.ServiceRequestStatusResponse {
+func PrepareStepStatusResponse(srvReqID uuid.UUID,
+	workflow *models.Workflow, stepsStatusArr []*models.StepsStatus) *models.ServiceRequestStatusResponse {
 	var srvReqStatusRes models.ServiceRequestStatusResponse
 	srvReqStatusRes.ServiceRequestID = srvReqID
 	srvReqStatusRes.WorkflowName = workflow.Name

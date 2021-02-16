@@ -54,7 +54,8 @@ func worker(workerID int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Infof("%s : Started listening to service request channel", prefix)
 	for serviceReq := range serviceReqChan {
-		executeWorkflow(&serviceReq, prefix)
+		serviceReqCopy := serviceReq
+		executeWorkflow(&serviceReqCopy, prefix)
 	}
 }
 

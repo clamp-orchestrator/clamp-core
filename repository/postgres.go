@@ -113,7 +113,7 @@ func (p *postgres) FindStepStatusByServiceRequestIDAndStatus(
 	serviceRequestID uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	var stepStatuses []*models.StepsStatus
-	err := p.getDb().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestID, status).Order("created_at ASC").Select()
+	err := p.getDB().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestID, status).Order("created_at ASC").Select()
 	if err != nil {
 		return stepStatuses, err
 	}

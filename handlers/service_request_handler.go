@@ -178,7 +178,8 @@ func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 	}
 }
 
-func prepareServiceRequestsResponse(serviceRequests []*models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
+func prepareServiceRequestsResponse(
+	serviceRequests []*models.ServiceRequest, pageNumber int, pageSize int) models.ServiceRequestPageResponse {
 	response := models.ServiceRequestPageResponse{
 		ServiceRequests: serviceRequests,
 		PageNumber:      pageNumber,
