@@ -108,7 +108,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		if !err.IsNil() {
 			return models.STATUS_FAILED
 		}
-		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.AsyncStepType {
+		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.StepTypeAsync {
 			log.Printf("%s : Pushed to sleep mode until response for step - %s is received", prefix, step.Name)
 			return models.STATUS_PAUSED
 		}
@@ -160,7 +160,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 		return *clampErrorResponse
-	} else if step.DidStepExecute() && resp != nil && step.Type == "SYNC" {
+	} else if step.DidStepExecute() && resp != nil && step.Type == utils.StepTypeSync {
 		log.Printf("%s Step response received: %s", prefix, resp.(string))
 		var responsePayload map[string]interface{}
 		json.Unmarshal([]byte(resp.(string)), &responsePayload)

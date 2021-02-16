@@ -12,25 +12,25 @@ type stepType string
 
 var stepEnrichmentMap map[stepType]stepEnricher = map[stepType]stepEnricher{
 
-	"AMQP": func(step Step, stepId int) Step {
+	utils.StepModeAMQP: func(step Step, stepId int) Step {
 		step.ID = stepId
 		step.Val.(*executors.AMQPVal).ReplyTo = config.ENV.QueueName
-		step.Type = utils.AsyncStepType
+		step.Type = utils.StepTypeAsync
 		return step
 	},
 
-	"HTTP": func(step Step, stepId int) Step {
+	utils.StepModeHTTP: func(step Step, stepId int) Step {
 		step.ID = stepId
 		if step.Type == "" {
-			step.Type = utils.SyncStepType
+			step.Type = utils.StepTypeSync
 		}
 		return step
 	},
 
-	"KAFKA": func(step Step, stepId int) Step {
+	utils.StepModeKafka: func(step Step, stepId int) Step {
 		step.ID = stepId
 		step.Val.(*executors.KafkaVal).ReplyTo = config.ENV.KafkaConsumerTopicName
-		step.Type = utils.AsyncStepType
+		step.Type = utils.StepTypeAsync
 		return step
 	},
 }

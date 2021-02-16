@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/transform"
+	"clamp-core/utils"
 	"testing"
 	"time"
 
@@ -19,8 +20,8 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "1",
-			Type:      "SYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeSync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			Val: &executors.HTTPVal{
@@ -72,8 +73,8 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "1",
-			Type:      "SYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeSync,
+			Mode:      utils.StepModeHTTP,
 			Transform: true,
 			Enabled:   false,
 			RequestTransform: &transform.JSONTransform{
@@ -128,8 +129,8 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "skipStep",
-			Type:      "SYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeSync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			When:      "skipStep.request.id1 == 'val3'",
@@ -183,8 +184,8 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 		workflow.ID = "TEST_WF"
 		step := models.Step{
 			Name:      "firstStep",
-			Type:      "SYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeSync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			When:      "firstStep.request.id1 == 'val1'",
@@ -196,8 +197,8 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 		}
 		step1 := models.Step{
 			Name:      "secondStep",
-			Type:      "SYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeSync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			When:      "firstStep.request.id1 == 'val1'",

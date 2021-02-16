@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"clamp-core/executors"
 	"clamp-core/models"
+	"clamp-core/utils"
 	"encoding/json"
 	"fmt"
 	"math/rand"
@@ -42,8 +43,8 @@ func setUpWorkflowRequest() models.Workflow {
 	}
 	steps[0] = models.Step{
 		Name:      "firstStep",
-		Type:      "SYNC",
-		Mode:      "HTTP",
+		Type:      utils.StepTypeSync,
+		Mode:      utils.StepModeHTTP,
 		Val:       httpVal,
 		Transform: false,
 		Enabled:   true,
@@ -132,7 +133,7 @@ func TestShouldThrowErrorIfStepsAreNotPresent(t *testing.T) {
 func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Steps[0].Name = ""
-	workflowReg.Steps[0].Mode = "HTTP"
+	workflowReg.Steps[0].Mode = utils.StepModeHTTP
 	router := setupRouter()
 	w := httptest.NewRecorder()
 	workflowJSONReg, _ := json.Marshal(workflowReg)

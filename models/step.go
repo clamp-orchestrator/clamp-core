@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"clamp-core/hooks"
 	"clamp-core/transform"
+	"clamp-core/utils"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -54,14 +55,14 @@ func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefi
 
 func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
-	case "HTTP":
+	case utils.StepModeHTTP:
 		step.UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody)
 		res, err := step.Val.(*executors.HTTPVal).DoExecute(requestBody.Payload, prefix)
 		return res, err
-	case "AMQP":
+	case utils.StepModeAMQP:
 		res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
 		return res, err
-	case "KAFKA":
+	case utils.StepModeKafka:
 		res, err := step.Val.(*executors.KafkaVal).DoExecute(requestBody, prefix)
 		return res, err
 	}
@@ -161,11 +162,11 @@ func (step *Step) setMode(mode interface{}) error {
 		return fmt.Errorf("%s is an invalid Mode", mode)
 	}
 	switch m {
-	case "HTTP":
+	case utils.StepModeHTTP:
 		step.Val = &executors.HTTPVal{}
-	case "AMQP":
+	case utils.StepModeAMQP:
 		step.Val = &executors.AMQPVal{}
-	case "KAFKA":
+	case utils.StepModeKafka:
 		step.Val = &executors.KafkaVal{}
 	default:
 		return fmt.Errorf("%s is an invalid Mode", mode)

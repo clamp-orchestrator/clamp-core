@@ -3,6 +3,7 @@ package models
 import (
 	"clamp-core/config"
 	"clamp-core/executors"
+	"clamp-core/utils"
 	"fmt"
 	"log"
 	"testing"
@@ -21,8 +22,8 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 	steps := []Step{{}}
 	steps[0] = Step{
 		Name:    "firstStep",
-		Type:    "SYNC",
-		Mode:    "HTTP",
+		Type:    utils.StepTypeSync,
+		Mode:    utils.StepModeHTTP,
 		Val:     http,
 		Enabled: true,
 	}
@@ -56,8 +57,8 @@ func TestShouldNotCreateWorkflowIfStepValIsNotPresent(t *testing.T) {
 	steps := []Step{{}}
 	steps[0] = Step{
 		Name:    "firstStep",
-		Type:    "SYNC",
-		Mode:    "HTTP",
+		Type:    utils.StepTypeSync,
+		Mode:    utils.StepModeHTTP,
 		Enabled: true,
 	}
 	workflow := Workflow{
@@ -86,7 +87,7 @@ func TestShouldThrowErrorIfInvalidModeIsUsed(t *testing.T) {
 	const InvalidMode = "xyz"
 	steps[0] = Step{
 		Name:    "firstStep",
-		Type:    "SYNC",
+		Type:    utils.StepTypeSync,
 		Mode:    InvalidMode,
 		Val:     http,
 		Enabled: true,
@@ -115,8 +116,8 @@ func TestShouldThrowErrorIfGetHTTPValIsCalledForADiffMode(t *testing.T) {
 	steps := []Step{{}}
 	steps[0] = Step{
 		Name:    "firstStep",
-		Type:    "ASYNC",
-		Mode:    "AMQP",
+		Type:    utils.StepTypeAsync,
+		Mode:    utils.StepModeAMQP,
 		Val:     queue,
 		Enabled: true,
 	}
@@ -147,8 +148,8 @@ func TestShouldThrowErrorIfGetHTTPValUrlIsEmpty(t *testing.T) {
 	steps := []Step{{}}
 	steps[0] = Step{
 		Name:    "firstStep",
-		Type:    "ASYNC",
-		Mode:    "AMQP",
+		Type:    utils.StepTypeAsync,
+		Mode:    utils.StepModeAMQP,
 		Val:     http,
 		Enabled: true,
 	}
@@ -173,8 +174,8 @@ func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefault
 	steps := []Step{{}}
 	steps[0] = Step{
 		Name:    "firstStep",
-		Type:    "ASYNC",
-		Mode:    "AMQP",
+		Type:    utils.StepTypeAsync,
+		Mode:    utils.StepModeAMQP,
 		Val:     queue,
 		Enabled: true,
 	}
@@ -214,13 +215,13 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 	failureSteps := []Step{{}}
 	failureSteps[0] = Step{
 		Name:    "onFailureStep",
-		Mode:    "HTTP",
+		Mode:    utils.StepModeHTTP,
 		Val:     http,
 		Enabled: true,
 	}
 	steps[0] = Step{
 		Name:      "firstStep",
-		Mode:      "HTTP",
+		Mode:      utils.StepModeHTTP,
 		Val:       http,
 		Enabled:   true,
 		OnFailure: failureSteps,
@@ -249,6 +250,6 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].getHTTPVal().URL)
 	assert.NotNil(t, workflowResponse.Steps[0].OnFailure)
 	assert.Equal(t, "onFailureStep", workflowResponse.Steps[0].OnFailure[0].Name)
-	assert.Equal(t, "HTTP", workflowResponse.Steps[0].OnFailure[0].Mode)
+	assert.Equal(t, utils.StepModeHTTP, workflowResponse.Steps[0].OnFailure[0].Mode)
 	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].OnFailure[0].getHTTPVal().URL)
 }

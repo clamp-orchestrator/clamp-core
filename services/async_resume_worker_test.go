@@ -3,6 +3,7 @@ package services
 import (
 	"clamp-core/executors"
 	"clamp-core/models"
+	"clamp-core/utils"
 	"testing"
 	"time"
 
@@ -35,8 +36,8 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		step := models.Step{
 			ID:        1,
 			Name:      "1",
-			Type:      "ASYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeAsync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			Val: &executors.HTTPVal{
@@ -126,8 +127,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		step := models.Step{
 			ID:        1,
 			Name:      "1",
-			Type:      "ASYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeAsync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			Val: &executors.HTTPVal{

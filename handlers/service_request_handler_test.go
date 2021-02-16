@@ -6,6 +6,7 @@ import (
 	"clamp-core/models"
 	"clamp-core/services"
 	"clamp-core/transform"
+	"clamp-core/utils"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -124,8 +125,8 @@ func callGetServiceRequestStatus(serviceRequestID uuid.UUID) (*httptest.Response
 func CreateWorkflowIfItsAlreadyDoesNotExists() {
 	step := models.Step{
 		Name:      "1",
-		Type:      "SYNC",
-		Mode:      "HTTP",
+		Type:      utils.StepTypeSync,
+		Mode:      utils.StepModeHTTP,
 		Transform: false,
 		Enabled:   false,
 		Val: &executors.HTTPVal{
@@ -160,8 +161,8 @@ func prepareServiceRequestPayload() map[string]interface{} {
 func createWorkflowWithTransformationEnabledInOneStep() {
 	step := models.Step{
 		Name:      "1",
-		Type:      "SYNC",
-		Mode:      "HTTP",
+		Type:      utils.StepTypeSync,
+		Mode:      utils.StepModeHTTP,
 		Transform: true,
 		Enabled:   false,
 		RequestTransform: &transform.JSONTransform{
