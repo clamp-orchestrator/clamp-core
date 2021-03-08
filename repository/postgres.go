@@ -113,12 +113,13 @@ func (p *postgres) FindStepStatusByServiceRequestIDAndStatus(
 	serviceRequestID uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 	var pgStepStatus []models.PGStepStatus
 	var stepStatuses []*models.StepsStatus
-	err := p.getDB().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestID, status).Order("created_at ASC").Select()
+	err := p.getDB().Model(&pgStepStatus).Where("service_request_id = ? and status = ?", serviceRequestID, status).
+		Order("created_at ASC").Select()
 	if err != nil {
 		return stepStatuses, err
 	}
-	for _, status := range pgStepStatus {
-		stepStatuses = append(stepStatuses, status.ToStepStatus())
+	for i := range pgStepStatus {
+		stepStatuses = append(stepStatuses, pgStepStatus[i].ToStepStatus())
 	}
 	return stepStatuses, err
 }
@@ -128,8 +129,8 @@ func (p *postgres) FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) 
 	err := p.getDB().Model(&pgStepStatus).Where("service_request_id = ?", serviceRequestID).Order("created_at ASC").Select()
 	var stepStatuses []*models.StepsStatus
 	if err == nil {
-		for _, status := range pgStepStatus {
-			stepStatuses = append(stepStatuses, status.ToStepStatus())
+		for i := range pgStepStatus {
+			stepStatuses = append(stepStatuses, pgStepStatus[i].ToStepStatus())
 		}
 	}
 	return stepStatuses, err
@@ -194,8 +195,8 @@ func (p *postgres) GetWorkflows(pageNumber int, pageSize int, sortFields models.
 		return []*models.Workflow{}, 0, err
 	}
 	var workflows []*models.Workflow
-	for _, pgWorkflow := range pgWorkflows {
-		workflows = append(workflows, pgWorkflow.ToWorkflow())
+	for i := range pgWorkflows {
+		workflows = append(workflows, pgWorkflows[i].ToWorkflow())
 	}
 	return workflows, totalWorkflowsCount, err
 }
