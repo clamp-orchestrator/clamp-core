@@ -85,7 +85,7 @@ func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string {
 	for key, value := range c.Request.Header {
 		serviceRequestHeaders += key + ":" + value[0] + ";"
 	}
-	//Setting Request Headers if it exists
+	// Setting Request Headers if it exists
 	if serviceRequestHeaders != "" {
 		log.Debugf("Service Request Headers ====> %s", serviceRequestHeaders)
 		return serviceRequestHeaders
@@ -145,7 +145,7 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 			return
 		}
 		stepsStatusResponse := services.PrepareStepStatusResponse(uuid.MustParse(serviceRequestID), workflow, stepsStatues)
-		//TODO - handle error scenario. Currently it is always 200 ok
+		// TODO - handle error scenario. Currently it is always 200 ok
 		serviceRequestByIDHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, stepsStatusResponse)
 	}
