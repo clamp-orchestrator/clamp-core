@@ -33,8 +33,12 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 	if err != nil {
 		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
-	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
-	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(), stepStatusReq.StepName, string(stepStatusReq.Status)).Inc()
+	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(),
+		stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
+
+	serviceRequestStepNameCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(),
+		stepStatusReq.StepName, string(stepStatusReq.Status)).Inc()
+
 	serviceRequestStepNameTimeExecutorHistogram.Observe(float64(stepStatusReq.TotalTimeInMs))
 	return stepStatusReq, err
 }
@@ -86,27 +90,27 @@ func PrepareStepStatusResponse(srvReqID uuid.UUID, workflow models.Workflow, ste
 				Payload:   stepsStatus.Payload,
 			}
 			switch stepsStatus.Status {
-			case models.STATUS_STARTED:
+			case models.StatusStarted:
 				startedStepsCount++
-			case models.STATUS_COMPLETED:
+			case models.StatusCompleted:
 				completedStepsCount++
-			case models.STATUS_FAILED:
+			case models.StatusFailed:
 				failedStepsCount++
-			case models.STATUS_PAUSED:
+			case models.StatusPaused:
 				pausedStepsCount++
-			case models.STATUS_SKIPPED:
+			case models.StatusSkipped:
 				skippedStepsCount++
 			}
 		}
-		//TODO Need to  change this  logic
+		// TODO Need to  change this  logic
 		if startedStepsCount >= stepsCount && skippedStepsCount+completedStepsCount >= stepsCount {
-			srvReqStatusRes.Status = models.STATUS_COMPLETED
+			srvReqStatusRes.Status = models.StatusCompleted
 		} else if failedStepsCount > 0 {
-			srvReqStatusRes.Status = models.STATUS_FAILED
+			srvReqStatusRes.Status = models.StatusFailed
 		} else if pausedStepsCount > 0 {
-			srvReqStatusRes.Status = models.STATUS_PAUSED
+			srvReqStatusRes.Status = models.StatusPaused
 		} else if startedStepsCount != stepsCount || completedStepsCount != stepsCount {
-			srvReqStatusRes.Status = models.STATUS_INPROGRESS
+			srvReqStatusRes.Status = models.StatusInprogress
 		}
 		timeTaken := calculateTimeTaken(stepsStatusArr[0].CreatedAt, stepsStatusArr[len(stepsStatusArr)-1].CreatedAt)
 		srvReqStatusRes.TotalTimeInMs = timeTaken.Nanoseconds() / utils.MilliSecondsDivisor

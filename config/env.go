@@ -2,9 +2,10 @@ package config
 
 import "github.com/caarlos0/env"
 
-//ENV is a config that is loaded at the application start up. The values here can be overridden by setting environment variables before the process starts up.
-//An example of overriding the value would be `PORT` has a default value of `env:"APP_PORT" envDefault:"8080"`. If environment variable APP_PORT is set to 9000
-//then the value 9000 will be used as the port for the application
+// ENV is a config that is loaded at the application start up. The values here can be overridden
+// by setting environment variables before the process starts up. An example of overriding
+// the value would be `PORT` has a default value of `env:"APP_PORT" envDefault:"8080"`.
+// If environment variable APP_PORT is set to 9000 then the value 9000 will be used as the port for the application
 var ENV = struct {
 
 	/**
@@ -46,8 +47,8 @@ var ENV = struct {
 	PORT         string   `env:"APP_PORT" envDefault:"8080"`
 	AllowOrigins []string `env:"ALLOW_ORIGINS" envDefault:"http://localhost:3000"`
 
-	EnableKafkaIntegration    bool `env:"ENABLE_KAFKA_INTEGRATION" envDefault:false`
-	EnableRabbitMQIntegration bool `env:"ENABLE_AMQP_INTEGRATION" envDefault:false`
+	EnableKafkaIntegration    bool `env:"ENABLE_KAFKA_INTEGRATION" envDefault:"false"`
+	EnableRabbitMQIntegration bool `env:"ENABLE_AMQP_INTEGRATION" envDefault:"false"`
 
 	EnableSQLQueriesLog bool `env:"ENABLE_SQL_QUERIES_LOG" envDefault:"false"`
 }{}

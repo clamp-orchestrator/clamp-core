@@ -50,7 +50,6 @@ var (
 // @Router /serviceRequest/{workflowname} [post]
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		startTime := time.Now()
 		log.Println("Create service request handler")
 		workflowName := c.Param("workflowName")
@@ -107,7 +106,7 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 	var payload map[string]interface{}
 	if c.Request.Body != nil {
 		data, _ := ioutil.ReadAll(c.Request.Body)
-		json.Unmarshal(data, &payload)
+		_ = json.Unmarshal(data, &payload)
 		log.Println("Request Body", payload)
 	}
 	return payload

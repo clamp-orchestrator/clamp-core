@@ -26,8 +26,8 @@ func FindWorkflowByName(workflowName string) (models.Workflow, error) {
 	return workflow, err
 }
 
-//DeleteWorkflow will delete the existing workflow by name
-//This method is not exposed an an API. It is implemented for running a test scenario.
+// DeleteWorkflow will delete the existing workflow by name
+// This method is not exposed an an API. It is implemented for running a test scenario.
 func DeleteWorkflowByName(workflowName string) error {
 	log.Printf("Deleting workflow by name : %s", workflowName)
 	err := repository.GetDB().DeleteWorkflowByName(workflowName)
@@ -37,9 +37,9 @@ func DeleteWorkflowByName(workflowName string) error {
 	return err
 }
 
-//GetWorkflows is used to fetch all the workflows for the GET call API
-//Implements a pagination approach
-//Also supports filters
+// GetWorkflows is used to fetch all the workflows for the GET call API
+// Implements a pagination approach
+// Also supports filters
 func GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
 	log.Printf("Getting workflows for pageNumber: %d, pageSize: %d", pageNumber, pageSize)
 	workflows, totalWorkflowsCount, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)

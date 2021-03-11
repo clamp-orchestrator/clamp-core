@@ -14,7 +14,7 @@ func TestSaveServiceRequest(t *testing.T) {
 	serviceReq := models.ServiceRequest{
 		ID:           uuid.UUID{},
 		WorkflowName: "TESTING",
-		Status:       models.STATUS_NEW,
+		Status:       models.StatusNew,
 	}
 
 	saveServiceRequestMock = func(serReq models.ServiceRequest) (request models.ServiceRequest, err error) {
@@ -28,7 +28,7 @@ func TestSaveServiceRequest(t *testing.T) {
 		return serReq, errors.New("insertion failed")
 	}
 	serviceReq.WorkflowName = ""
-	request, err = SaveServiceRequest(serviceReq)
+	_, err = SaveServiceRequest(serviceReq)
 	assert.NotNil(t, err)
 	assert.Equal(t, "insertion failed", err.Error())
 }
@@ -37,7 +37,7 @@ func TestShouldFailToSaveServiceRequestAndThrowError(t *testing.T) {
 	serviceReq := models.ServiceRequest{
 		ID:           uuid.UUID{},
 		WorkflowName: "TESTING",
-		Status:       models.STATUS_NEW,
+		Status:       models.StatusNew,
 	}
 
 	saveServiceRequestMock = func(serReq models.ServiceRequest) (request models.ServiceRequest, err error) {
@@ -51,19 +51,19 @@ func TestShouldFailToSaveServiceRequestAndThrowError(t *testing.T) {
 }
 
 func TestFindByID(t *testing.T) {
-	repository.SetDb(&mockDB{})
+	repository.SetDB(&mockDB{})
 	serviceReq := models.ServiceRequest{
 		ID: uuid.UUID{},
 	}
 	findServiceRequestByIDMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
 		request.WorkflowName = "TEST_WF"
-		request.Status = models.STATUS_COMPLETED
+		request.Status = models.StatusCompleted
 		return request, nil
 	}
 	resp, err := FindServiceRequestByID(serviceReq.ID)
 	assert.Nil(t, err)
 	assert.Equal(t, "TEST_WF", resp.WorkflowName)
-	assert.Equal(t, models.STATUS_COMPLETED, resp.Status)
+	assert.Equal(t, models.StatusCompleted, resp.Status)
 
 	findServiceRequestByIDMock = func(id uuid.UUID) (request models.ServiceRequest, err error) {
 		return request, errors.New("select query failed")

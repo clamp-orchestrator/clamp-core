@@ -3,6 +3,7 @@ package services
 import (
 	"clamp-core/executors"
 	"clamp-core/models"
+	"clamp-core/utils"
 	"testing"
 	"time"
 
@@ -35,8 +36,8 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		step := models.Step{
 			ID:        1,
 			Name:      "1",
-			Type:      "ASYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeAsync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			Val: &executors.HTTPVal{
@@ -78,7 +79,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		serviceRequest := models.ServiceRequest{
 			ID:            serviceRequestID,
 			WorkflowName:  workflowName,
-			Status:        models.STATUS_NEW,
+			Status:        models.StatusNew,
 			CreatedAt:     time.Time{},
 			Payload:       prepareRequestPayload(),
 			CurrentStepID: 1,
@@ -93,7 +94,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			ID:               "2",
 			ServiceRequestID: serviceRequestId,
 			WorkflowName:     workflowName,
-			Status:           models.STATUS_STARTED,
+			Status:           models.StatusStarted,
 			CreatedAt:        time.Now(),
 			TotalTimeInMs:    1000,
 			StepName:         "1",
@@ -126,8 +127,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		step := models.Step{
 			ID:        1,
 			Name:      "1",
-			Type:      "ASYNC",
-			Mode:      "HTTP",
+			Type:      utils.StepTypeAsync,
+			Mode:      utils.StepModeHTTP,
 			Transform: false,
 			Enabled:   false,
 			Val: &executors.HTTPVal{
@@ -174,7 +175,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			ID:               "2",
 			ServiceRequestID: serviceRequestId,
 			WorkflowName:     workflowName,
-			Status:           models.STATUS_STARTED,
+			Status:           models.StatusStarted,
 			CreatedAt:        time.Now(),
 			TotalTimeInMs:    1000,
 			StepName:         "1",

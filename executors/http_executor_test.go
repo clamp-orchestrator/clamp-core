@@ -93,8 +93,10 @@ func TestHttpVal_DoExecute(t *testing.T) {
 				assert.Contains(t, err.Error(), tt.wantErrMsg)
 			} else {
 				var responsePayload map[string]interface{}
-				json.Unmarshal([]byte(got.(string)), &responsePayload)
-				if !reflect.DeepEqual(responsePayload, tt.want) {
+				err = json.Unmarshal([]byte(got.(string)), &responsePayload)
+				if err != nil {
+					t.Errorf("DoExecute() error = %v", err)
+				} else if !reflect.DeepEqual(responsePayload, tt.want) {
 					t.Errorf("DoExecute() got = %v, want %v", got, tt.want)
 				}
 			}

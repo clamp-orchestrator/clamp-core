@@ -27,8 +27,16 @@ type StepsStatus struct {
 }
 
 func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
-	return StepsStatus{ID: stepStatus.ID, ServiceRequestID: stepStatus.ServiceRequestID, WorkflowName: stepStatus.WorkflowName,
-		Status: STATUS_STARTED, CreatedAt: time.Now(), TotalTimeInMs: stepStatus.TotalTimeInMs, StepName: stepStatus.StepName, Reason: stepStatus.Reason}
+	return StepsStatus{
+		ID:               stepStatus.ID,
+		ServiceRequestID: stepStatus.ServiceRequestID,
+		WorkflowName:     stepStatus.WorkflowName,
+		Status:           StatusStarted,
+		CreatedAt:        time.Now(),
+		TotalTimeInMs:    stepStatus.TotalTimeInMs,
+		StepName:         stepStatus.StepName,
+		Reason:           stepStatus.Reason,
+	}
 }
 
 // CreateStepsStatus : Entry for a given service request id and return step status details
@@ -37,7 +45,7 @@ func CreateStepsStatus(stepStatus StepsStatus) StepsStatus {
 }
 
 type PGStepStatus struct {
-	tableName        struct{} `pg:"steps_status"`
+	tableName        struct{} `pg:"steps_status"` //nolint:structcheck,unused
 	ID               string
 	ServiceRequestID uuid.UUID
 	WorkflowName     string

@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"clamp-core/hooks"
 	"clamp-core/transform"
+	"clamp-core/utils"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -43,7 +44,8 @@ func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefi
 
 	if step.When != "" {
 		for s, stepRequestResponse := range contextPayload {
-			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+			stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] =
+				map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
 		}
 		step.canStepExecute, err = hooks.GetExprHook().ShouldStepExecute(step.When, stepRequestResponsePayload, prefix)
 	}
@@ -53,14 +55,14 @@ func (step *Step) PreStepExecution(contextPayload map[string]*StepContext, prefi
 
 func (step *Step) stepExecution(requestBody *StepRequest, prefix string) (interface{}, error) {
 	switch step.Mode {
-	case "HTTP":
+	case utils.StepModeHTTP:
 		step.UpdateRequestHeadersBasedOnRequestHeadersAndStepHeaders(requestBody)
 		res, err := step.Val.(*executors.HTTPVal).DoExecute(requestBody.Payload, prefix)
 		return res, err
-	case "AMQP":
+	case utils.StepModeAMQP:
 		res, err := step.Val.(*executors.AMQPVal).DoExecute(requestBody, prefix)
 		return res, err
-	case "KAFKA":
+	case utils.StepModeKafka:
 		res, err := step.Val.(*executors.KafkaVal).DoExecute(requestBody, prefix)
 		return res, err
 	}
@@ -86,22 +88,26 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	request := requestContext.GetStepRequestFromContext(step.Name)
 	if !step.canStepExecute {
 		requestContext.StepsContext[step.Name].StepSkipped = true
-		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ", prefix, step.Name, step.When, requestContext.StepsContext)
+		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ",
+			prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}
-	res, err := step.stepExecution(NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)), prefix)
-	//post Step execution
+	res, err := step.stepExecution(
+		NewStepRequest(requestContext.ServiceRequestID, step.ID, request, requestContext.GetStepRequestHeadersFromContext(step.Name)),
+		prefix)
+	// post Step execution
 	return res, err
 }
 
 func (step *Step) DoTransform(requestContext RequestContext, prefix string) (map[string]interface{}, error) {
 	stepRequestResponsePayload := make(map[string]interface{})
 	for s, stepRequestResponse := range requestContext.StepsContext {
-		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] = map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
+		stepRequestResponsePayload[strings.ReplaceAll(s, " ", "_")] =
+			map[string]interface{}{"request": stepRequestResponse.Request, "response": stepRequestResponse.Response}
 	}
 	if step.Transform {
 		switch step.TransformFormat {
-		case "XML":
+		case utils.TransformFormatXML:
 			res, err := step.RequestTransform.(*transform.XMLTransform).DoTransform(stepRequestResponsePayload, prefix)
 			return res, err
 		default:
@@ -118,7 +124,7 @@ func (step *Step) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	mode := v["mode"]
-	//TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
+	// TODO I guess this is initialization section otherwise transform.JSONTransform was not getting called.
 	requestTransform := v["transformFormat"]
 
 	if requestTransform != nil {
@@ -142,7 +148,7 @@ func (step *Step) setRequestTransform(requestTransform interface{}) error {
 		return fmt.Errorf("%s is an invalid Mode", requestTransform)
 	}
 	switch m {
-	case "XML":
+	case utils.TransformFormatXML:
 		step.RequestTransform = &transform.XMLTransform{}
 	default:
 		step.RequestTransform = &transform.JSONTransform{}
@@ -156,11 +162,11 @@ func (step *Step) setMode(mode interface{}) error {
 		return fmt.Errorf("%s is an invalid Mode", mode)
 	}
 	switch m {
-	case "HTTP":
+	case utils.StepModeHTTP:
 		step.Val = &executors.HTTPVal{}
-	case "AMQP":
+	case utils.StepModeAMQP:
 		step.Val = &executors.AMQPVal{}
-	case "KAFKA":
+	case utils.StepModeKafka:
 		step.Val = &executors.KafkaVal{}
 	default:
 		return fmt.Errorf("%s is an invalid Mode", mode)

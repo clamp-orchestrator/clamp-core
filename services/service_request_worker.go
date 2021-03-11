@@ -67,18 +67,17 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 		lastStep := workflow.Steps[len(workflow.Steps)-1]
 		if serviceReq.CurrentStepID == 0 || serviceReq.CurrentStepID != lastStep.ID {
 			status := executeWorkflowSteps(workflow, prefix, serviceReq)
-			if status == models.STATUS_COMPLETED {
+			if status == models.StatusCompleted {
 				completedServiceRequestCounter.Inc()
 				elapsed := time.Since(start)
 				log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
-			} else if status == models.STATUS_FAILED {
+			} else if status == models.StatusFailed {
 				failedServiceRequestCounter.Inc()
 			}
 		} else {
 			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
 		}
 	}
-
 }
 
 func catchErrors(prefix string, requestID uuid.UUID) {
@@ -97,7 +96,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		log.Printf("%s Skipping steps till  step id %d\n", prefix, executeStepsFromIndex)
 	}
 	requestContext := CreateRequestContext(workflow, serviceRequest)
-	//prepare request context for async steps
+	// prepare request context for async steps
 
 	if executeStepsFromIndex > 0 {
 		EnhanceRequestContextWithExecutedSteps(&requestContext)
@@ -107,17 +106,17 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		ComputeRequestToCurrentStepInContext(workflow, step, &requestContext, executeStepsFromIndex+i, stepRequestPayload)
 		err := ExecuteWorkflowStep(step, requestContext, prefix)
 		if !err.IsNil() {
-			return models.STATUS_FAILED
+			return models.StatusFailed
 		}
-		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.AsyncStepType {
-			log.Printf("%s : Pushed to sleep mode until response for step - %s is recieved", prefix, step.Name)
-			return models.STATUS_PAUSED
+		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.StepTypeAsync {
+			log.Printf("%s : Pushed to sleep mode until response for step - %s is received", prefix, step.Name)
+			return models.StatusPaused
 		}
 	}
-	return models.STATUS_COMPLETED
+	return models.StatusCompleted
 }
 
-//TODO: replace prefix with other standard way like MDC
+// TODO: replace prefix with other standard way like MDC
 func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
 	serviceRequestID := requestContext.ServiceRequestID
 	workflowName := requestContext.WorkflowName
@@ -139,7 +138,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		StepID: step.ID,
 	}
 
-	//TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
+	// TODO Condition should be checked on transformed request or original request? Based on that this section needs to be altered
 	if step.Transform {
 		transform, transformErrors := step.DoTransform(requestContext, prefix)
 		if transformErrors != nil {
@@ -161,17 +160,17 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
 		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 		return *clampErrorResponse
-	} else if step.DidStepExecute() && resp != nil && step.Type == "SYNC" {
+	} else if step.DidStepExecute() && resp != nil && step.Type == utils.StepTypeSync {
 		log.Printf("%s Step response received: %s", prefix, resp.(string))
 		var responsePayload map[string]interface{}
-		json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		_ = json.Unmarshal([]byte(resp.(string)), &responsePayload)
 		stepStatus.Payload.Response = responsePayload
 		recordStepCompletionStatus(stepStatus, stepStartTime)
 		requestContext.SetStepResponseToContext(step.Name, responsePayload)
 		return models.EmptyErrorResponse()
 	} else if !step.DidStepExecute() {
-		//record step skipped
-		//setting response of skipped step with same as request for future validations use
+		// record step skipped
+		// setting response of skipped step with same as request for future validations use
 		requestContext.SetStepResponseToContext(step.Name, requestContext.GetStepRequestFromContext(step.Name))
 		recordStepSkippedStatus(stepStatus, stepStartTime)
 		return models.EmptyErrorResponse()
@@ -180,31 +179,31 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 }
 
 func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
-	stepStatus.Status = models.STATUS_COMPLETED
+	stepStatus.Status = models.StatusCompleted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepSkippedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
-	stepStatus.Status = models.STATUS_SKIPPED
+	stepStatus.Status = models.StatusSkipped
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
-	stepStatus.Status = models.STATUS_PAUSED
+	stepStatus.Status = models.StatusPaused
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
-	stepStatus.Status = models.STATUS_STARTED
+	stepStatus.Status = models.StatusStarted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
 func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
-	stepStatus.Status = models.STATUS_FAILED
+	stepStatus.Status = models.StatusFailed
 	marshal, marshalErr := json.Marshal(clampErrorResponse)
 	log.Println("clampErrorResponse: Marshal error", marshalErr)
 	var responsePayload map[string]interface{}

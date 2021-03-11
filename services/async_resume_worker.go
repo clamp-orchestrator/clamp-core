@@ -46,10 +46,10 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
 		var currentStepStatus models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
-			if stepStatus.Status == models.STATUS_STARTED {
+			if stepStatus.Status == models.StatusStarted {
 				currentStepStatus = stepStatus
 			}
-			if stepStatus.Status == models.STATUS_COMPLETED || stepStatus.Status == models.STATUS_FAILED {
+			if stepStatus.Status == models.StatusCompleted || stepStatus.Status == models.StatusFailed {
 				log.Printf("%s : [DUPLICATE_STEP_RESPONSE] Received step is already completed : %v \n", prefix, stepResponse)
 				duplicateStepResponse = true
 				break
@@ -60,8 +60,8 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				currentStepStatus.ID = ""
 				resumeStepStartTime := currentStepStatus.CreatedAt
 				currentStepStatus.CreatedAt = time.Time{}
-				//TODO Setting ID empty and also errors validations
-				//TODO subtracting -5.30 since time is stored in GMT in PSql
+				// TODO Setting ID empty and also errors validations
+				// TODO subtracting -5.30 since time is stored in GMT in PSql
 				if !stepResponse.Error.IsNil() {
 					recordStepFailedStatus(currentStepStatus, stepResponse.Error, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
 					continue
@@ -72,7 +72,7 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 			}
 			serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestID)
 			if err != nil {
-				//TODO
+				// TODO
 			} else {
 				serviceRequest.Payload = stepResponse.Response
 				serviceRequest.CurrentStepID = stepResponse.StepID
@@ -80,7 +80,6 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				AddServiceRequestToChannel(serviceRequest)
 			}
 		}
-
 	}
 }
 

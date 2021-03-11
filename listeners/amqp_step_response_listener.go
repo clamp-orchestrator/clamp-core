@@ -2,15 +2,15 @@ package listeners
 
 import "clamp-core/config"
 
-type AmqpStepResponseListenerInterface interface {
+type AMQPStepResponseListenerInterface interface {
 	Listen()
 }
 
-var AmqpStepResponseListener AmqpStepResponseListenerInterface
+var AMQPStepResponseListener AMQPStepResponseListenerInterface
 
 func init() {
 	switch config.ENV.QueueDriver {
 	case "amqp":
-		AmqpStepResponseListener = &amqpListener{}
+		AMQPStepResponseListener = &amqpListener{}
 	}
 }

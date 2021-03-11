@@ -58,11 +58,11 @@ func (amqpListener amqpListener) Listen() {
 				var res models.AsyncStepResponse
 				err = json.Unmarshal(d.Body, &res)
 				if err != nil {
-					log.Printf("[AMQP Consumer] : Message recieved is not in proper format %s: %s", d.Body, err.Error())
+					log.Printf("[AMQP Consumer] : Message received is not in proper format %s: %s", d.Body, err.Error())
 				} else {
 					err := binding.Validator.ValidateStruct(res)
 					if err != nil {
-						log.Printf("[AMQP Consumer] : Message recieved is not in proper format %s: %s", d.Body, err.Error())
+						log.Printf("[AMQP Consumer] : Message received is not in proper format %s: %s", d.Body, err.Error())
 					}
 					log.Printf("[AMQP Consumer] : Received step completed response: %v", res)
 					log.Printf("[AMQP Consumer] : Pushing step completed response to channel")

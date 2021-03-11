@@ -21,4 +21,4 @@ func (res *AsyncStepResponse) IsStepStatusRecorded() bool {
 	return res.stepStatusRecorded
 }
 
-//StepProcessed to be true if step response was received internally, false if response received from external
+// StepProcessed to be true if step response was received internally, false if response received from external

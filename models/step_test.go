@@ -3,6 +3,7 @@ package models
 import (
 	"clamp-core/executors"
 	"clamp-core/transform"
+	"clamp-core/utils"
 	"reflect"
 	"testing"
 
@@ -57,8 +58,8 @@ func TestStep_DoExecute(t *testing.T) {
 			fields: fields{
 				ID:       1,
 				Name:     "dummyStep",
-				Mode:     "HTTP",
-				StepType: "SYNC",
+				Mode:     utils.StepModeHTTP,
+				StepType: utils.StepTypeSync,
 				Val: &executors.HTTPVal{
 					Method: "POST",
 					URL:    "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
@@ -85,8 +86,8 @@ func TestStep_DoExecute(t *testing.T) {
 			fields: fields{
 				ID:       1,
 				Name:     "dummyStep",
-				Mode:     "HTTP",
-				StepType: "SYNC",
+				Mode:     utils.StepModeHTTP,
+				StepType: utils.StepTypeSync,
 				Val: &executors.HTTPVal{
 					Method: "POST",
 					URL:    "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
@@ -170,8 +171,8 @@ func TestStep_DoTransform(t *testing.T) {
 			fields: fields{
 				ID:       1,
 				Name:     "dummyStep",
-				Mode:     "HTTP",
-				StepType: "SYNC",
+				Mode:     utils.StepModeHTTP,
+				StepType: utils.StepTypeSync,
 				RequestTransform: &transform.JSONTransform{
 					Spec: map[string]interface{}{"userdetails.name": "dummyStep.request.user_name"},
 				},
@@ -203,12 +204,12 @@ func TestStep_DoTransform(t *testing.T) {
 			fields: fields{
 				ID:       1,
 				Name:     "dummyStep",
-				Mode:     "HTTP",
-				StepType: "SYNC",
+				Mode:     utils.StepModeHTTP,
+				StepType: utils.StepTypeSync,
 				RequestTransform: &transform.XMLTransform{
 					Keys: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
-				TransformFormat: "XML",
+				TransformFormat: utils.TransformFormatXML,
 				Val: &executors.HTTPVal{
 					Method:  "POST",
 					URL:     "https://reqres.in/api/users",
@@ -242,8 +243,8 @@ func TestStep_DoTransform(t *testing.T) {
 			fields: fields{
 				ID:       1,
 				Name:     "dummyStep",
-				Mode:     "HTTP",
-				StepType: "SYNC",
+				Mode:     utils.StepModeHTTP,
+				StepType: utils.StepTypeSync,
 				RequestTransform: &transform.JSONTransform{
 					Spec: map[string]interface{}{"name": "dummyStep.request.user_name"},
 				},
@@ -279,8 +280,8 @@ func TestStep_DoTransform(t *testing.T) {
 			fields: fields{
 				ID:       1,
 				Name:     "dummyStep",
-				Mode:     "HTTP",
-				StepType: "SYNC",
+				Mode:     utils.StepModeHTTP,
+				StepType: utils.StepTypeSync,
 				RequestTransform: &transform.JSONTransform{
 					Spec: map[string]interface{}{},
 				},
