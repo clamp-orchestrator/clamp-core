@@ -2,7 +2,8 @@ package transform
 
 import (
 	"clamp-core/hooks"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type JSONTransform struct {
@@ -10,12 +11,12 @@ type JSONTransform struct {
 }
 
 func (jsonTransform JSONTransform) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
-	log.Printf("%s Json Transformation : Transform keys %v and request body:%v", prefix, jsonTransform.Spec, requestBody)
+	log.Debugf("%s Json Transformation : Transform keys %v and request body:%v", prefix, jsonTransform.Spec, requestBody)
 	transformedRequestBody, err := hooks.GetTransformHook().TransformRequest(requestBody, jsonTransform.Spec)
 	if err != nil {
-		log.Println("Transformation failed")
+		log.Debugf("Transformation failed: %s", err)
 		return nil, err
 	}
-	log.Println("Transformed Request Body is ", transformedRequestBody)
+	log.Debug("Transformed Request Body is ", transformedRequestBody)
 	return transformedRequestBody, nil
 }

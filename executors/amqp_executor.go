@@ -3,8 +3,8 @@ package executors
 import (
 	"encoding/json"
 	"errors"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
@@ -20,18 +20,18 @@ type AMQPVal struct {
 
 // DoExecute : Connection to Rabbitmq and sending message into Exchange
 func (val AMQPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
-	log.Printf("%s AMQP Executor: Executing amqp %s body:%v", prefix, val.getName(), requestBody)
+	log.Debugf("%s AMQP Executor: Executing amqp %s body:%v", prefix, val.getName(), requestBody)
 
 	conn, err := amqp.Dial(val.ConnectionURL)
 	if err != nil {
-		log.Printf("%s AMQP Error: %s", prefix, err.Error())
+		log.Errorf("%s AMQP Error: %s", prefix, err.Error())
 		return nil, err
 	}
 	defer conn.Close()
 
 	ch, err := conn.Channel()
 	if err != nil {
-		log.Printf("%s AMQP Error: %s", prefix, err.Error())
+		log.Errorf("%s AMQP Error: %s", prefix, err.Error())
 		return nil, err
 	}
 	defer ch.Close()
@@ -62,7 +62,7 @@ func sendMessageToQueue(ch *amqp.Channel, val AMQPVal, body interface{}, prefix 
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("%s AMQP Executor: pushed message successfully", prefix)
+	log.Debugf("%s AMQP Executor: pushed message successfully", prefix)
 	return nil, nil
 }
 
@@ -84,7 +84,7 @@ func sendMessageToExchange(ch *amqp.Channel, val AMQPVal, body interface{}, pref
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("%s AMQP Executor: pushed message successfully", prefix)
+	log.Debugf("%s AMQP Executor: pushed message successfully", prefix)
 	return nil, nil
 }
 

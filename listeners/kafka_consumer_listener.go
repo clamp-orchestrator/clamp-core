@@ -6,11 +6,11 @@ import (
 	"clamp-core/services"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/Shopify/sarama"
 	"github.com/gin-gonic/gin/binding"
+	log "github.com/sirupsen/logrus"
 )
 
 type Consumer struct {
@@ -53,14 +53,14 @@ func (c *Consumer) Listen() {
 					var res models.AsyncStepResponse
 					err = json.Unmarshal(msg.Value, &res)
 					if err != nil {
-						log.Printf("[AMQP Consumer] : Message received is not in proper format %s: %s", msg.Value, err.Error())
+						log.Errorf("[Kafka Consumer] : Message received is not in proper format %s: %s", msg.Value, err.Error())
 					} else {
 						err := binding.Validator.ValidateStruct(res)
 						if err != nil {
-							log.Printf("[AMQP Consumer] : Message received is not in proper format %s: %s", msg.Value, err.Error())
+							log.Errorf("[Kafka Consumer] : Message received is not in proper format %s: %s", msg.Value, err.Error())
 						}
-						log.Printf("[AMQP Consumer] : Received step completed response: %v", res)
-						log.Printf("[AMQP Consumer] : Pushing step completed response to channel")
+						log.Debugf("[Kafka Consumer] : Received step completed response: %v", res)
+						log.Debug("[Kafka Consumer] : Pushing step completed response to channel")
 						services.AddStepResponseToResumeChannel(res)
 					}
 				case consumerError := <-errors:
@@ -82,9 +82,9 @@ func consume(topic string, master sarama.Consumer) (chan *sarama.ConsumerMessage
 	for _, partition := range partitions {
 		consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {
-			fmt.Printf("Topic %v Partitions: %v", topic, partition)
-			panic(err)
+			log.Fatalf("consuming topic %v partitions %v failed: %s", topic, partition, err)
 		}
+
 		fmt.Println(" Starting Kafka consumer topic ", topic)
 		go func(topic string, consumer sarama.PartitionConsumer) {
 			for {

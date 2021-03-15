@@ -3,13 +3,13 @@ package handlers
 import (
 	"clamp-core/models"
 	"clamp-core/services"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -41,15 +41,14 @@ func createStepResponseHandler() gin.HandlerFunc {
 		resumeAsyncServiceRequestCounter.WithLabelValues("resume").Inc()
 		err := c.ShouldBindJSON(&res)
 		if err != nil {
-			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-			log.Println(err)
-			c.JSON(http.StatusBadRequest, errorResponse)
+			log.Errorf("binding to step response failed: %s", err)
+			c.JSON(http.StatusBadRequest, models.CreateErrorResponse(http.StatusBadRequest, err.Error()))
 			return
 		}
 		resumeServiceRequestHeaders := readRequestHeadersAndSetInServiceRequest(c)
 		res.RequestHeaders = resumeServiceRequestHeaders
-		log.Printf("[HTTP Consumer] : Received step completed response: %v", res)
-		log.Printf("[HTTP Consumer] : Pushing step completed response to channel")
+		log.Debugf("[HTTP Consumer] : Received step completed response: %v", res)
+		log.Debug("[HTTP Consumer] : Pushing step completed response to channel")
 		services.AddStepResponseToResumeChannel(res)
 		resumeAsyncServiceRequestHistogram.Observe(time.Since(startTime).Seconds())
 		c.JSON(http.StatusOK, models.CreateSuccessResponse(http.StatusOK, "success"))

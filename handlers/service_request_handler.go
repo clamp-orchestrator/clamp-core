@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -15,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -51,7 +51,7 @@ var (
 func createServiceRequestHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
-		log.Println("Create service request handler")
+		log.Debug("Create service request handler")
 		workflowName := c.Param("workflowName")
 		serviceRequestCounter.WithLabelValues(workflowName).Inc()
 		_, err := services.FindWorkflowByName(workflowName)
@@ -87,7 +87,7 @@ func readRequestHeadersAndSetInServiceRequest(c *gin.Context) string {
 	}
 	//Setting Request Headers if it exists
 	if serviceRequestHeaders != "" {
-		log.Println("Service Request Headers ====>" + serviceRequestHeaders)
+		log.Debugf("Service Request Headers ====> %s", serviceRequestHeaders)
 		return serviceRequestHeaders
 	}
 	return serviceRequestHeaders
@@ -107,7 +107,7 @@ func readRequestPayload(c *gin.Context) map[string]interface{} {
 	if c.Request.Body != nil {
 		data, _ := ioutil.ReadAll(c.Request.Body)
 		_ = json.Unmarshal(data, &payload)
-		log.Println("Request Body", payload)
+		log.Debug("Request Body", payload)
 	}
 	return payload
 }
@@ -153,7 +153,7 @@ func getServiceRequestStatusHandler() gin.HandlerFunc {
 
 func findServiceRequestByWorkflowNameHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println("Get service request by workflow name handler")
+		log.Debug("Get service request by workflow name handler")
 		pageSizeStr := c.Query("pageSize")
 		pageNumberStr := c.Query("pageNumber")
 		if pageSizeStr == "" || pageNumberStr == "" {

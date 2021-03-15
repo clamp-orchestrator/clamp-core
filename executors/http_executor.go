@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // HTTPVal : Http configuration details
@@ -20,7 +21,7 @@ type HTTPVal struct {
 
 // DoExecute : Preparing to make a http call with request body
 func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
-	log.Printf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.URL, requestBody)
+	log.Debugf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.URL, requestBody)
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
 	}
@@ -40,11 +41,11 @@ func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interf
 	if resp.StatusCode != 200 && resp.StatusCode != 201 {
 		data, _ := ioutil.ReadAll(resp.Body)
 		err = errors.New(string(data))
-		log.Println("Unable to execute \t", httpVal.URL, " with error message", err)
+		log.Error("Unable to execute \t", httpVal.URL, " with error message", err)
 		return nil, err
 	}
 	data, _ := ioutil.ReadAll(resp.Body)
-	log.Printf("%sHTTP Executor: Successfully called http %s:%s", prefix, httpVal.Method, httpVal.URL)
+	log.Debugf("%sHTTP Executor: Successfully called http %s:%s", prefix, httpVal.Method, httpVal.URL)
 	return string(data), err
 }
 
