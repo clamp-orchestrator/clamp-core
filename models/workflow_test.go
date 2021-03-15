@@ -42,7 +42,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		log.Println(err)
 	}
 	assert.Nil(t, err)
-	workflowResponse := CreateWorkflow(serviceFlowRequest)
+	workflowResponse := CreateWorkflow(&serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)
 	assert.NotNil(t, workflowResponse.CreatedAt)
@@ -194,7 +194,7 @@ func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefault
 		log.Println(err)
 	}
 	assert.Nil(t, err)
-	workflowResponse := CreateWorkflow(serviceFlowRequest)
+	workflowResponse := CreateWorkflow(&serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)
 	assert.NotNil(t, workflowResponse.CreatedAt)
@@ -241,7 +241,7 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 		log.Println(err)
 	}
 	assert.Nil(t, err)
-	workflowResponse := CreateWorkflow(serviceFlowRequest)
+	workflowResponse := CreateWorkflow(&serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)
 	assert.NotNil(t, workflowResponse.CreatedAt)
@@ -256,7 +256,7 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 }
 
 func TestWorkflowStepIDAreSequentiallyIncrementing(t *testing.T) {
-	w := CreateWorkflow(Workflow{
+	w := CreateWorkflow(&Workflow{
 		ID:          "abc",
 		Name:        "WorkflowABC",
 		Description: "Workflow ABC",

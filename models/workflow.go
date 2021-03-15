@@ -93,24 +93,25 @@ func (pgWorkflow *PGWorkflow) ToWorkflow() *Workflow {
 // and can be triggered. Once a workflow has been created it is not possible to change/edit it currently. During creation
 // each step is assigned an id, which is unique to the workflow, a type and a reply to queue name for Kafka and AMQP
 // to ensure that for async channels a reply channel is set during workflow creation.
-func CreateWorkflow(workflowRequest Workflow) *Workflow {
+func CreateWorkflow(workflowRequest *Workflow) *Workflow {
+	workflow := newServiceFlow(workflowRequest)
 	stepCount := 0
 	for i := 0; i < len(workflowRequest.Steps); i++ {
 		stepCount++
 		stepTypeName := stepType(workflowRequest.Steps[i].Mode)
 		workflowRequest.Steps[i] = stepEnrichmentMap[stepTypeName](workflowRequest.Steps[i], stepCount)
-		updateStepCounterForEachOfSubSteps(workflowRequest, i, stepCount)
+		updateStepCounterForEachOfSubSteps(workflow, i, &stepCount)
 	}
-	return newServiceFlow(&workflowRequest)
+	return workflow
 }
 
-func updateStepCounterForEachOfSubSteps(workflowRequest Workflow, i int, stepCount int) {
+func updateStepCounterForEachOfSubSteps(workflowRequest *Workflow, i int, stepCount *int) {
 	if workflowRequest.Steps[i].OnFailure != nil {
-		updateSubStepsIds(workflowRequest, i, stepCount)
+		*stepCount = updateSubStepsIds(workflowRequest, i, *stepCount)
 	}
 }
 
-func updateSubStepsIds(workflowRequest Workflow, i int, stepCount int) int {
+func updateSubStepsIds(workflowRequest *Workflow, i int, stepCount int) int {
 	subSteps := workflowRequest.Steps[i].OnFailure
 	for subStepID := range subSteps {
 		stepCount++
