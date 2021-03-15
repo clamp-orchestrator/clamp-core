@@ -14,8 +14,15 @@ import (
 )
 
 func main() {
+	logLevel, err := log.ParseLevel(config.ENV.LogLevel)
+	if err != nil {
+		log.Fatalf("parsing log level failed: %s", err)
+	}
+
+	log.SetLevel(logLevel)
+
 	log.Info("Pinging DB...")
-	err := repository.GetDB().Ping()
+	err = repository.GetDB().Ping()
 	if err != nil {
 		log.Fatalf("DB ping failed: %s", err)
 	}

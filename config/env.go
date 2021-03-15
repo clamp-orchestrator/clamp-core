@@ -51,6 +51,8 @@ var ENV = struct {
 	EnableRabbitMQIntegration bool `env:"ENABLE_AMQP_INTEGRATION" envDefault:"false"`
 
 	EnableSQLQueriesLog bool `env:"ENABLE_SQL_QUERIES_LOG" envDefault:"false"`
+
+	LogLevel string `env:"LOG_LEVEL" envDefault:"info"` // valid values: fatal, error, warn, info, debug and trace
 }{}
 
 func init() {
