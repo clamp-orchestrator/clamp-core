@@ -2,9 +2,9 @@ package hooks
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/qntfy/kazaam"
+	log "github.com/sirupsen/logrus"
 )
 
 // TransformHook : Request Transform hook
@@ -29,7 +29,7 @@ func (e *TransformHook) TransformRequest(
 	transform, kazaamErr := kazaam.NewKazaam(string(specString))
 	if kazaamErr != nil {
 		// TODO If transformation fails what to do, Need to handle that scenario
-		log.Println("Something went wrong")
+		log.Errorf("Kazaam creation failed: %s", kazaamErr)
 		return nil, kazaamErr
 	}
 	// Actual transformation happens here
@@ -38,8 +38,12 @@ func (e *TransformHook) TransformRequest(
 		return nil, err
 	}
 
-	_ = json.Unmarshal(bytes, &transformedRequestBody)
-	log.Println("Evaluted value ", transformedRequestBody)
+	err = json.Unmarshal(bytes, &transformedRequestBody)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debug("Evaluted value ", transformedRequestBody)
 	return transformedRequestBody, nil
 }
 

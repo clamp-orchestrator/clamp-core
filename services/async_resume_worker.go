@@ -5,11 +5,11 @@ import (
 	"clamp-core/utils"
 	"errors"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -39,10 +39,10 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 	duplicateStepResponse := false
 	prefix := fmt.Sprintf("[RESUME_STEP_WORKER_%d] ", workerID)
 	prefix = fmt.Sprintf("%15s", prefix)
-	log.Printf("%s : Started listening to resume steps channel\n", prefix)
+	log.Infof("%s : Started listening to resume steps channel", prefix)
 	for stepResponse := range resumeStepsChannel {
 		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestID)
-		log.Printf("%s : Received step response : %v \n", prefix, stepResponse)
+		log.Debugf("%s : Received step response : %v", prefix, stepResponse)
 		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
 		var currentStepStatus models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
@@ -50,7 +50,7 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				currentStepStatus = stepStatus
 			}
 			if stepStatus.Status == models.StatusCompleted || stepStatus.Status == models.StatusFailed {
-				log.Printf("%s : [DUPLICATE_STEP_RESPONSE] Received step is already completed : %v \n", prefix, stepResponse)
+				log.Warnf("%s : [DUPLICATE_STEP_RESPONSE] Received step is already completed : %v", prefix, stepResponse)
 				duplicateStepResponse = true
 				break
 			}
@@ -92,7 +92,7 @@ func getResumeStepResponseChannel() chan models.AsyncStepResponse {
 
 func AddStepResponseToResumeChannel(response models.AsyncStepResponse) {
 	if response.ServiceRequestID == uuid.Nil || response.StepID == 0 || (response.Response == nil && response.Error.Code == 0) {
-		log.Printf("Invalid step resume request received %v", response)
+		log.Errorf("Invalid step resume request received %v", response)
 		return
 	}
 	channel := getResumeStepResponseChannel()

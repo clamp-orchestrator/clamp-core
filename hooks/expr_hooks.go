@@ -2,10 +2,10 @@ package hooks
 
 import (
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/antonmedv/expr"
+	log "github.com/sirupsen/logrus"
 )
 
 // ContextPrefix ... It will contain a prefix so that it will be applicable during condition check
@@ -23,7 +23,7 @@ func (e *ExprHook) TransformRequest(m map[string]interface{}, s map[string]inter
 // ShouldStepExecute : Check whether Step should execute or skipped
 func (e *ExprHook) ShouldStepExecute(
 	whenCondition string, stepRequest map[string]interface{}, prefix string) (canStepExecute bool, _ error) {
-	log.Printf("%s Pre-step execution for step is in progress", prefix)
+	log.Debugf("%s Pre-step execution for step is in progress", prefix)
 
 	if !strings.HasPrefix(whenCondition, ContextPrefix) {
 		whenCondition = ContextPrefix + whenCondition

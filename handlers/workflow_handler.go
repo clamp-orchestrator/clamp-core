@@ -5,7 +5,6 @@ import (
 	"clamp-core/services"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -13,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -71,12 +71,11 @@ func createWorkflowHandler() gin.HandlerFunc {
 		workflowRequestCounter.WithLabelValues("workflow").Inc()
 		err := c.ShouldBindJSON(&workflowReq)
 		if err != nil {
-			errorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-			log.Println(err)
-			c.JSON(http.StatusBadRequest, errorResponse)
+			log.Errorf("binding to workflow request failed: %s", err)
+			c.JSON(http.StatusBadRequest, models.CreateErrorResponse(http.StatusBadRequest, err.Error()))
 			return
 		}
-		log.Printf("Create workflow request : %v \n", workflowReq)
+		log.Debugf("Create workflow request : %v", workflowReq)
 		serviceFlowRes := models.CreateWorkflow(workflowReq)
 		serviceFlowRes, err = services.SaveWorkflow(serviceFlowRes)
 		workflowRequestHistogram.Observe(time.Since(startTime).Seconds())

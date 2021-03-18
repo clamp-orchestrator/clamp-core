@@ -2,10 +2,11 @@ package migrations
 
 import (
 	"clamp-core/repository"
+	"os"
+
 	"github.com/go-pg/pg/v9"
 	migrations "github.com/robinjoseph08/go-pg-migrations/v2"
-	"log"
-	"os"
+	log "github.com/sirupsen/logrus"
 )
 
 const directory = "migrations"
@@ -16,8 +17,7 @@ func Migrate() {
 	db := pg.Connect(options)
 
 	err := migrations.Run(db, directory, os.Args)
-
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("migration failed: %s", err)
 	}
 }

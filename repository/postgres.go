@@ -5,12 +5,13 @@ import (
 	"clamp-core/models"
 	"context"
 	"errors"
-	"log"
 	"strings"
 	"sync"
 
 	"github.com/go-pg/pg/v9"
 	"github.com/google/uuid"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // reference human readable keys to DB key values
@@ -26,7 +27,7 @@ func (d dbLogger) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Cont
 
 func (d dbLogger) AfterQuery(c context.Context, q *pg.QueryEvent) error {
 	query, err := q.FormattedQuery()
-	log.Printf("[PSQL] Query: %v, Error: %v", query, err)
+	log.Infof("[PSQL] Query: %v, Error: %v", query, err)
 	return nil
 }
 
@@ -154,7 +155,7 @@ func (p *postgres) DeleteWorkflowByName(workflowName string) error {
 
 func (p *postgres) SaveWorkflow(workflowReq models.Workflow) (models.Workflow, error) {
 	pgWorkflow := workflowReq.ToPGWorkflow()
-	log.Printf("pgworfklow: %v", pgWorkflow)
+	log.Debugf("pgworfklow: %v", pgWorkflow)
 	err := p.getDB().Insert(&pgWorkflow)
 	return pgWorkflow.ToWorkflow(), err
 }
@@ -207,7 +208,7 @@ func (p *postgres) Ping() error {
 
 func (p *postgres) getDB() *pg.DB {
 	singletonOnce.Do(func() {
-		log.Println("Connecting to DB")
+		log.Info("Connecting to DB")
 		p.db = connectDB()
 	})
 	return p.db
@@ -215,7 +216,7 @@ func (p *postgres) getDB() *pg.DB {
 
 func (p *postgres) closeDB() {
 	if p.db != nil {
-		log.Println("Disconnecting from DB")
+		log.Info("Disconnecting from DB")
 		p.db.Close()
 	}
 }

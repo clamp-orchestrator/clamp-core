@@ -8,13 +8,21 @@ import (
 	"clamp-core/models"
 	"clamp-core/repository"
 
-	"log"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	log.Println("Pinging DB...")
-	err := repository.GetDB().Ping()
+	logLevel, err := log.ParseLevel(config.ENV.LogLevel)
+	if err != nil {
+		log.Fatalf("parsing log level failed: %s", err)
+	}
+
+	log.SetLevel(logLevel)
+
+	log.Info("Pinging DB...")
+	err = repository.GetDB().Ping()
 	if err != nil {
 		log.Fatalf("DB ping failed: %s", err)
 	}
@@ -34,5 +42,5 @@ func main() {
 		listeners.KafkaStepResponseListener.Listen()
 	}
 	handlers.LoadHTTPRoutes()
-	log.Println("Calling listener")
+	log.Info("Calling listener")
 }

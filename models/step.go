@@ -7,8 +7,9 @@ import (
 	"clamp-core/utils"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Val interface {
@@ -88,7 +89,7 @@ func (step *Step) DoExecute(requestContext RequestContext, prefix string) (_ int
 	request := requestContext.GetStepRequestFromContext(step.Name)
 	if !step.canStepExecute {
 		requestContext.StepsContext[step.Name].StepSkipped = true
-		log.Printf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ",
+		log.Debugf("%s Skipping step: %s, condition (%s), request payload (%v), not satisified ",
 			prefix, step.Name, step.When, requestContext.StepsContext)
 		return request, nil
 	}

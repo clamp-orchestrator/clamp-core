@@ -4,12 +4,12 @@ import (
 	"clamp-core/models"
 	"clamp-core/repository"
 	"clamp-core/utils"
-	"log"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -28,10 +28,10 @@ var (
 )
 
 func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error) {
-	log.Printf("Saving step status : %v", stepStatusReq)
+	log.Debugf("Saving step status : %v", stepStatusReq)
 	stepStatusReq, err := repository.GetDB().SaveStepStatus(stepStatusReq)
 	if err != nil {
-		log.Printf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
+		log.Errorf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
 	serviceRequestStepNameTimeExecutorCounter.WithLabelValues(stepStatusReq.ServiceRequestID.String(),
 		stepStatusReq.StepName, string(stepStatusReq.Status)).Add(float64(stepStatusReq.TotalTimeInMs))
@@ -44,30 +44,30 @@ func SaveStepStatus(stepStatusReq models.StepsStatus) (models.StepsStatus, error
 }
 
 func FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]models.StepsStatus, error) {
-	log.Printf("Find step statues by request id : %s ", serviceRequestID)
+	log.Debugf("Find step statues by request id : %s ", serviceRequestID)
 	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestID(serviceRequestID)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestID)
+		log.Errorf("No record found with given service request id %s", serviceRequestID)
 		return []models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
 
 func FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]models.StepsStatus, error) {
-	log.Printf("Find step statues by request id : %s ", serviceRequestID)
+	log.Debugf("Find step statues by request id : %s ", serviceRequestID)
 	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestIDAndStatus(serviceRequestID, status)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestID)
+		log.Errorf("No record found with given service request id %s", serviceRequestID)
 		return []models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
 
 func FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]models.StepsStatus, error) {
-	log.Printf("Find all step statues by request id : %s and step id : %d", serviceRequestID, stepID)
+	log.Debugf("Find all step statues by request id : %s and step id : %d", serviceRequestID, stepID)
 	stepsStatuses, err := repository.GetDB().FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID, stepID)
 	if err != nil {
-		log.Printf("No record found with given service request id %s", serviceRequestID)
+		log.Errorf("No record found with given service request id %s", serviceRequestID)
 		return []models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
@@ -120,6 +120,6 @@ func PrepareStepStatusResponse(srvReqID uuid.UUID, workflow models.Workflow, ste
 }
 
 func calculateTimeTaken(startTime time.Time, endTime time.Time) time.Duration {
-	//log.Println("Time Difference is == ", endTime.Sub(startTime))
+	//log.Debug("Time Difference is == ", endTime.Sub(startTime))
 	return endTime.Sub(startTime)
 }

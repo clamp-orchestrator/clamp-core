@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -14,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -52,7 +52,7 @@ func createServiceRequestWorkers() {
 func worker(workerID int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix := fmt.Sprintf("[WORKER_%d] ", workerID)
 	prefix = fmt.Sprintf("%15s", prefix)
-	log.Printf("%s : Started listening to service request channel\n", prefix)
+	log.Infof("%s : Started listening to service request channel", prefix)
 	for serviceReq := range serviceReqChan {
 		executeWorkflow(serviceReq, prefix)
 	}
@@ -60,7 +60,7 @@ func worker(workerID int, serviceReqChan <-chan models.ServiceRequest) {
 
 func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 	prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, serviceReq.ID)
-	log.Printf("%s Started processing service request id %s\n", prefix, serviceReq.ID)
+	log.Debugf("%s Started processing service request id %s", prefix, serviceReq.ID)
 	start := time.Now()
 	workflow, err := FindWorkflowByName(serviceReq.WorkflowName)
 	if err == nil {
@@ -70,20 +70,20 @@ func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
 			if status == models.StatusCompleted {
 				completedServiceRequestCounter.Inc()
 				elapsed := time.Since(start)
-				log.Printf("%s Completed processing service request id %s in %s\n", prefix, serviceReq.ID, elapsed)
+				log.Debugf("%s Completed processing service request id %s in %s", prefix, serviceReq.ID, elapsed)
 			} else if status == models.StatusFailed {
 				failedServiceRequestCounter.Inc()
 			}
 		} else {
-			log.Printf("%s All steps are executed for service request id: %s\n", prefix, serviceReq.ID)
+			log.Debugf("%s All steps are executed for service request id: %s", prefix, serviceReq.ID)
 		}
 	}
 }
 
 func catchErrors(prefix string, requestID uuid.UUID) {
 	if r := recover(); r != nil {
-		log.Println("[ERROR]", r)
-		log.Printf("%s Failed processing service request id %s\n", prefix, requestID)
+		log.Error("[ERROR]", r)
+		log.Errorf("%s Failed processing service request id %s", prefix, requestID)
 	}
 }
 
@@ -93,7 +93,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 	executeStepsFromIndex := 0
 	if lastStepExecuted > 0 {
 		executeStepsFromIndex = lastStepExecuted
-		log.Printf("%s Skipping steps till  step id %d\n", prefix, executeStepsFromIndex)
+		log.Debugf("%s Skipping steps till step id %d", prefix, executeStepsFromIndex)
 	}
 	requestContext := CreateRequestContext(workflow, serviceRequest)
 	// prepare request context for async steps
@@ -109,7 +109,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 			return models.StatusFailed
 		}
 		if !requestContext.StepsContext[step.Name].StepSkipped && step.Type == utils.StepTypeAsync {
-			log.Printf("%s : Pushed to sleep mode until response for step - %s is received", prefix, step.Name)
+			log.Debugf("%s : Pushed to sleep mode until response for step - %s is received", prefix, step.Name)
 			return models.StatusPaused
 		}
 	}
@@ -142,7 +142,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	if step.Transform {
 		transform, transformErrors := step.DoTransform(requestContext, prefix)
 		if transformErrors != nil {
-			log.Println("Error while transforming request payload")
+			log.Error("Error while transforming request payload")
 			panic(transformErrors)
 		}
 		requestContext.SetStepRequestToContext(step.Name, transform)
@@ -161,7 +161,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
 		return *clampErrorResponse
 	} else if step.DidStepExecute() && resp != nil && step.Type == utils.StepTypeSync {
-		log.Printf("%s Step response received: %s", prefix, resp.(string))
+		log.Debugf("%s Step response received: %s", prefix, resp.(string))
 		var responsePayload map[string]interface{}
 		_ = json.Unmarshal([]byte(resp.(string)), &responsePayload)
 		stepStatus.Payload.Response = responsePayload
@@ -204,11 +204,19 @@ func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.T
 
 func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusFailed
-	marshal, marshalErr := json.Marshal(clampErrorResponse)
-	log.Println("clampErrorResponse: Marshal error", marshalErr)
+	marshal, err := json.Marshal(clampErrorResponse)
+	if err != nil {
+		log.Error("clampErrorResponse: Marshal error", err)
+		return
+	}
+
 	var responsePayload map[string]interface{}
-	unmarshalErr := json.Unmarshal(marshal, &responsePayload)
-	log.Println("clampErrorResponse: UnMarshal error", unmarshalErr)
+	err = json.Unmarshal(marshal, &responsePayload)
+	if err != nil {
+		log.Error("clampErrorResponse: UnMarshal error", err)
+		return
+	}
+
 	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
 	stepStatus.Reason = clampErrorResponse.Message
