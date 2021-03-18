@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareWorkflow() models.Workflow {
+func prepareWorkflow() *models.Workflow {
 	steps := []models.Step{{}}
 
 	steps[0] = models.Step{
@@ -24,12 +24,12 @@ func prepareWorkflow() models.Workflow {
 		Enabled:     false,
 		Steps:       steps,
 	}
-	return workflow
+	return &workflow
 }
 func TestSaveWorkflow(t *testing.T) {
 
 	workflow := prepareWorkflow()
-	SaveWorkflowMock = func(workflow models.Workflow) (models.Workflow, error) {
+	SaveWorkflowMock = func(workflow *models.Workflow) (*models.Workflow, error) {
 		return workflow, nil
 	}
 	response, err := SaveWorkflow(workflow)
@@ -40,7 +40,7 @@ func TestSaveWorkflow(t *testing.T) {
 	assert.Equal(t, workflow.Name, response.Name, fmt.Sprintf("Expected worflow name to be %s but was %s", workflow.Name, response.Name))
 	assert.Equal(t, workflow.Steps[0].Name, response.Steps[0].Name, fmt.Sprintf("Expected worflow first step name to be %s but was %s", workflow.Steps[0].Name, response.Steps[0].Name))
 
-	SaveWorkflowMock = func(workflow models.Workflow) (models.Workflow, error) {
+	SaveWorkflowMock = func(workflow *models.Workflow) (*models.Workflow, error) {
 		return workflow, errors.New("insertion failed")
 	}
 	response, err = SaveWorkflow(workflow)
@@ -50,14 +50,14 @@ func TestSaveWorkflow(t *testing.T) {
 func TestFindWorkflowByWorkflowName(t *testing.T) {
 	workflow := prepareWorkflow()
 
-	findWorkflowByNameMock = func(workflowName string) (models.Workflow, error) {
+	findWorkflowByNameMock = func(workflowName string) (*models.Workflow, error) {
 		return workflow, nil
 	}
 	resp, err := FindWorkflowByName(workflow.Name)
 	assert.Nil(t, err)
 	assert.Equal(t, workflow.Name, resp.Name)
 	assert.NotNil(t, resp.Steps)
-	findWorkflowByNameMock = func(workflowName string) (models.Workflow, error) {
+	findWorkflowByNameMock = func(workflowName string) (*models.Workflow, error) {
 		return workflow, errors.New("select query failed")
 	}
 	_, err = FindWorkflowByName(workflow.Name)
@@ -70,11 +70,11 @@ func TestGetWorkflowsWithoutSortByArgs(t *testing.T) {
 	var receivedSortByArgs models.SortByFields
 	var pgNumberReceived int
 	var pgSizeReceived int
-	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error) {
 		receivedSortByArgs = sortBy
 		pgNumberReceived = pageNumber
 		pgSizeReceived = pageSize
-		return []models.Workflow{workflow}, 1, nil
+		return []*models.Workflow{workflow}, 1, nil
 
 	}
 	pageSize := 1
@@ -95,11 +95,11 @@ func TestGetWorkflowsWithSortByArgs(t *testing.T) {
 	var receivedSortByArgs models.SortByFields
 	var pgNumberReceived int
 	var pgSizeReceived int
-	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]models.Workflow, int, error) {
+	getWorkflowsMock = func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error) {
 		receivedSortByArgs = sortBy
 		pgNumberReceived = pageNumber
 		pgSizeReceived = pageSize
-		return []models.Workflow{workflow}, 1, nil
+		return []*models.Workflow{workflow}, 1, nil
 
 	}
 	pageSize := 1

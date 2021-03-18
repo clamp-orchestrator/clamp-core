@@ -76,7 +76,7 @@ func createWorkflowHandler() gin.HandlerFunc {
 			return
 		}
 		log.Debugf("Create workflow request : %v", workflowReq)
-		serviceFlowRes := models.CreateWorkflow(workflowReq)
+		serviceFlowRes := models.CreateWorkflow(&workflowReq)
 		serviceFlowRes, err = services.SaveWorkflow(serviceFlowRes)
 		workflowRequestHistogram.Observe(time.Since(startTime).Seconds())
 		if err != nil {
@@ -153,7 +153,7 @@ func getWorkflows() gin.HandlerFunc {
 }
 
 func prepareWorkflowResponse(
-	workflows []models.Workflow, pageNumber int, pageSize int, totalWorkflowsCount int) models.WorkflowsPageResponse {
+	workflows []*models.Workflow, pageNumber int, pageSize int, totalWorkflowsCount int) models.WorkflowsPageResponse {
 	response := models.WorkflowsPageResponse{
 		Workflows:           workflows,
 		PageNumber:          pageNumber,

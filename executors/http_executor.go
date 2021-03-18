@@ -20,7 +20,7 @@ type HTTPVal struct {
 }
 
 // DoExecute : Preparing to make a http call with request body
-func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
+func (httpVal *HTTPVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Debugf("%s HTTP Executor: Calling http %s:%s body:%v", prefix, httpVal.Method, httpVal.URL, requestBody)
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
@@ -49,7 +49,7 @@ func (httpVal HTTPVal) DoExecute(requestBody interface{}, prefix string) (interf
 	return string(data), err
 }
 
-func fetchAndLoadRequestWithHeadersIfDefined(httpVal HTTPVal, request *http.Request) {
+func fetchAndLoadRequestWithHeadersIfDefined(httpVal *HTTPVal, request *http.Request) {
 	if httpVal.Headers != "" {
 		httpHeaders := strings.Split(httpVal.Headers, ";")
 		for _, header := range httpHeaders[:len(httpHeaders)-1] {

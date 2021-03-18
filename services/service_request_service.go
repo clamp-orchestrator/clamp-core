@@ -9,7 +9,7 @@ import (
 )
 
 // FindServiceRequestByID is used to fetch service requests by their ID values
-func FindServiceRequestByID(serviceRequestID uuid.UUID) (models.ServiceRequest, error) {
+func FindServiceRequestByID(serviceRequestID uuid.UUID) (*models.ServiceRequest, error) {
 	log.Debugf("Find service Request request by id: %s", serviceRequestID)
 	serviceRequest, err := repository.GetDB().FindServiceRequestByID(serviceRequestID)
 	if err != nil {
@@ -19,7 +19,7 @@ func FindServiceRequestByID(serviceRequestID uuid.UUID) (models.ServiceRequest, 
 }
 
 // SaveServiceRequest is used to save the created service requests to DB
-func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest, error) {
+func SaveServiceRequest(serviceReq *models.ServiceRequest) (*models.ServiceRequest, error) {
 	log.Debugf("Saving service request: %v", serviceReq)
 	serviceRequest, err := repository.GetDB().SaveServiceRequest(serviceReq)
 	if err != nil {
@@ -29,7 +29,7 @@ func SaveServiceRequest(serviceReq models.ServiceRequest) (models.ServiceRequest
 }
 
 // FindServiceRequestByWorkflowName fetches all ServiceRequests that are associated to a workflow type
-func FindServiceRequestByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]models.ServiceRequest, error) {
+func FindServiceRequestByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]*models.ServiceRequest, error) {
 	log.Debugf("Getting service request by workflow name: %s", workflowName)
 	serviceRequests, err := repository.GetDB().FindServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize)
 	if err != nil {

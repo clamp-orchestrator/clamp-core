@@ -5,6 +5,6 @@ type XMLTransform struct {
 	Keys map[string]interface{} `json:"keys"`
 }
 
-func (t XMLTransform) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
+func (t *XMLTransform) DoTransform(requestBody map[string]interface{}, prefix string) (map[string]interface{}, error) {
 	return requestBody, nil
 }

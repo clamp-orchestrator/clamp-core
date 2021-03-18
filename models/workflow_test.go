@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin/binding"
 
@@ -41,7 +42,7 @@ func TestShouldCreateANewWorkflow(t *testing.T) {
 		log.Println(err)
 	}
 	assert.Nil(t, err)
-	workflowResponse := CreateWorkflow(serviceFlowRequest)
+	workflowResponse := CreateWorkflow(&serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)
 	assert.NotNil(t, workflowResponse.CreatedAt)
@@ -193,7 +194,7 @@ func TestIfReplyToQueueNameIsNotProvidedAsPartOfWorkflowRequestShouldReadDefault
 		log.Println(err)
 	}
 	assert.Nil(t, err)
-	workflowResponse := CreateWorkflow(serviceFlowRequest)
+	workflowResponse := CreateWorkflow(&serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)
 	assert.NotNil(t, workflowResponse.CreatedAt)
@@ -240,7 +241,7 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 		log.Println(err)
 	}
 	assert.Nil(t, err)
-	workflowResponse := CreateWorkflow(serviceFlowRequest)
+	workflowResponse := CreateWorkflow(&serviceFlowRequest)
 
 	assert.NotEmpty(t, workflowResponse.ID)
 	assert.NotNil(t, workflowResponse.CreatedAt)
@@ -252,4 +253,80 @@ func TestShouldCreateNewWorkflowWithOnFailureSteps(t *testing.T) {
 	assert.Equal(t, "onFailureStep", workflowResponse.Steps[0].OnFailure[0].Name)
 	assert.Equal(t, utils.StepModeHTTP, workflowResponse.Steps[0].OnFailure[0].Mode)
 	assert.Equal(t, "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d", workflowResponse.Steps[0].OnFailure[0].getHTTPVal().URL)
+}
+
+func TestWorkflowStepIDAreSequentiallyIncrementing(t *testing.T) {
+	w := CreateWorkflow(&Workflow{
+		ID:          "abc",
+		Name:        "WorkflowABC",
+		Description: "Workflow ABC",
+		Enabled:     true,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+		Steps: []Step{
+			{
+				ID:             0,
+				Name:           "Step1",
+				Mode:           utils.StepModeHTTP,
+				Enabled:        true,
+				canStepExecute: true,
+				OnFailure: []Step{
+					{
+						ID:             0,
+						Name:           "OnFailureStep1",
+						Mode:           utils.StepModeHTTP,
+						Enabled:        true,
+						canStepExecute: true,
+					},
+					{
+						ID:             0,
+						Name:           "OnFailureStep2",
+						Mode:           utils.StepModeHTTP,
+						Enabled:        true,
+						canStepExecute: true,
+					},
+				},
+			},
+			{
+				ID:             0,
+				Name:           "Step2",
+				Mode:           utils.StepModeHTTP,
+				Enabled:        true,
+				canStepExecute: true,
+				OnFailure: []Step{
+					{
+						ID:             0,
+						Name:           "OnFailureStep1",
+						Mode:           utils.StepModeHTTP,
+						Enabled:        true,
+						canStepExecute: true,
+					},
+					{
+						ID:             0,
+						Name:           "OnFailureStep2",
+						Mode:           utils.StepModeHTTP,
+						Enabled:        true,
+						canStepExecute: true,
+					},
+				},
+			},
+			{
+				ID:             0,
+				Name:           "Step2",
+				Mode:           utils.StepModeHTTP,
+				Enabled:        true,
+				canStepExecute: true,
+			},
+		},
+	})
+
+	assert.Equal(t, 1, w.Steps[0].ID)
+	assert.Equal(t, 2, w.Steps[0].OnFailure[0].ID)
+	assert.Equal(t, 3, w.Steps[0].OnFailure[1].ID)
+
+	assert.Equal(t, 4, w.Steps[1].ID)
+	assert.Equal(t, 5, w.Steps[1].OnFailure[0].ID)
+	assert.Equal(t, 6, w.Steps[1].OnFailure[1].ID)
+
+	assert.Equal(t, 7, w.Steps[2].ID)
 }

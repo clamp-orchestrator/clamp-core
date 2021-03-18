@@ -36,7 +36,7 @@ func setupRouter() *gin.Engine {
 	return r
 }
 
-//LoadHTTPRoutes loads all the http endpoints that clamp exposes.This function is executed automatically during application startup
+// LoadHTTPRoutes loads all the http endpoints that clamp exposes.This function is executed automatically during application startup
 func LoadHTTPRoutes() {
 	r := setupRouter()
 	err := r.Run()

@@ -19,9 +19,9 @@ type ServiceRequest struct {
 	RequestHeaders string
 }
 
-func NewServiceRequest(workflowName string, payload map[string]interface{}) ServiceRequest {
+func NewServiceRequest(workflowName string, payload map[string]interface{}) *ServiceRequest {
 	currentTime := time.Now()
-	return ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: StatusNew, CreatedAt: currentTime, Payload: payload}
+	return &ServiceRequest{ID: uuid.New(), WorkflowName: workflowName, Status: StatusNew, CreatedAt: currentTime, Payload: payload}
 }
 
 type PGServiceRequest struct {
@@ -33,8 +33,8 @@ type PGServiceRequest struct {
 	Payload      map[string]interface{} `json:"payload"`
 }
 
-func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
-	return PGServiceRequest{
+func (serviceReq *ServiceRequest) ToPgServiceRequest() *PGServiceRequest {
+	return &PGServiceRequest{
 		ID:           serviceReq.ID,
 		WorkflowName: serviceReq.WorkflowName,
 		Status:       serviceReq.Status,
@@ -43,8 +43,8 @@ func (serviceReq ServiceRequest) ToPgServiceRequest() PGServiceRequest {
 	}
 }
 
-func (pgServReq PGServiceRequest) ToServiceRequest() ServiceRequest {
-	return ServiceRequest{
+func (pgServReq *PGServiceRequest) ToServiceRequest() *ServiceRequest {
+	return &ServiceRequest{
 		ID:           pgServReq.ID,
 		WorkflowName: pgServReq.WorkflowName,
 		Status:       pgServReq.Status,

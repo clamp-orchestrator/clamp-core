@@ -54,11 +54,12 @@ func worker(workerID int, serviceReqChan <-chan models.ServiceRequest) {
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Infof("%s : Started listening to service request channel", prefix)
 	for serviceReq := range serviceReqChan {
-		executeWorkflow(serviceReq, prefix)
+		serviceReqCopy := serviceReq
+		executeWorkflow(&serviceReqCopy, prefix)
 	}
 }
 
-func executeWorkflow(serviceReq models.ServiceRequest, prefix string) {
+func executeWorkflow(serviceReq *models.ServiceRequest, prefix string) {
 	prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, serviceReq.ID)
 	log.Debugf("%s Started processing service request id %s", prefix, serviceReq.ID)
 	start := time.Now()
@@ -87,7 +88,7 @@ func catchErrors(prefix string, requestID uuid.UUID) {
 	}
 }
 
-func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceRequest models.ServiceRequest) models.Status {
+func executeWorkflowSteps(workflow *models.Workflow, prefix string, serviceRequest *models.ServiceRequest) models.Status {
 	stepRequestPayload := serviceRequest.Payload
 	lastStepExecuted := serviceRequest.CurrentStepID
 	executeStepsFromIndex := 0
@@ -102,7 +103,8 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 		EnhanceRequestContextWithExecutedSteps(&requestContext)
 	}
 
-	for i, step := range workflow.Steps[executeStepsFromIndex:] {
+	for i := range workflow.Steps[executeStepsFromIndex:] {
+		step := &workflow.Steps[i]
 		ComputeRequestToCurrentStepInContext(workflow, step, &requestContext, executeStepsFromIndex+i, stepRequestPayload)
 		err := ExecuteWorkflowStep(step, requestContext, prefix)
 		if !err.IsNil() {
@@ -117,7 +119,7 @@ func executeWorkflowSteps(workflow models.Workflow, prefix string, serviceReques
 }
 
 // TODO: replace prefix with other standard way like MDC
-func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
+func ExecuteWorkflowStep(step *models.Step, requestContext models.RequestContext, prefix string) models.ClampErrorResponse {
 	serviceRequestID := requestContext.ServiceRequestID
 	workflowName := requestContext.WorkflowName
 	stepRequest := requestContext.StepsContext[step.Name].Request
@@ -127,7 +129,7 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	requestContext.SetStepRequestToContext(step.Name, stepRequest)
 
 	stepStartTime := time.Now()
-	stepStatus := models.StepsStatus{
+	stepStatus := &models.StepsStatus{
 		ServiceRequestID: serviceRequestID,
 		WorkflowName:     workflowName,
 		StepName:         step.Name,
@@ -153,7 +155,8 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	resp, err := step.DoExecute(requestContext, prefix)
 	if err != nil {
 		if step.OnFailure != nil {
-			for _, stepOnFailure := range step.OnFailure {
+			for i := range step.OnFailure {
+				stepOnFailure := &step.OnFailure[i]
 				ExecuteWorkflowStep(stepOnFailure, requestContext, prefix)
 			}
 		}
@@ -178,31 +181,31 @@ func ExecuteWorkflowStep(step models.Step, requestContext models.RequestContext,
 	return models.EmptyErrorResponse()
 }
 
-func recordStepCompletionStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepCompletionStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusCompleted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepSkippedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepSkippedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusSkipped
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepPausedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepPausedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusPaused
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepStartedStatus(stepStatus models.StepsStatus, stepStartTime time.Time) {
+func recordStepStartedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusStarted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
 	SaveStepStatus(stepStatus)
 }
 
-func recordStepFailedStatus(stepStatus models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
+func recordStepFailedStatus(stepStatus *models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
 	stepStatus.Status = models.StatusFailed
 	marshal, err := json.Marshal(clampErrorResponse)
 	if err != nil {
@@ -231,7 +234,7 @@ func getServiceRequestChannel() chan models.ServiceRequest {
 	return serviceRequestChannel
 }
 
-func AddServiceRequestToChannel(serviceReq models.ServiceRequest) {
+func AddServiceRequestToChannel(serviceReq *models.ServiceRequest) {
 	channel := getServiceRequestChannel()
-	channel <- serviceReq
+	channel <- *serviceReq
 }

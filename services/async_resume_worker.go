@@ -44,7 +44,7 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestID)
 		log.Debugf("%s : Received step response : %v", prefix, stepResponse)
 		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
-		var currentStepStatus models.StepsStatus
+		var currentStepStatus *models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
 			if stepStatus.Status == models.StatusStarted {
 				currentStepStatus = stepStatus
@@ -90,11 +90,11 @@ func getResumeStepResponseChannel() chan models.AsyncStepResponse {
 	return resumeStepsChannel
 }
 
-func AddStepResponseToResumeChannel(response models.AsyncStepResponse) {
+func AddStepResponseToResumeChannel(response *models.AsyncStepResponse) {
 	if response.ServiceRequestID == uuid.Nil || response.StepID == 0 || (response.Response == nil && response.Error.Code == 0) {
 		log.Errorf("Invalid step resume request received %v", response)
 		return
 	}
 	channel := getResumeStepResponseChannel()
-	channel <- response
+	channel <- *response
 }

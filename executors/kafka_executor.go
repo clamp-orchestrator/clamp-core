@@ -16,7 +16,7 @@ type KafkaVal struct {
 }
 
 // DoExecute : Connecting to Kakfa URL and producing a message to Topic
-func (val KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
+func (val *KafkaVal) DoExecute(requestBody interface{}, prefix string) (interface{}, error) {
 	log.Debugf("%s Kafka Executor: Executing kafka %s body:%v", prefix, val.TopicName, requestBody)
 	syncProducer, err := sarama.NewSyncProducer([]string{val.ConnectionURL}, nil)
 	//asyncProducer, err := sarama.NewAsyncProducer([]string{val.ConnectionURL}, nil)

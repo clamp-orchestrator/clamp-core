@@ -26,8 +26,8 @@ type StepsStatus struct {
 	StepID           int       `json:"step_id"`
 }
 
-func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
-	return StepsStatus{
+func NewStepsStatus(stepStatus *StepsStatus) *StepsStatus {
+	return &StepsStatus{
 		ID:               stepStatus.ID,
 		ServiceRequestID: stepStatus.ServiceRequestID,
 		WorkflowName:     stepStatus.WorkflowName,
@@ -40,7 +40,7 @@ func NewStepsStatus(stepStatus StepsStatus) StepsStatus {
 }
 
 // CreateStepsStatus : Entry for a given service request id and return step status details
-func CreateStepsStatus(stepStatus StepsStatus) StepsStatus {
+func CreateStepsStatus(stepStatus *StepsStatus) *StepsStatus {
 	return NewStepsStatus(stepStatus)
 }
 
@@ -58,8 +58,8 @@ type PGStepStatus struct {
 	StepID           int
 }
 
-func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
-	return PGStepStatus{
+func (stepStatus *StepsStatus) ToPgStepStatus() *PGStepStatus {
+	return &PGStepStatus{
 		ID:               stepStatus.ID,
 		ServiceRequestID: stepStatus.ServiceRequestID,
 		WorkflowName:     stepStatus.WorkflowName,
@@ -73,8 +73,8 @@ func (stepStatus StepsStatus) ToPgStepStatus() PGStepStatus {
 	}
 }
 
-func (pgStepStatus PGStepStatus) ToStepStatus() StepsStatus {
-	return StepsStatus{
+func (pgStepStatus *PGStepStatus) ToStepStatus() *StepsStatus {
+	return &StepsStatus{
 		ID:               pgStepStatus.ID,
 		ServiceRequestID: pgStepStatus.ServiceRequestID,
 		WorkflowName:     pgStepStatus.WorkflowName,
