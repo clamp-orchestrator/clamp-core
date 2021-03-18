@@ -19,7 +19,7 @@ func FindServiceRequestByID(serviceRequestID uuid.UUID) (*models.ServiceRequest,
 }
 
 // SaveServiceRequest is used to save the created service requests to DB
-func SaveServiceRequest(serviceReq models.ServiceRequest) (*models.ServiceRequest, error) {
+func SaveServiceRequest(serviceReq *models.ServiceRequest) (*models.ServiceRequest, error) {
 	log.Debugf("Saving service request: %v", serviceReq)
 	serviceRequest, err := repository.GetDB().SaveServiceRequest(serviceReq)
 	if err != nil {

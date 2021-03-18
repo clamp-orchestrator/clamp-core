@@ -27,7 +27,7 @@ var (
 	})
 )
 
-func SaveStepStatus(stepStatusReq models.StepsStatus) (*models.StepsStatus, error) {
+func SaveStepStatus(stepStatusReq *models.StepsStatus) (*models.StepsStatus, error) {
 	log.Debugf("Saving step status : %v", stepStatusReq)
 	stepStatusReq, err := repository.GetDB().SaveStepStatus(stepStatusReq)
 	if err != nil {
@@ -49,7 +49,7 @@ func FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]*models.Ste
 	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestID(serviceRequestID)
 	if err != nil {
 		log.Errorf("No record found with given service request id %s", serviceRequestID)
-		return []models.StepsStatus{}, err
+		return []*models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
@@ -59,7 +59,7 @@ func FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, statu
 	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestIDAndStatus(serviceRequestID, status)
 	if err != nil {
 		log.Errorf("No record found with given service request id %s", serviceRequestID)
-		return []models.StepsStatus{}, err
+		return []*models.StepsStatus{}, err
 	}
 	return stepsStatuses, err
 }
