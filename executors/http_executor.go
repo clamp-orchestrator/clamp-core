@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -25,7 +26,11 @@ func (httpVal *HTTPVal) DoExecute(requestBody interface{}, prefix string) (inter
 	var httpClient = &http.Client{
 		Timeout: time.Second * 10,
 	}
-	requestJSONBytes, _ := json.Marshal(requestBody)
+	requestJSONBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, err
+	}
+
 	request, err := http.NewRequest(httpVal.Method, httpVal.URL, bytes.NewBuffer(requestJSONBytes))
 	fetchAndLoadRequestWithHeadersIfDefined(httpVal, request)
 	if err != nil {
@@ -38,13 +43,17 @@ func (httpVal *HTTPVal) DoExecute(requestBody interface{}, prefix string) (inter
 
 	defer resp.Body.Close()
 
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error while reading http executor response: %w", err)
+	}
+
 	if resp.StatusCode != 200 && resp.StatusCode != 201 {
-		data, _ := ioutil.ReadAll(resp.Body)
 		err = errors.New(string(data))
 		log.Error("Unable to execute \t", httpVal.URL, " with error message", err)
 		return nil, err
 	}
-	data, _ := ioutil.ReadAll(resp.Body)
+
 	log.Debugf("%sHTTP Executor: Successfully called http %s:%s", prefix, httpVal.Method, httpVal.URL)
 	return string(data), err
 }

@@ -55,7 +55,11 @@ func prepareSpecStringAsPerKazaamContract(transformedStructure map[string]interf
 		"spec":      transformedStructure,
 	}
 	spec[0] = specInterface
-	specString, _ := json.Marshal(spec)
+	specString, err := json.Marshal(spec)
+	if err != nil {
+		log.Errorf("error while marshaling spec: %s", err)
+	}
+
 	return specString
 }
 

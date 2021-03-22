@@ -105,8 +105,16 @@ func prepareServiceRequestResponse(serviceReq *models.ServiceRequest) models.Ser
 func readRequestPayload(c *gin.Context) map[string]interface{} {
 	var payload map[string]interface{}
 	if c.Request.Body != nil {
-		data, _ := ioutil.ReadAll(c.Request.Body)
-		_ = json.Unmarshal(data, &payload)
+		data, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			log.Errorf("error while reading readRequestPayload request bod: %s", err)
+		}
+
+		err = json.Unmarshal(data, &payload)
+		if err != nil {
+			log.Errorf("error while unmarshaling readRequestPayload: %s", err)
+		}
+
 		log.Debug("Request Body", payload)
 	}
 	return payload
