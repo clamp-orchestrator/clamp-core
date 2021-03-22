@@ -2,6 +2,7 @@ package executors
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/Shopify/sarama"
 	log "github.com/sirupsen/logrus"
@@ -25,7 +26,11 @@ func (val *KafkaVal) DoExecute(requestBody interface{}, prefix string) (interfac
 		return nil, err
 	}
 
-	requestJSONBytes, _ := json.Marshal(requestBody)
+	requestJSONBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return nil, fmt.Errorf("error while marshaling kafka executor request: %w", err)
+	}
+
 	msg := &sarama.ProducerMessage{
 		Topic: val.TopicName,
 		Value: sarama.StringEncoder(requestJSONBytes),

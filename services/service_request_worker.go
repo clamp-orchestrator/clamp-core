@@ -150,7 +150,12 @@ func ExecuteWorkflowStep(step *models.Step, requestContext models.RequestContext
 		requestContext.SetStepRequestToContext(step.Name, transform)
 		stepStatus.Payload.Request = transform
 	}
-	recordStepStartedStatus(stepStatus, stepStartTime)
+
+	err := recordStepStartedStatus(stepStatus, stepStartTime)
+	if err != nil {
+		log.Errorf("error while recording step started status: %s", err)
+		return models.ClampErrorResponse{Code: http.StatusInternalServerError}
+	}
 
 	resp, err := step.DoExecute(requestContext, prefix)
 	if err != nil {
@@ -160,71 +165,98 @@ func ExecuteWorkflowStep(step *models.Step, requestContext models.RequestContext
 				ExecuteWorkflowStep(stepOnFailure, requestContext, prefix)
 			}
 		}
+
 		clampErrorResponse := models.CreateErrorResponse(http.StatusBadRequest, err.Error())
-		recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
+
+		err := recordStepFailedStatus(stepStatus, *clampErrorResponse, stepStartTime)
+		if err != nil {
+			log.Errorf("error while recording step failed status: %s", err)
+			return models.ClampErrorResponse{Code: http.StatusInternalServerError}
+		}
+
 		return *clampErrorResponse
 	} else if step.DidStepExecute() && resp != nil && step.Type == utils.StepTypeSync {
 		log.Debugf("%s Step response received: %s", prefix, resp.(string))
 		var responsePayload map[string]interface{}
-		_ = json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		err = json.Unmarshal([]byte(resp.(string)), &responsePayload)
+		if err != nil {
+			log.Errorf("error while unmarshaling step response: %s", err)
+			return models.ClampErrorResponse{Code: http.StatusInternalServerError}
+		}
+
 		stepStatus.Payload.Response = responsePayload
-		recordStepCompletionStatus(stepStatus, stepStartTime)
+
+		err = recordStepCompletionStatus(stepStatus, stepStartTime)
+		if err != nil {
+			log.Errorf("error while recording step completion status: %s", err)
+			return models.ClampErrorResponse{Code: http.StatusInternalServerError}
+		}
+
 		requestContext.SetStepResponseToContext(step.Name, responsePayload)
 		return models.EmptyErrorResponse()
 	} else if !step.DidStepExecute() {
 		// record step skipped
 		// setting response of skipped step with same as request for future validations use
 		requestContext.SetStepResponseToContext(step.Name, requestContext.GetStepRequestFromContext(step.Name))
-		recordStepSkippedStatus(stepStatus, stepStartTime)
+
+		err = recordStepSkippedStatus(stepStatus, stepStartTime)
+		if err != nil {
+			log.Errorf("error while recording step skipped status: %s", err)
+			return models.ClampErrorResponse{Code: http.StatusInternalServerError}
+		}
+
 		return models.EmptyErrorResponse()
 	}
 	return models.EmptyErrorResponse()
 }
 
-func recordStepCompletionStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
+func recordStepCompletionStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) error {
 	stepStatus.Status = models.StatusCompleted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
-	SaveStepStatus(stepStatus)
+	_, err := SaveStepStatus(stepStatus)
+	return err
 }
 
-func recordStepSkippedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
+func recordStepSkippedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) error {
 	stepStatus.Status = models.StatusSkipped
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
-	SaveStepStatus(stepStatus)
+	_, err := SaveStepStatus(stepStatus)
+	return err
 }
 
-func recordStepPausedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
+func recordStepPausedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) error {
 	stepStatus.Status = models.StatusPaused
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
-	SaveStepStatus(stepStatus)
+	_, err := SaveStepStatus(stepStatus)
+	return err
 }
 
-func recordStepStartedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) {
+func recordStepStartedStatus(stepStatus *models.StepsStatus, stepStartTime time.Time) error {
 	stepStatus.Status = models.StatusStarted
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
-	SaveStepStatus(stepStatus)
+	_, err := SaveStepStatus(stepStatus)
+	return err
 }
 
-func recordStepFailedStatus(stepStatus *models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) {
+func recordStepFailedStatus(stepStatus *models.StepsStatus, clampErrorResponse models.ClampErrorResponse, stepStartTime time.Time) error {
 	stepStatus.Status = models.StatusFailed
 	marshal, err := json.Marshal(clampErrorResponse)
 	if err != nil {
-		log.Error("clampErrorResponse: Marshal error", err)
-		return
+		return fmt.Errorf("marshaling clampErrorResponse failed: %w", err)
 	}
 
 	var responsePayload map[string]interface{}
 	err = json.Unmarshal(marshal, &responsePayload)
 	if err != nil {
-		log.Error("clampErrorResponse: UnMarshal error", err)
-		return
+		return fmt.Errorf("unmarshaling clampErrorResponse failed: %w", err)
 	}
 
 	errPayload := map[string]interface{}{"errors": responsePayload}
 	stepStatus.Payload.Response = errPayload
 	stepStatus.Reason = clampErrorResponse.Message
 	stepStatus.TotalTimeInMs = time.Since(stepStartTime).Nanoseconds() / utils.MilliSecondsDivisor
-	SaveStepStatus(stepStatus)
+	_, err = SaveStepStatus(stepStatus)
+	return err
 }
 
 func getServiceRequestChannel() chan models.ServiceRequest {

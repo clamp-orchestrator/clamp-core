@@ -78,7 +78,11 @@ func consume(topic string, master sarama.Consumer) (chan *sarama.ConsumerMessage
 	consumers := make(chan *sarama.ConsumerMessage)
 	errors := make(chan *sarama.ConsumerError)
 
-	partitions, _ := master.Partitions(topic)
+	partitions, err := master.Partitions(topic)
+	if err != nil {
+		log.Errorf("error while retrieving partitions: %s", err)
+	}
+
 	for _, partition := range partitions {
 		consumer, err := master.ConsumePartition(topic, partition, sarama.OffsetNewest)
 		if err != nil {

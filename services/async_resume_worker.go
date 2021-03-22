@@ -43,7 +43,10 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 	for stepResponse := range resumeStepsChannel {
 		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestID)
 		log.Debugf("%s : Received step response : %v", prefix, stepResponse)
-		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
+		currentStepStatusArr, err := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
+		if err != nil {
+			log.Errorf("error while finding step status by service request id and step id: %s", err)
+		}
 		var currentStepStatus *models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {
 			if stepStatus.Status == models.StatusStarted {
@@ -63,11 +66,17 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 				// TODO Setting ID empty and also errors validations
 				// TODO subtracting -5.30 since time is stored in GMT in PSql
 				if !stepResponse.Error.IsNil() {
-					recordStepFailedStatus(currentStepStatus, stepResponse.Error, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
+					err := recordStepFailedStatus(currentStepStatus, stepResponse.Error, currentStepStatus.CreatedAt.Add(-(time.Minute * 330)))
+					if err != nil {
+						log.Errorf("error while recording step failed status: %s", err)
+					}
 					continue
 				} else {
 					currentStepStatus.Payload.Response = stepResponse.Response
-					recordStepCompletionStatus(currentStepStatus, resumeStepStartTime)
+					err := recordStepCompletionStatus(currentStepStatus, resumeStepStartTime)
+					if err != nil {
+						log.Errorf("error while recording step completion status: %s", err)
+					}
 				}
 			}
 			serviceRequest, err := FindServiceRequestByID(stepResponse.ServiceRequestID)
