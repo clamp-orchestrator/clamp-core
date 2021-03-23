@@ -119,3 +119,38 @@ func TestHttpVal_DoExecute(t *testing.T) {
 		})
 	}
 }
+
+func TestHttpVal_PopulateRequestHeaders(t *testing.T) {
+	assert := assert.New(t)
+
+	testCases := []struct {
+		name           string
+		httpValHeaders string
+		wantHTTPHeader http.Header
+	}{
+		{
+			name:           "SingleHeader",
+			httpValHeaders: "Content-Type:application/json",
+			wantHTTPHeader: http.Header{
+				"Content-Type": {"application/json"},
+			},
+		},
+		{
+			name:           "MultipleHeaders",
+			httpValHeaders: "Content-Type:application/json;X-Header1:Value1;X-Header2:Value2",
+			wantHTTPHeader: http.Header{
+				"Content-Type": {"application/json"},
+				"X-Header1":    {"Value1"},
+				"X-Header2":    {"Value2"},
+			},
+		},
+	}
+
+	for i := range testCases {
+		testCase := &testCases[i]
+
+		httpHeader := make(http.Header)
+		populateRequestHeaders(testCase.httpValHeaders, &httpHeader)
+		assert.Equal(testCase.wantHTTPHeader, httpHeader)
+	}
+}
