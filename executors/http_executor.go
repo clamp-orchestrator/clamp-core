@@ -51,8 +51,7 @@ func (httpVal *HTTPVal) DoExecute(requestBody interface{}, prefix string) (inter
 
 func fetchAndLoadRequestWithHeadersIfDefined(httpVal *HTTPVal, request *http.Request) {
 	if httpVal.Headers != "" {
-		httpHeaders := strings.Split(httpVal.Headers, ";")
-		for _, header := range httpHeaders[:len(httpHeaders)-1] {
+		for _, header := range strings.Split(httpVal.Headers, ";") {
 			httpHeader := strings.Split(header, ":")
 			if len(httpHeader) > 1 {
 				request.Header.Add(httpHeader[0], httpHeader[1])
