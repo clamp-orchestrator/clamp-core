@@ -29,7 +29,7 @@ var (
 
 func SaveStepStatus(stepStatusReq *models.StepsStatus) (*models.StepsStatus, error) {
 	log.Debugf("Saving step status : %v", stepStatusReq)
-	stepStatusReq, err := repository.GetDB().SaveStepStatus(stepStatusReq)
+	stepStatusReq, err := repository.GetStepStatusRepository().SaveStepStatus(stepStatusReq)
 	if err != nil {
 		log.Errorf("Failed saving step status : %v, %s", stepStatusReq, err.Error())
 	}
@@ -46,7 +46,7 @@ func SaveStepStatus(stepStatusReq *models.StepsStatus) (*models.StepsStatus, err
 
 func FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]*models.StepsStatus, error) {
 	log.Debugf("Find step statues by request id : %s ", serviceRequestID)
-	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestID(serviceRequestID)
+	stepsStatuses, err := repository.GetStepStatusRepository().FindStepStatusByServiceRequestID(serviceRequestID)
 	if err != nil {
 		log.Errorf("No record found with given service request id %s", serviceRequestID)
 		return []*models.StepsStatus{}, err
@@ -56,7 +56,7 @@ func FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]*models.Ste
 
 func FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 	log.Debugf("Find step statues by request id : %s ", serviceRequestID)
-	stepsStatuses, err := repository.GetDB().FindStepStatusByServiceRequestIDAndStatus(serviceRequestID, status)
+	stepsStatuses, err := repository.GetStepStatusRepository().FindStepStatusByServiceRequestIDAndStatus(serviceRequestID, status)
 	if err != nil {
 		log.Errorf("No record found with given service request id %s", serviceRequestID)
 		return []*models.StepsStatus{}, err
@@ -66,7 +66,7 @@ func FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, statu
 
 func FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]*models.StepsStatus, error) {
 	log.Debugf("Find all step statues by request id : %s and step id : %d", serviceRequestID, stepID)
-	stepsStatuses, err := repository.GetDB().FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID, stepID)
+	stepsStatuses, err := repository.GetStepStatusRepository().FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID, stepID)
 	if err != nil {
 		log.Errorf("No record found with given service request id %s", serviceRequestID)
 		return []*models.StepsStatus{}, err

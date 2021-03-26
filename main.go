@@ -22,7 +22,7 @@ func main() {
 	log.SetLevel(logLevel)
 
 	log.Info("Pinging DB...")
-	err = repository.GetDB().Ping()
+	err = repository.Ping()
 	if err != nil {
 		log.Fatalf("DB ping failed: %s", err)
 	}
