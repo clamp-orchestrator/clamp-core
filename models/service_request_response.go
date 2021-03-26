@@ -6,5 +6,5 @@ import "github.com/google/uuid"
 type ServiceRequestResponse struct {
 	URL    string    `json:"pollUrl"`
 	Status Status    `json:"status"`
-	ID     uuid.UUID `json:"serviceRequestId"`
+	ID     uuid.UUID `json:"id"`
 }
