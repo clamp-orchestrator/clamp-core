@@ -3,6 +3,7 @@ package services
 import (
 	"clamp-core/executors"
 	"clamp-core/models"
+	"clamp-core/repository"
 	"clamp-core/utils"
 	"testing"
 	"time"
@@ -192,6 +193,8 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStepIdAndStatus")
 		return statuses, err
 	}
+
+	repository.SetStepStatusRepository(&mockDBStepStatus{})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -42,7 +42,7 @@ func resumeSteps(workerID int, resumeStepsChannel <-chan models.AsyncStepRespons
 	log.Infof("%s : Started listening to resume steps channel", prefix)
 	for stepResponse := range resumeStepsChannel {
 		prefix = fmt.Sprintf("%s [REQUEST_ID: %s]", prefix, stepResponse.ServiceRequestID)
-		log.Debugf("%s : Received step response : %v", prefix, stepResponse)
+		log.Infof("%s : Received step response : %v", prefix, stepResponse)
 		currentStepStatusArr, _ := FindAllStepStatusByServiceRequestIDAndStepID(stepResponse.ServiceRequestID, stepResponse.StepID)
 		var currentStepStatus *models.StepsStatus
 		for _, stepStatus := range currentStepStatusArr {

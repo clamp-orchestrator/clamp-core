@@ -2,7 +2,6 @@ package services
 
 import (
 	"clamp-core/models"
-	"clamp-core/repository"
 	"errors"
 	"testing"
 
@@ -51,7 +50,7 @@ func TestShouldFailToSaveServiceRequestAndThrowError(t *testing.T) {
 }
 
 func TestFindByID(t *testing.T) {
-	repository.SetDB(&mockDB{})
+
 	serviceReq := models.ServiceRequest{
 		ID: uuid.UUID{},
 	}

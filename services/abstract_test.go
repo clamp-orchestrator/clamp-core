@@ -7,25 +7,27 @@ import (
 	"github.com/google/uuid"
 )
 
-type mockDB struct{}
+type mockDBServiceRequest struct{}
+type mockDBWorkFlow struct{}
+type mockDBStepStatus struct{}
 
-func (m mockDB) DeleteWorkflowByName(workflowName string) error {
+func (m mockDBWorkFlow) DeleteWorkflowByName(workflowName string) error {
 	return deleteWorkflowByNameMock(workflowName)
 }
 
-func (m mockDB) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]*models.ServiceRequest, error) {
+func (m mockDBServiceRequest) FindServiceRequestsByWorkflowName(workflowName string, pageNumber int, pageSize int) ([]*models.ServiceRequest, error) {
 	return findServiceRequestsByWorkflowName(workflowName, pageNumber, pageSize)
 }
 
-func (m mockDB) GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error) {
+func (m mockDBWorkFlow) GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error) {
 	return getWorkflowsMock(pageNumber, pageSize, sortBy)
 }
 
-func (m mockDB) FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (*models.StepsStatus, error) {
+func (m mockDBStepStatus) FindStepStatusByServiceRequestIDAndStepIDAndStatus(serviceRequestID uuid.UUID, stepID int, status models.Status) (*models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIDAndStepIDAndStatusMock(serviceRequestID, stepID, status)
 }
 
-func (m mockDB) FindStepStatusByServiceRequestIDAndStepNameAndStatus(serviceRequestID uuid.UUID, stepName string, status models.Status) (*models.StepsStatus, error) {
+func (m mockDBStepStatus) FindStepStatusByServiceRequestIDAndStepNameAndStatus(serviceRequestID uuid.UUID, stepName string, status models.Status) (*models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIDAndStepNameAndStatusMock(serviceRequestID, stepName, status)
 }
 
@@ -43,42 +45,44 @@ var findStepStatusByServiceRequestIDAndStepIDAndStatusMock func(serviceRequestID
 var getWorkflowsMock func(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error)
 var deleteWorkflowByNameMock func(workflowName string) error
 
-func (m mockDB) SaveServiceRequest(serReq *models.ServiceRequest) (*models.ServiceRequest, error) {
+func (m mockDBServiceRequest) SaveServiceRequest(serReq *models.ServiceRequest) (*models.ServiceRequest, error) {
 	return saveServiceRequestMock(serReq)
 }
 
-func (m mockDB) FindServiceRequestByID(id uuid.UUID) (*models.ServiceRequest, error) {
+func (m mockDBServiceRequest) FindServiceRequestByID(id uuid.UUID) (*models.ServiceRequest, error) {
 	return findServiceRequestByIDMock(id)
 }
 
-func (m mockDB) SaveWorkflow(workflow *models.Workflow) (*models.Workflow, error) {
+func (m mockDBWorkFlow) SaveWorkflow(workflow *models.Workflow) (*models.Workflow, error) {
 	return SaveWorkflowMock(workflow)
 }
 
-func (m mockDB) FindWorkflowByName(workflowName string) (*models.Workflow, error) {
+func (m mockDBWorkFlow) FindWorkflowByName(workflowName string) (*models.Workflow, error) {
 	return findWorkflowByNameMock(workflowName)
 }
 
-func (m mockDB) SaveStepStatus(stepStatus *models.StepsStatus) (*models.StepsStatus, error) {
+func (m mockDBStepStatus) SaveStepStatus(stepStatus *models.StepsStatus) (*models.StepsStatus, error) {
 	return saveStepStatusMock(stepStatus)
 }
 
-func (m mockDB) FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]*models.StepsStatus, error) {
+func (m mockDBStepStatus) FindStepStatusByServiceRequestID(serviceRequestID uuid.UUID) ([]*models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIDMock(serviceRequestID)
 }
 
-func (m mockDB) FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
+func (m mockDBStepStatus) FindStepStatusByServiceRequestIDAndStatus(serviceRequestID uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 	return findStepStatusByServiceRequestIDAndStatusMock(serviceRequestID, status)
 }
 
-func (m mockDB) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]*models.StepsStatus, error) {
+func (m mockDBStepStatus) FindAllStepStatusByServiceRequestIDAndStepID(serviceRequestID uuid.UUID, stepID int) ([]*models.StepsStatus, error) {
 	return findAllStepStatusByServiceRequestIDAndStepIDMock(serviceRequestID, stepID)
 }
 
-func (m mockDB) Ping() error {
+func (m mockDBStepStatus) Ping() error {
 	return nil
 }
 
 func init() {
-	repository.SetDB(&mockDB{})
+	repository.SetServiceRequestRepository(&mockDBServiceRequest{})
+	repository.SetWorkFlowRepository(&mockDBWorkFlow{})
+	repository.SetStepStatusRepository(&mockDBStepStatus{})
 }

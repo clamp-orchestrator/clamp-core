@@ -9,7 +9,7 @@ import (
 
 func SaveWorkflow(workflowReq *models.Workflow) (*models.Workflow, error) {
 	log.Debugf("Saving worflow %v", workflowReq)
-	workflow, err := repository.GetDB().SaveWorkflow(workflowReq)
+	workflow, err := repository.GetWorkFlowRepository().SaveWorkflow(workflowReq)
 	if err != nil {
 		log.Errorf("Failed to save workflow: %v, error: %s", workflow, err.Error())
 	} else {
@@ -20,7 +20,7 @@ func SaveWorkflow(workflowReq *models.Workflow) (*models.Workflow, error) {
 
 func FindWorkflowByName(workflowName string) (*models.Workflow, error) {
 	log.Debugf("Finding workflow by name : %s", workflowName)
-	workflow, err := repository.GetDB().FindWorkflowByName(workflowName)
+	workflow, err := repository.GetWorkFlowRepository().FindWorkflowByName(workflowName)
 	if err != nil {
 		log.Errorf("No record found with given workflow name %s, error: %s", workflowName, err.Error())
 	}
@@ -31,7 +31,7 @@ func FindWorkflowByName(workflowName string) (*models.Workflow, error) {
 // This method is not exposed an an API. It is implemented for running a test scenario.
 func DeleteWorkflowByName(workflowName string) error {
 	log.Debugf("Deleting workflow by name : %s", workflowName)
-	err := repository.GetDB().DeleteWorkflowByName(workflowName)
+	err := repository.GetWorkFlowRepository().DeleteWorkflowByName(workflowName)
 	if err != nil {
 		log.Debugf("No record found with given workflow name %s, error: %s", workflowName, err.Error())
 	}
@@ -43,7 +43,7 @@ func DeleteWorkflowByName(workflowName string) error {
 // Also supports filters
 func GetWorkflows(pageNumber int, pageSize int, sortBy models.SortByFields) ([]*models.Workflow, int, error) {
 	log.Debugf("Getting workflows for pageNumber: %d, pageSize: %d", pageNumber, pageSize)
-	workflows, totalWorkflowsCount, err := repository.GetDB().GetWorkflows(pageNumber, pageSize, sortBy)
+	workflows, totalWorkflowsCount, err := repository.GetWorkFlowRepository().GetWorkflows(pageNumber, pageSize, sortBy)
 	if err != nil {
 		log.Debugf("Failed to fetch worflows for pageNumber: %d, pageSize: %d, sortBy %v", pageNumber, pageSize, sortBy)
 	}
