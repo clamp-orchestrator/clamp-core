@@ -16,7 +16,7 @@ const workflowName string = "testWF"
 
 func TestAddServiceRequestToChannel(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -35,7 +35,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
@@ -62,7 +62,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
 		})
@@ -71,7 +71,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 
 func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflow(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -93,7 +93,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
@@ -120,7 +120,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
 		})
@@ -129,7 +129,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 
 func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -149,7 +149,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
@@ -177,7 +177,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
 		})
@@ -186,7 +186,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 
 func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -219,12 +219,12 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
 	}
-	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
+	mockDB.FindStepStatusByServiceRequestIDAndStatusMockFunc = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStatus")
 		stepsStatus := make([]*models.StepsStatus, 1)
 		stepsStatus[0] = &models.StepsStatus{}
@@ -257,7 +257,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 4, len(functionCalledStack))
 		})
