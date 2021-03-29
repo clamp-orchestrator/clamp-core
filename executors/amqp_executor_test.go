@@ -67,8 +67,6 @@ func drainDeliveries(deliveryCh <-chan wabbit.Delivery) {
 }
 
 func TestAMQPVal_DoExecute(t *testing.T) {
-	assert := assert.New(t)
-
 	amqpPublishFunc = amqpTestPublish
 
 	t.Run("should return error if connection fails", func(t *testing.T) {
@@ -80,7 +78,7 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 			ContentType:   testContentType,
 		}
 		_, err := val.DoExecute(testMessageBody, "")
-		assert.Error(err)
+		assert.Error(t, err)
 	})
 
 	amqpTestServer := amqptestserver.NewServer(testConnectionURL)
@@ -136,16 +134,16 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 			ContentType:   testContentType,
 		}
 		_, err := val.DoExecute(testMessageBody, "")
-		assert.NoError(err)
+		assert.NoError(t, err)
 
 		time.Sleep(time.Millisecond) // gives time for the delivery
 
 		d := popDelivery(deliveryCh)
-		if assert.NotNil(d) {
+		if assert.NotNil(t, d) {
 			var messageBody interface{}
 			err = json.Unmarshal(d.Body(), &messageBody)
-			assert.NoError(err)
-			assert.Equal(testMessageBody, messageBody)
+			assert.NoError(t, err)
+			assert.Equal(t, testMessageBody, messageBody)
 		}
 	})
 
@@ -160,16 +158,16 @@ func TestAMQPVal_DoExecute(t *testing.T) {
 			ContentType:   testContentType,
 		}
 		_, err := val.DoExecute(testMessageBody, "")
-		assert.NoError(err)
+		assert.NoError(t, err)
 
 		time.Sleep(time.Millisecond) // gives time for the delivery
 
 		d := popDelivery(deliveryCh)
-		if assert.NotNil(d) {
+		if assert.NotNil(t, d) {
 			var messageBody interface{}
 			err = json.Unmarshal(d.Body(), &messageBody)
-			assert.NoError(err)
-			assert.Equal(testMessageBody, messageBody)
+			assert.NoError(t, err)
+			assert.Equal(t, testMessageBody, messageBody)
 		}
 	})
 

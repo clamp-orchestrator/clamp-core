@@ -11,8 +11,6 @@ import (
 )
 
 func TestHttpVal_DoExecute(t *testing.T) {
-	assert := assert.New(t)
-
 	httpRequestBody := map[string]interface{}{"k": "v"}
 	httpResponseBody := map[string]interface{}{"id": "1234", "name": "ABC", "email": "abc@sahaj.com", "org": "sahaj"}
 
@@ -90,9 +88,9 @@ func TestHttpVal_DoExecute(t *testing.T) {
 
 			got, err := httpVal.DoExecute(tt.args.requestBody, "")
 			if tt.wantErrMsg != "" {
-				assert.Contains(err.Error(), tt.wantErrMsg)
+				assert.Contains(t, err.Error(), tt.wantErrMsg)
 			} else {
-				assert.NoError(err)
+				assert.NoError(t, err)
 
 				var responseBody map[string]interface{}
 				err = json.Unmarshal([]byte(got.(string)), &responseBody)
@@ -101,19 +99,19 @@ func TestHttpVal_DoExecute(t *testing.T) {
 				}
 
 				if tt.wantRequestBody != nil {
-					assert.Equal(tt.wantRequestBody, requestBody)
+					assert.Equal(t, tt.wantRequestBody, requestBody)
 				}
 
 				if tt.wantRequestHeader != nil {
 					for k, v := range tt.wantRequestHeader {
 						v2, ok := requestHeader[k]
-						assert.True(ok)
-						assert.Equal(v, v2)
+						assert.True(t, ok)
+						assert.Equal(t, v, v2)
 					}
 				}
 
 				if tt.wantResponseBody != nil {
-					assert.Equal(tt.wantResponseBody, responseBody)
+					assert.Equal(t, tt.wantResponseBody, responseBody)
 				}
 			}
 		})
@@ -121,8 +119,6 @@ func TestHttpVal_DoExecute(t *testing.T) {
 }
 
 func TestHttpVal_PopulateRequestHeaders(t *testing.T) {
-	assert := assert.New(t)
-
 	testCases := []struct {
 		name           string
 		httpValHeaders string
@@ -151,6 +147,6 @@ func TestHttpVal_PopulateRequestHeaders(t *testing.T) {
 
 		httpHeader := make(http.Header)
 		populateRequestHeaders(testCase.httpValHeaders, &httpHeader)
-		assert.Equal(testCase.wantHTTPHeader, httpHeader)
+		assert.Equal(t, testCase.wantHTTPHeader, httpHeader)
 	}
 }

@@ -13,8 +13,6 @@ import (
 )
 
 func TestRecordStepResponse(t *testing.T) {
-	assert := assert.New(t)
-
 	w := httptest.NewRecorder()
 	res := models.AsyncStepResponse{
 		ServiceRequestID: uuid.UUID{},
@@ -31,13 +29,11 @@ func TestRecordStepResponse(t *testing.T) {
 	var jsonResp models.ClampSuccessResponse
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
-	assert.Equal(http.StatusOK, w.Code)
-	assert.Equal("success", jsonResp.Message)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, "success", jsonResp.Message)
 }
 
 func TestShouldReturnBadRequestWhenRequestContainsInvalidDataForRecordStepResponse(t *testing.T) {
-	assert := assert.New(t)
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/stepResponse", nil)
 	testHTTRouter.ServeHTTP(w, req)
@@ -46,6 +42,6 @@ func TestShouldReturnBadRequestWhenRequestContainsInvalidDataForRecordStepRespon
 	var jsonResp models.ClampErrorResponse
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
-	assert.Equal(http.StatusBadRequest, w.Code)
-	assert.Equal("invalid request", jsonResp.Message)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, "invalid request", jsonResp.Message)
 }

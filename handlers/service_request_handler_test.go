@@ -43,36 +43,30 @@ func callGetServiceRequestStatus(serviceRequestID uuid.UUID) (*httptest.Response
 }
 
 func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
-	assert := assert.New(t)
-
 	w, bodyStr := callCreateServiceRequest(testWorkflowName)
-	assert.Equal(http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	var jsonResp models.ServiceRequest
 	err := json.Unmarshal([]byte(bodyStr), &jsonResp)
-	assert.NoError(err)
+	assert.NoError(t, err)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
-	assert.NotEqual(jsonResp.ID, uuid.Nil)
-	assert.Equal(models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+	assert.NotEqual(t, jsonResp.ID, uuid.Nil)
+	assert.Equal(t, models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
 func TestShouldCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) {
-	assert := assert.New(t)
-
 	w, bodyStr := callCreateServiceRequest(testTransformationWorkflow)
-	assert.Equal(http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	var jsonResp models.ServiceRequest
 	err := json.Unmarshal([]byte(bodyStr), &jsonResp)
-	assert.NoError(err)
+	assert.NoError(t, err)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
-	assert.NotEqual(jsonResp.ID, uuid.Nil)
-	assert.Equal(models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+	assert.NotEqual(t, jsonResp.ID, uuid.Nil)
+	assert.Equal(t, models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
 func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidData(t *testing.T) {
-	assert := assert.New(t)
-
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/serviceRequest/"+testWorkflowName, bytes.NewBuffer([]byte("bad payload")))
 	testHTTRouter.ServeHTTP(w, req)
@@ -80,53 +74,47 @@ func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidD
 	w, bodyStr := callCreateServiceRequest(testWorkflowName)
 	var jsonResp models.ServiceRequest
 	err := json.Unmarshal([]byte(bodyStr), &jsonResp)
-	assert.NoError(err)
+	assert.NoError(t, err)
 
-	assert.Equal(http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 	//	assert.Equal(t, workflowName, jsonResp.WorkflowName, fmt.Sprintf("The expected name was CreateOrder but we got %s", jsonResp.WorkflowName))
-	assert.NotEqual(jsonResp.ID, uuid.Nil)
-	assert.Equal(models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
+	assert.NotEqual(t, jsonResp.ID, uuid.Nil)
+	assert.Equal(t, models.StatusNew, jsonResp.Status, fmt.Sprintf("The expected status was NEW but we got %s", jsonResp.Status))
 }
 
 func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
-	assert := assert.New(t)
-
 	w, bodyStr := callCreateServiceRequest("InvalidWF")
-	assert.Equal(http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 
 	var jsonResp models.ClampErrorResponse
 	err := json.Unmarshal([]byte(bodyStr), &jsonResp)
-	assert.NoError(err)
+	assert.NoError(t, err)
 
-	assert.Equal(http.StatusBadRequest, jsonResp.Code)
-	assert.Equal("No record found with given workflow name : InvalidWF", jsonResp.Message)
+	assert.Equal(t, http.StatusBadRequest, jsonResp.Code)
+	assert.Equal(t, "No record found with given workflow name : InvalidWF", jsonResp.Message)
 }
 
 func TestShouldGetServiceRequestStatus(t *testing.T) {
-	assert := assert.New(t)
-
 	_, bodyStr := callCreateServiceRequest(testWorkflowName)
 	var serviceReq models.ServiceRequestResponse
 	err := json.Unmarshal([]byte(bodyStr), &serviceReq)
-	assert.NoError(err)
+	assert.NoError(t, err)
 
 	time.Sleep(time.Second) // gives time to complete service request
 
 	status, body := callGetServiceRequestStatus(serviceReq.ID)
-	assert.Equal(http.StatusOK, status.Code)
+	assert.Equal(t, http.StatusOK, status.Code)
 
 	var response models.ServiceRequestStatusResponse
 	err = json.Unmarshal([]byte(body), &response)
-	assert.NoError(err)
-	assert.Equal(models.StatusCompleted, response.Status)
-	assert.Equal(2, len(response.Steps))
+	assert.NoError(t, err)
+	assert.Equal(t, models.StatusCompleted, response.Status)
+	assert.Equal(t, 2, len(response.Steps))
 }
 
 func TestShouldFindServiceRequestByWorkflowNameByPage(t *testing.T) {
-	assert := assert.New(t)
-
 	w, _ := callCreateServiceRequest(testWorkflowName)
-	assert.Equal(http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusOK, w.Code)
 
 	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=1", nil)
 	w = httptest.NewRecorder()
@@ -135,16 +123,14 @@ func TestShouldFindServiceRequestByWorkflowNameByPage(t *testing.T) {
 	bodyStr := w.Body.String()
 	var jsonResp models.ServiceRequestPageResponse
 	err := json.Unmarshal([]byte(bodyStr), &jsonResp)
-	assert.NoError(err)
+	assert.NoError(t, err)
 
-	assert.Equal(http.StatusOK, w.Code)
-	assert.NotNil(jsonResp)
-	assert.NotNil(jsonResp.ServiceRequests)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.NotNil(t, jsonResp.ServiceRequests)
 }
 
 func TestShouldThrowErrorIfQueryParamsAreNotPassedInServiceRequestByWorkflowName(t *testing.T) {
-	assert := assert.New(t)
-
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/serviceRequests/%s?pageNumber=0", testWorkflowName), nil)
 	w := httptest.NewRecorder()
 	testHTTRouter.ServeHTTP(w, req)
@@ -153,14 +139,12 @@ func TestShouldThrowErrorIfQueryParamsAreNotPassedInServiceRequestByWorkflowName
 	var jsonResp models.ClampErrorResponse
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
-	assert.Equal(http.StatusBadRequest, w.Code)
-	assert.NotNil(jsonResp)
-	assert.Equal("page number or page size is not been defined", jsonResp.Message)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not been defined", jsonResp.Message)
 }
 
 func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInServiceRequestByWorkflowName(t *testing.T) {
-	assert := assert.New(t)
-
 	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=-1", nil)
 	w := httptest.NewRecorder()
 	testHTTRouter.ServeHTTP(w, req)
@@ -169,7 +153,7 @@ func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInServiceRequestByWorkflo
 	var jsonResp models.ClampErrorResponse
 	json.Unmarshal([]byte(bodyStr), &jsonResp)
 
-	assert.Equal(http.StatusBadRequest, w.Code)
-	assert.NotNil(jsonResp)
-	assert.Equal("page number or page size is not in proper format", jsonResp.Message)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.NotNil(t, jsonResp)
+	assert.Equal(t, "page number or page size is not in proper format", jsonResp.Message)
 }

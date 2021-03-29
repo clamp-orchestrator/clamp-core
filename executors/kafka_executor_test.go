@@ -11,8 +11,6 @@ import (
 )
 
 func TestKafkaVal_DoExecute(t *testing.T) {
-	assert := assert.New(t)
-
 	testKafkaConnectionURL := "localhost:61234"
 	testTopicName := "topic_test"
 	testMessageBody := make(map[string]interface{})
@@ -25,7 +23,7 @@ func TestKafkaVal_DoExecute(t *testing.T) {
 			ContentType:   "text/plain",
 		}
 		_, err := val.DoExecute(testMessageBody, "")
-		assert.Error(err)
+		assert.Error(t, err)
 	})
 
 	mockSyncProducer := mocks.NewSyncProducer(t, &sarama.Config{})
@@ -47,8 +45,8 @@ func TestKafkaVal_DoExecute(t *testing.T) {
 		})
 
 		_, err := val.DoExecute(testMessageBody, "")
-		assert.NoError(err)
-		assert.Equal(testMessageBody, message)
+		assert.NoError(t, err)
+		assert.Equal(t, testMessageBody, message)
 	})
 
 	t.Run("SendMessageFailure", func(t *testing.T) {
@@ -61,6 +59,6 @@ func TestKafkaVal_DoExecute(t *testing.T) {
 		mockSyncProducer.ExpectSendMessageAndFail(errors.New("internal error"))
 
 		_, err := val.DoExecute(testMessageBody, "")
-		assert.Error(err)
+		assert.Error(t, err)
 	})
 }
