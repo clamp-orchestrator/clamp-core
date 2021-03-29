@@ -62,7 +62,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: utils.StepTypeSync,
 				Val: &executors.HTTPVal{
 					Method: "POST",
-					URL:    "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+					URL:    testHTTPServer.URL,
 				},
 				Transform: false,
 				Enabled:   true,
@@ -90,7 +90,7 @@ func TestStep_DoExecute(t *testing.T) {
 				StepType: utils.StepTypeSync,
 				Val: &executors.HTTPVal{
 					Method: "POST",
-					URL:    "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+					URL:    testHTTPServer.URL,
 				},
 				Transform: false,
 				Enabled:   true,
