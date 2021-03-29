@@ -1,8 +1,6 @@
 package models
 
 import (
-	"clamp-core/repository"
-
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +8,6 @@ import (
 	"testing"
 )
 
-var mockDB repository.MockDB
 var testHTTPServer *httptest.Server
 
 func TestMain(m *testing.M) {
@@ -18,8 +15,6 @@ func TestMain(m *testing.M) {
 		httpResponseBody := map[string]interface{}{"id": "1234", "name": "ABC", "email": "abc@sahaj.com", "org": "sahaj"}
 		json.NewEncoder(w).Encode(httpResponseBody)
 	}))
-
-	repository.SetDB(&mockDB)
 
 	os.Exit(m.Run())
 }
