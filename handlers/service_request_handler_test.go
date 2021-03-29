@@ -115,7 +115,7 @@ func TestShouldGetServiceRequestStatus(t *testing.T) {
 	err := json.Unmarshal([]byte(bodyStr), &serviceReq)
 	assert.NoError(err)
 
-	time.Sleep(time.Millisecond) // gives time to complete service request
+	time.Sleep(time.Second) // gives time to complete service request
 
 	status, body := callGetServiceRequestStatus(serviceReq.ID)
 	assert.Equal(http.StatusOK, status.Code)

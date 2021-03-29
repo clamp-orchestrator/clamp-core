@@ -27,7 +27,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -85,7 +85,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 			},
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -141,7 +141,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 			When:      "skipStep.request.id1 == 'val3'",
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -198,7 +198,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -211,7 +211,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}

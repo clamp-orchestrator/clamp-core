@@ -44,7 +44,7 @@ func TestShouldAddSuccessResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -136,7 +136,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
