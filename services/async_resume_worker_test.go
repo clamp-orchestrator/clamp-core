@@ -4,6 +4,7 @@ import (
 	"clamp-core/executors"
 	"clamp-core/models"
 	"clamp-core/utils"
+	"net/http"
 	"testing"
 	"time"
 
@@ -163,7 +164,7 @@ func TestShouldAddFailureResponseFromAsyncStepResponseToChannel(t *testing.T) {
 					StepID:           1,
 					Response:         prepareResponsePayload(),
 					Error: models.ClampErrorResponse{
-						Code:    400,
+						Code:    http.StatusBadRequest,
 						Message: "Failed to process due to internal failure",
 					},
 				},
