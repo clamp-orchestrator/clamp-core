@@ -59,7 +59,6 @@ func setUpWorkflowRequest() models.Workflow {
 
 func TestCreateNewWorkflowRequestRoute(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	workflowReg := setUpWorkflowRequest()
 	w := httptest.NewRecorder()
@@ -83,7 +82,6 @@ func TestCreateNewWorkflowRequestRoute(t *testing.T) {
 
 func TestShouldThrowErrorIfNameFieldsIsNotPresent(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Name = ""
@@ -104,7 +102,6 @@ func TestShouldThrowErrorIfNameFieldsIsNotPresent(t *testing.T) {
 
 func TestShouldThrowErrorIfStepsAreNotPresent(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Steps = nil
@@ -139,7 +136,6 @@ func TestShouldThrowErrorIfStepsAreNotPresent(t *testing.T) {
 
 func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Steps[0].Name = ""
@@ -162,7 +158,6 @@ func TestShouldThrowErrorIfStepRequiredFieldsAreNotPresent(t *testing.T) {
 
 func TestShouldReturnCreatedWorkflowSuccessfullyByWorkflowNameRoute(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	workflowReg := setUpWorkflowRequest()
 	w := httptest.NewRecorder()
@@ -182,7 +177,6 @@ func TestShouldReturnCreatedWorkflowSuccessfullyByWorkflowNameRoute(t *testing.T
 
 func TestShouldFailToReturnWorkflowIfInvalidWorkflowNameIsProvidedInTheRoute(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/workflow/"+"dummy", nil)
@@ -200,7 +194,6 @@ func TestShouldFailToReturnWorkflowIfInvalidWorkflowNameIsProvidedInTheRoute(t *
 
 func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	workflowReg := setUpWorkflowRequest()
 	workflowReg.Name = testWorkflowName
@@ -221,7 +214,6 @@ func TestCreateNewWorkflowRequestShouldFailIfWorkflowNameAlreadyExistsRoute(t *t
 
 func TestShouldGetAllWorkflowsByPage(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 
@@ -240,7 +232,6 @@ func TestShouldGetAllWorkflowsByPage(t *testing.T) {
 
 func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1", nil)
@@ -257,7 +248,6 @@ func TestShouldThrowErrorIfQueryParamsAreNotPassedInGetAllWorkflows(t *testing.T
 
 func TestShouldThrowErrorIfPageNumberIsLessThanOne(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 
@@ -275,7 +265,6 @@ func TestShouldThrowErrorIfPageNumberIsLessThanOne(t *testing.T) {
 
 func TestShouldThrowErrorIfPageSizeIsLessThanOne(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=0", nil)
@@ -292,7 +281,6 @@ func TestShouldThrowErrorIfPageSizeIsLessThanOne(t *testing.T) {
 
 func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/workflows?pageNumber=1&pageSize=-1", nil)
@@ -309,7 +297,6 @@ func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInGetAllWorkflows(t *test
 
 func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	sortByString := `id,`
@@ -328,7 +315,6 @@ func TestShouldThrowErrorIfSortByStringIsNotInTheRightFormat(t *testing.T) {
 
 func TestShouldThrowErrorIfSortContainsInvalidFields(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	sortByString := `updatedate:ASC`

@@ -44,7 +44,6 @@ func callGetServiceRequestStatus(serviceRequestID uuid.UUID) (*httptest.Response
 
 func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w, bodyStr := callCreateServiceRequest(testWorkflowName)
 	assert.Equal(http.StatusOK, w.Code)
@@ -59,7 +58,6 @@ func TestShouldCreateNewServiceRequestRoute(t *testing.T) {
 
 func TestShouldCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w, bodyStr := callCreateServiceRequest(testTransformationWorkflow)
 	assert.Equal(http.StatusOK, w.Code)
@@ -74,7 +72,6 @@ func TestShouldCreateNewServiceRequestRouteWithTransformationStep(t *testing.T) 
 
 func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidData(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/serviceRequest/"+testWorkflowName, bytes.NewBuffer([]byte("bad payload")))
@@ -93,7 +90,6 @@ func TestShouldNotCreateNewServiceRequestRouteWhenServiceRequestContainsInvalidD
 
 func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w, bodyStr := callCreateServiceRequest("InvalidWF")
 	assert.Equal(http.StatusBadRequest, w.Code)
@@ -108,7 +104,6 @@ func TestShouldNotCreateServiceRequestForInvalidWorkflowName(t *testing.T) {
 
 func TestShouldGetServiceRequestStatus(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	_, bodyStr := callCreateServiceRequest(testWorkflowName)
 	var serviceReq models.ServiceRequestResponse
@@ -129,7 +124,6 @@ func TestShouldGetServiceRequestStatus(t *testing.T) {
 
 func TestShouldFindServiceRequestByWorkflowNameByPage(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w, _ := callCreateServiceRequest(testWorkflowName)
 	assert.Equal(http.StatusOK, w.Code)
@@ -150,7 +144,6 @@ func TestShouldFindServiceRequestByWorkflowNameByPage(t *testing.T) {
 
 func TestShouldThrowErrorIfQueryParamsAreNotPassedInServiceRequestByWorkflowName(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/serviceRequests/%s?pageNumber=0", testWorkflowName), nil)
 	w := httptest.NewRecorder()
@@ -167,7 +160,6 @@ func TestShouldThrowErrorIfQueryParamsAreNotPassedInServiceRequestByWorkflowName
 
 func TestShouldThrowErrorIfQueryParamsAreNotValidValuesInServiceRequestByWorkflowName(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	req, _ := http.NewRequest("GET", "/serviceRequests/testWorkflow?pageNumber=0&pageSize=-1", nil)
 	w := httptest.NewRecorder()

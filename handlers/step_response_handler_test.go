@@ -14,7 +14,6 @@ import (
 
 func TestRecordStepResponse(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	res := models.AsyncStepResponse{
@@ -38,7 +37,6 @@ func TestRecordStepResponse(t *testing.T) {
 
 func TestShouldReturnBadRequestWhenRequestContainsInvalidDataForRecordStepResponse(t *testing.T) {
 	assert := assert.New(t)
-	setUpFixture()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/stepResponse", nil)
