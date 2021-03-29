@@ -62,7 +62,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
 		})
@@ -120,7 +120,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
 		})
@@ -177,7 +177,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 3, len(functionCalledStack))
 		})
@@ -257,7 +257,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			AddServiceRequestToChannel(&tt.args.serviceReq)
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 5)
 			assert.Equal(t, 0, len(serviceRequestChannel))
 			assert.Equal(t, 4, len(functionCalledStack))
 		})
