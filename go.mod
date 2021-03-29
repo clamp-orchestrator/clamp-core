@@ -3,6 +3,7 @@ module clamp-core
 go 1.14
 
 require (
+	github.com/NeowayLabs/wabbit v0.0.0-20201021105516-ded4a9ef19d2 // indirect
 	github.com/Shopify/sarama v1.26.4
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/antonmedv/expr v1.8.8
@@ -17,6 +18,7 @@ require (
 	github.com/kr/pty v1.1.5 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
+	github.com/pborman/uuid v1.2.1 // indirect
 	github.com/prometheus/client_golang v1.7.1
 	github.com/qntfy/jsonparser v1.0.2 // indirect
 	github.com/qntfy/kazaam v3.4.8+incompatible

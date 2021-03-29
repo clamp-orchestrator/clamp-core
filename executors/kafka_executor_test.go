@@ -1,69 +1,64 @@
 package executors
 
 import (
-	"clamp-core/config"
+	"encoding/json"
+	"errors"
 	"testing"
+
+	"github.com/Shopify/sarama"
+	"github.com/Shopify/sarama/mocks"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestKafkaVal_DoExecute(t *testing.T) {
-	type fields struct {
-		ConnectionURL string
-		TopicName     string
-		ContentType   string
-		ReplyTo       string
+	testKafkaConnectionURL := "localhost:61234"
+	testTopicName := "topic_test"
+	testMessageBody := make(map[string]interface{})
+	testMessageBody["payload"] = "data"
+
+	t.Run("ErrorOnConnectionFailure", func(t *testing.T) {
+		val := KafkaVal{
+			ConnectionURL: testKafkaConnectionURL,
+			TopicName:     testTopicName,
+			ContentType:   "text/plain",
+		}
+		_, err := val.DoExecute(testMessageBody, "")
+		assert.Error(t, err)
+	})
+
+	mockSyncProducer := mocks.NewSyncProducer(t, &sarama.Config{})
+	newSyncProducerFunc = func(_ []string, config *sarama.Config) (sarama.SyncProducer, error) {
+		return mockSyncProducer, nil
 	}
-	type args struct {
-		requestBody interface{}
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    interface{}
-		wantErr bool
-	}{
-		{
-			name: "should return error if connection fails",
-			fields: fields{
-				ConnectionURL: "localhost:19092/",
-				TopicName:     "topic_test",
-				ContentType:   "text/plain",
-			},
-			args: args{
-				requestBody: "message body",
-			},
-			want:    nil,
-			wantErr: true,
-		},
-		{
-			name: "should publish message to kafka topic",
-			fields: fields{
-				ConnectionURL: config.ENV.KafkaConnectionStr,
-				TopicName:     config.ENV.KafkaTopicName,
-				ContentType:   "text/plain",
-			},
-			args: args{
-				requestBody: "message body",
-			},
-			want:    nil,
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			val := KafkaVal{
-				ConnectionURL: tt.fields.ConnectionURL,
-				TopicName:     tt.fields.TopicName,
-				ContentType:   tt.fields.ContentType,
-			}
-			got, err := val.DoExecute(tt.args.requestBody, "")
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DoExecute() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != nil {
-				t.Errorf("DoExecute() got = %v, want %v", got, tt.want)
-			}
+
+	t.Run("SuccessfulSendMessage", func(t *testing.T) {
+		val := KafkaVal{
+			ConnectionURL: testKafkaConnectionURL,
+			TopicName:     testTopicName,
+			ContentType:   "text/plain",
+		}
+
+		message := make(map[string]interface{})
+		mockSyncProducer.ExpectSendMessageWithCheckerFunctionAndSucceed(func(msg []byte) error {
+			json.Unmarshal(msg, &message)
+			return nil
 		})
-	}
+
+		_, err := val.DoExecute(testMessageBody, "")
+		assert.NoError(t, err)
+		assert.Equal(t, testMessageBody, message)
+	})
+
+	t.Run("SendMessageFailure", func(t *testing.T) {
+		val := KafkaVal{
+			ConnectionURL: testKafkaConnectionURL,
+			TopicName:     testTopicName,
+			ContentType:   "text/plain",
+		}
+
+		mockSyncProducer.ExpectSendMessageAndFail(errors.New("internal error"))
+
+		_, err := val.DoExecute(testMessageBody, "")
+		assert.Error(t, err)
+	})
 }

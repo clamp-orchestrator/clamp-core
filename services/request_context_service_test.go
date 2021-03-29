@@ -61,7 +61,7 @@ func TestShouldEnhanceRequestContext(t *testing.T) {
 	}, &models.ServiceRequest{
 		ID: uuid.New(),
 	})
-	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
+	mockDB.FindStepStatusByServiceRequestIDAndStatusMockFunc = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 		stepsStatus := make([]*models.StepsStatus, 2)
 		stepsStatus[0] = &models.StepsStatus{}
 		stepsStatus[0].StepName = "step1"

@@ -16,7 +16,7 @@ const workflowName string = "testWF"
 
 func TestAddServiceRequestToChannel(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -27,7 +27,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 			Enabled:   false,
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -35,7 +35,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
@@ -71,7 +71,7 @@ func TestAddServiceRequestToChannel(t *testing.T) {
 
 func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTheWorkflow(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -85,7 +85,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 			},
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -93,7 +93,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
@@ -129,7 +129,7 @@ func TestShouldAddServiceRequestToChannelWithTransformationEnabledForOneStepInTh
 
 func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -141,7 +141,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 			When:      "skipStep.request.id1 == 'val3'",
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -149,7 +149,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
@@ -186,7 +186,7 @@ func TestShouldSkipStepIfConditionDoesNotMatch(t *testing.T) {
 
 func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 	var functionCalledStack []string
-	findWorkflowByNameMock = func(workflowName string) (workflow *models.Workflow, err error) {
+	mockDB.FindWorkflowByNameMockFunc = func(workflowName string) (workflow *models.Workflow, err error) {
 		workflow = &models.Workflow{}
 		workflow.ID = "TEST_WF"
 		step := models.Step{
@@ -198,7 +198,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -211,7 +211,7 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 			When:      "firstStep.request.id1 == 'val1'",
 			Val: &executors.HTTPVal{
 				Method:  "POST",
-				URL:     "https://run.mocky.io/v3/0590fbf8-0f1c-401c-b9df-65e98ef0385d",
+				URL:     "https://non-existent-url.com",
 				Headers: "",
 			},
 		}
@@ -219,12 +219,12 @@ func TestShouldResumeTheWorkflowExecutionFromNextStep(t *testing.T) {
 		functionCalledStack = append(functionCalledStack, "findWorkflowByName")
 		return workflow, err
 	}
-	saveStepStatusMock = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
+	mockDB.SaveStepStatusMockFunc = func(stepStatus *models.StepsStatus) (status *models.StepsStatus, err error) {
 		functionCalledStack = append(functionCalledStack, "saveStepStatusMock")
 		status = &models.StepsStatus{}
 		return status, nil
 	}
-	findStepStatusByServiceRequestIDAndStatusMock = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
+	mockDB.FindStepStatusByServiceRequestIDAndStatusMockFunc = func(serviceRequestId uuid.UUID, status models.Status) ([]*models.StepsStatus, error) {
 		functionCalledStack = append(functionCalledStack, "findStepStatusByServiceRequestIdAndStatus")
 		stepsStatus := make([]*models.StepsStatus, 1)
 		stepsStatus[0] = &models.StepsStatus{}
