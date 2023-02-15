@@ -17,11 +17,11 @@ require (
 	github.com/kr/pty v1.1.5 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
-	github.com/prometheus/client_golang v1.7.1
+	github.com/prometheus/client_golang v1.11.1
 	github.com/qntfy/jsonparser v1.0.2 // indirect
 	github.com/qntfy/kazaam v3.4.8+incompatible
 	github.com/robinjoseph08/go-pg-migrations/v2 v2.1.0
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.6.1
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
@@ -29,5 +29,4 @@ require (
 	github.com/swaggo/swag v1.6.8
 	golang.org/x/net v0.0.0-20201016165138-7b1cca2348c0 // indirect
 	golang.org/x/tools v0.0.0-20201016155721-7c89c52d2f52 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
