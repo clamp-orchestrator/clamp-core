@@ -21,13 +21,13 @@ require (
 	github.com/qntfy/jsonparser v1.0.2 // indirect
 	github.com/qntfy/kazaam v3.4.8+incompatible
 	github.com/robinjoseph08/go-pg-migrations/v2 v2.1.0
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.8.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.6.1
 	github.com/swaggo/files v0.0.0-20190704085106-630677cd5c14
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.8
-	golang.org/x/net v0.0.0-20201016165138-7b1cca2348c0 // indirect
-	golang.org/x/tools v0.0.0-20201016155721-7c89c52d2f52 // indirect
+	golang.org/x/net v0.7.0 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
